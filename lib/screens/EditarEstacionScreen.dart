@@ -6,8 +6,23 @@ import 'package:http/http.dart' as http;
 class EditarEstacionScreen extends StatefulWidget {
   // EditarEstacionScreen();
   final int estacionId;
+  final String coordenada;
+  final double dirVelViento;
+  final double pcpn;
+  final double taevap;
+  final double tempAmb;
+  final double tempMax;
+  final double tempMin;
 
-  EditarEstacionScreen({required this.estacionId});
+  EditarEstacionScreen(
+      {required this.estacionId,
+      required this.coordenada,
+      required this.dirVelViento,
+      required this.pcpn,
+      required this.taevap,
+      required this.tempAmb,
+      required this.tempMax,
+      required this.tempMin});
 
   @override
   _EditarEstacionScreenState createState() => _EditarEstacionScreenState();
@@ -16,13 +31,23 @@ class EditarEstacionScreen extends StatefulWidget {
 class _EditarEstacionScreenState extends State<EditarEstacionScreen> {
   TextEditingController coordenada = TextEditingController();
   TextEditingController dirVelViento = TextEditingController();
-  TextEditingController fechaDatos = TextEditingController();
   TextEditingController pcpn = TextEditingController();
   TextEditingController taevap = TextEditingController();
   TextEditingController tempAmb = TextEditingController();
   TextEditingController tempMax = TextEditingController();
   TextEditingController tempMin = TextEditingController();
-  // Agrega controladores para otros campos según sea necesario
+
+  @override
+  void initState() {
+    super.initState();
+    coordenada.text = widget.coordenada.toString();
+    dirVelViento.text = widget.dirVelViento.toString();
+    pcpn.text = widget.pcpn.toString();
+    taevap.text = widget.taevap.toString();
+    tempAmb.text = widget.tempAmb.toString();
+    tempMax.text = widget.tempMax.toString();
+    tempMin.text = widget.tempMin.toString();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,10 +69,6 @@ class _EditarEstacionScreenState extends State<EditarEstacionScreen> {
               decoration: InputDecoration(labelText: 'dirVelViento'),
             ),
             TextFormField(
-              controller: fechaDatos,
-              decoration: InputDecoration(labelText: 'fechaDatos'),
-            ),
-            TextFormField(
               controller: pcpn,
               decoration: InputDecoration(labelText: 'pcpn'),
             ),
@@ -65,7 +86,8 @@ class _EditarEstacionScreenState extends State<EditarEstacionScreen> {
             ),
             TextFormField(
               controller: tempMin,
-              decoration: InputDecoration(labelText: 'tempMin'),
+              decoration: InputDecoration(labelText: 'Temperatura Mínima'),
+              // Puedes establecer un valor inicial si lo deseas
             ),
             // Agrega más TextFormField para otros campos según sea necesario
             SizedBox(height: 20),
@@ -89,7 +111,6 @@ class _EditarEstacionScreenState extends State<EditarEstacionScreen> {
     Map<String, dynamic> datosActualizados = {
       "coordenada": coordenada.text,
       "dirVelViento": dirVelViento.text,
-      "fechaDatos": fechaDatos.text,
       "pcpn": pcpn.text,
       "taevap": taevap.text,
       "tempAmb": tempAmb.text,

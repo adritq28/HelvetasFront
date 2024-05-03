@@ -18,15 +18,6 @@ class _ListaEstacionScreenState extends State<ListaEstacionScreen> {
 
   late EstacionService miModelo4; // Futuro de la lista de personas
 
-  // @override
-  // void initState() {
-  //   //miModelo.getDatosEstacion();
-  //   //cargarDatos();
-  //   super.initState();
-  //   _futureDatosEstacion = _datosService2.getDatosEstacion2(); // Obtiene la lista de personas al iniciar el estado
-  //   miModelo4 = Provider.of<EstacionService>(context, listen: false);
-  //   cargarDatos();
-  // }
   late List<DatosEstacion> _datosEstacion = [];
   @override
   void initState() {
@@ -47,18 +38,6 @@ class _ListaEstacionScreenState extends State<ListaEstacionScreen> {
       print('Error al cargar los datos: $e');
     }
   }
-  //var miModelo;
-
-  // Future<void> cargarDatos() async {
-  //   // miModelo = Provider.of<EstacionService>(context);
-  //   await miModelo4.getDatosEstacion();
-  //   List<DatosEstacion> a = miModelo4
-  //       .lista11; // Suponiendo que tienes un método para cargar los datos en tu modelo
-  //   setState(() {});
-  //   print('aaaaooooo ' +
-  //       a.length
-  //           .toString()); //Actualiza el estado para que los cambios se reflejen en la interfaz
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -117,6 +96,7 @@ class _ListaEstacionScreenState extends State<ListaEstacionScreen> {
                     DataCell(
                       Row(
                         children: [
+                          //editar
                           IconButton(
                             icon: Icon(Icons.edit),
                             onPressed: () {
@@ -124,17 +104,50 @@ class _ListaEstacionScreenState extends State<ListaEstacionScreen> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) =>
-                                      EditarEstacionScreen(estacionId: dato.id),
+                                  builder: (context) => EditarEstacionScreen(
+                                    estacionId: dato.id,
+                                    coordenada: dato.coordenada,
+                                    dirVelViento: dato.dirVelViento,
+                                    pcpn: dato.pcpn,
+                                    taevap: dato.taevap,
+                                    tempAmb: dato.tempAmb,
+                                    tempMax: dato.tempMax,
+                                    tempMin: dato.tempMin,
+                                  ),
                                 ),
                               );
                             },
                           ),
+                          //eliminar
                           IconButton(
                             icon: Icon(Icons.delete),
                             onPressed: () {
-                              // Acción para eliminar el registro
-                              // Puedes mostrar un diálogo de confirmación antes de eliminar
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: Text("Eliminar estación"),
+                                    content: Text(
+                                        "¿Estás seguro de que quieres eliminar esta estación?"),
+                                    actions: <Widget>[
+                                      TextButton(
+                                        child: Text("Cancelar"),
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                      ),
+                                      TextButton(
+                                        child: Text("Eliminar"),
+                                        onPressed: () async {
+                                          await _datosService2.eliminarEstacion(dato.id);
+                                          Navigator.of(context).pop();
+                                          _cargarDatosEstacion();
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
                             },
                           ),
                         ],

@@ -83,4 +83,17 @@ class EstacionService extends ChangeNotifier {
       throw Exception('Error: $e');
     }
   }
+
+  Future<void> eliminarEstacion(int id) async {
+    print('Dsddddddddddddddddde');
+  final response = await http.delete(Uri.parse('http://localhost:8080/datosEstacion/$id'));
+  if (response.statusCode == 200) {
+    // La estación se eliminó exitosamente
+    // Puedes realizar alguna acción adicional si es necesario
+    print('Datos Estacion eliminada correctamente');
+  } else {
+    // Ocurrió un error al intentar eliminar la estación
+    throw Exception('Error al eliminar la estación');
+  }
+}
 }
