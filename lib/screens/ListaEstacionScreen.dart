@@ -68,7 +68,7 @@ class _ListaEstacionScreenState extends State<ListaEstacionScreen> {
               scrollDirection: Axis.horizontal,
               child: DataTable(
                 columnSpacing: 20,
-                columns: [
+                columns: const [
                   DataColumn(label: Text('ID')),
                   DataColumn(label: Text('Coordenada')),
                   DataColumn(label: Text('dirVelViento')),
