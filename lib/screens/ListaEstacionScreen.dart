@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:helvetasfront/model/DatosEstacion.dart';
 import 'package:helvetasfront/screens/EditarEstacionScreen.dart';
-import 'package:helvetasfront/screens/GraficaScreen.dart';
 import 'package:helvetasfront/services/EstacionService.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class ListaEstacionScreen extends StatefulWidget {
@@ -70,28 +68,30 @@ class _ListaEstacionScreenState extends State<ListaEstacionScreen> {
                 columnSpacing: 20,
                 columns: const [
                   DataColumn(label: Text('ID')),
-                  DataColumn(label: Text('Coordenada')),
-                  DataColumn(label: Text('dirVelViento')),
-                  DataColumn(label: Text('fechaDatos')),
-                  DataColumn(label: Text('pcpn')),
-                  DataColumn(label: Text('taevap')),
-                  DataColumn(label: Text('tempAmb')),
                   DataColumn(label: Text('tempMax')),
                   DataColumn(label: Text('tempMin')),
+                  DataColumn(label: Text('tempAmb')),
+                  DataColumn(label: Text('pcpn')),
+                  DataColumn(label: Text('taevap')),
+                  DataColumn(label: Text('dirViento')),
+                  DataColumn(label: Text('velViento')),
+                  DataColumn(label: Text('idEstacion')),
                   DataColumn(label: Text('Acciones')),
                 ],
                 rows: miModelo4.lista11.map((dato) {
                   // Usamos la lista directamente del modelo
                   return DataRow(cells: [
                     DataCell(Text(dato.id.toString())),
-                    DataCell(Text(dato.coordenada)),
-                    DataCell(Text(dato.dirVelViento.toString())),
-                    DataCell(Text(dato.fechaDatos.toString().split(' ')[0])),
-                    DataCell(Text(dato.pcpn.toString())),
-                    DataCell(Text(dato.taevap.toString())),
-                    DataCell(Text(dato.tempAmb.toString())),
                     DataCell(Text(dato.tempMax.toString())),
                     DataCell(Text(dato.tempMin.toString())),
+                    DataCell(Text(dato.tempAmb.toString())),
+                    DataCell(Text(dato.pcpn.toString())),
+                    DataCell(Text(dato.taevap.toString())),
+                    DataCell(Text(dato.dirViento)),
+                    DataCell(Text(dato.velViento.toString())),
+                    DataCell(Text(dato.idEstacion.toString())),
+                    
+                    
                     // Agrega más celdas según tus necesidades
                     DataCell(
                       Row(
@@ -106,13 +106,14 @@ class _ListaEstacionScreenState extends State<ListaEstacionScreen> {
                                 MaterialPageRoute(
                                   builder: (context) => EditarEstacionScreen(
                                     estacionId: dato.id,
-                                    coordenada: dato.coordenada,
-                                    dirVelViento: dato.dirVelViento,
-                                    pcpn: dato.pcpn,
-                                    taevap: dato.taevap,
-                                    tempAmb: dato.tempAmb,
                                     tempMax: dato.tempMax,
                                     tempMin: dato.tempMin,
+                                    tempAmb: dato.tempAmb,
+                                    pcpn: dato.pcpn,
+                                    taevap: dato.taevap,
+                                    dirViento: dato.dirViento,
+                                    velViento: dato.velViento,
+                                    idEstacion: dato.idEstacion,
                                   ),
                                 ),
                               );
@@ -186,28 +187,17 @@ class _ListaEstacionScreenState extends State<ListaEstacionScreen> {
   }
 
   final _formKey = GlobalKey<FormState>();
-  late String _coordenada;
-  late double _dirVelViento;
-  late DateTime _fechaDatos = DateTime.now();
-  late double _pcpn;
-  late double _taevap;
-  late double _tempAmb;
   late double _tempMax;
   late double _tempMin;
+  late double _tempAmb;
+  late double _pcpn;
+  late double _taevap;
+  late String _dirViento;
+  late double _velViento;
+  late int _idEstacion;
+  
+  
 
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? pickedDate = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(1900),
-      lastDate: DateTime.now(),
-    );
-    if (pickedDate != null && pickedDate != _fechaDatos) {
-      setState(() {
-        _fechaDatos = pickedDate;
-      });
-    }
-  }
 
 //clave de acceso
   Widget formDatosEstacion() {
@@ -215,96 +205,7 @@ class _ListaEstacionScreenState extends State<ListaEstacionScreen> {
       key: _formKey,
       child: Column(
         children: <Widget>[
-          Row(
-            children: [
-              Expanded(
-                child: MyTextField(
-                  labelText: 'Coordenada 1',
-                  hintText: 'Coordenada 1',
-                  prefixIcon: Icons.person,
-                  onSaved: (value) {
-                    _coordenada = value!;
-                  },
-                ),
-              ),
-              const SizedBox(width: 10), // Espacio entre los campos
-              Expanded(
-                child: MyTextField(
-                  labelText: 'Dir Vel Viento',
-                  hintText: 'Dir Vel Viento',
-                  prefixIcon: Icons.person,
-                  onSaved: (value) {
-                    _dirVelViento = double.tryParse(value ?? '0') ?? 0.0;
-                  },
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          Row(
-            children: [
-              Expanded(
-                child: TextFormField(
-                  readOnly: true,
-                  controller: TextEditingController(
-                    text: _fechaDatos == null
-                        ? ''
-                        : DateFormat('yyyy-MM-dd').format(_fechaDatos!),
-                  ),
-                  onTap: () => _selectDate(context),
-                  decoration: const InputDecoration(
-                    labelText: 'Fecha',
-                    hintText: 'Seleccionar fecha',
-                    suffixIcon: Icon(Icons.calendar_today),
-                    border: OutlineInputBorder(),
-                  ),
-                  onSaved: (value) {
-                    // No necesitas hacer nada aquí para el campo de fecha
-                    // El valor de la fecha ya está almacenado en _fechaDatos
-                  },
-                ),
-              ),
-              const SizedBox(width: 10), // Espacio entre los campos
-              Expanded(
-                child: MyTextField(
-                  labelText: 'Precipitacion',
-                  hintText: 'Precipitacion',
-                  prefixIcon: Icons.person,
-                  onSaved: (value) {
-                    _pcpn = double.tryParse(value ?? '0') ?? 0.0;
-                  },
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          Row(
-            children: [
-              Expanded(
-                child: MyTextField(
-                  labelText: 'Tasa de evaporacion',
-                  hintText: 'Tasa de evaporacion',
-                  prefixIcon: Icons.person,
-                  onSaved: (value) {
-                    _taevap = double.tryParse(value ?? '0') ?? 0.0;
-                  },
-                ),
-              ),
-              const SizedBox(width: 10), // Espacio entre los campos
-              Expanded(
-                child: MyTextField(
-                  labelText: 'Temperatura ambiente',
-                  hintText: 'Temperatura ambiente',
-                  prefixIcon: Icons.person,
-                  onSaved: (value) {
-                    _tempAmb = double.tryParse(value ?? '0') ?? 0.0;
-                  },
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          Row(
+           Row(
             children: [
               Expanded(
                 child: MyTextField(
@@ -329,6 +230,83 @@ class _ListaEstacionScreenState extends State<ListaEstacionScreen> {
               ),
             ],
           ),
+          Row(
+            children: [
+              const SizedBox(width: 10), // Espacio entre los campos
+              Expanded(
+                child: MyTextField(
+                  labelText: 'Temperatura ambiente',
+                  hintText: 'Temperatura ambiente',
+                  prefixIcon: Icons.person,
+                  onSaved: (value) {
+                    _tempAmb = double.tryParse(value ?? '0') ?? 0.0;
+                  },
+                ),
+              ),
+              const SizedBox(width: 10), // Espacio entre los campos
+              Expanded(
+                child: MyTextField(
+                  labelText: 'Precipitacion',
+                  hintText: 'Precipitacion',
+                  prefixIcon: Icons.person,
+                  onSaved: (value) {
+                    _pcpn = double.tryParse(value ?? '0') ?? 0.0;
+                  },
+                ),
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: MyTextField(
+                  labelText: 'Tasa de evaporacion',
+                  hintText: 'Tasa de evaporacion',
+                  prefixIcon: Icons.person,
+                  onSaved: (value) {
+                    _taevap = double.tryParse(value ?? '0') ?? 0.0;
+                  },
+                ),
+              ),
+              const SizedBox(width: 10), // Espacio entre los campos
+              Expanded(
+                child: MyTextField(
+                  labelText: 'Dir Viento',
+                  hintText: 'Dir Viento',
+                  prefixIcon: Icons.person,
+                  onSaved: (value) {
+                    _dirViento = value!;
+                  },
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              Expanded(
+                child: MyTextField(
+                  labelText: 'Vel Viento',
+                  hintText: 'Vel Viento',
+                  prefixIcon: Icons.person,
+                  onSaved: (value) {
+                    _velViento = double.tryParse(value ?? '0') ?? 0.0;
+                  },
+                ),
+              ),
+              Expanded(
+                child: MyTextField(
+                  labelText: 'Vel Viento',
+                  hintText: 'Vel Viento',
+                  prefixIcon: Icons.person,
+                  onSaved: (value) {
+                    _idEstacion= int.tryParse(value ?? '0') ?? 0;;
+                  },
+                ),
+              ),
+            ],
+          ),
+      
           SizedBox(height: 20),
           ElevatedButton(
             onPressed: () {
@@ -336,14 +314,15 @@ class _ListaEstacionScreenState extends State<ListaEstacionScreen> {
                 _formKey.currentState!.save();
                 DatosEstacion nuevoDato = DatosEstacion(
                   id: 0,
-                  coordenada: _coordenada,
-                  dirVelViento: _dirVelViento,
-                  fechaDatos: _fechaDatos,
-                  pcpn: _pcpn,
-                  taevap: _taevap,
-                  tempAmb: _tempAmb,
                   tempMax: _tempMax,
                   tempMin: _tempMin,
+                  tempAmb: _tempAmb,
+                  pcpn: _pcpn,
+                  taevap: _taevap,
+                  dirViento: _dirViento,
+                  velViento: _velViento,
+                  idEstacion: _idEstacion,
+                  
                 );
                 print(nuevoDato.toStringDatosEstacion());
 
@@ -371,21 +350,12 @@ class _ListaEstacionScreenState extends State<ListaEstacionScreen> {
               ),
             ),
           ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => GraficaScreen()));
-            },
-            child: const Text('Ir a la grafica'),
-          ),
           // ElevatedButton(
           //   onPressed: () {
-          //     Navigator.push(
-          //         context,
-          //         MaterialPageRoute(
-          //             builder: (context) => EditarEstacionScreen()));
+          //     Navigator.push(context,
+          //         MaterialPageRoute(builder: (context) => GraficaScreen()));
           //   },
-          //   child: const Text('Editar'),
+          //   child: const Text('Ir a la grafica'),
           // ),
         ],
       ),

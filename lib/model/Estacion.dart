@@ -1,55 +1,64 @@
 class Estacion {
   final int id;
   final String nombre;
+  final String latitud;
+  final String longitud;
+  final String altura;
   final bool estado;
   final String tipoEstacion;
-  final String coordenadas;
-  final String imagen;
-  final int idDatosEstacion;
-  final int idObservador;
   final int idMunicipio;
 
   Estacion(
-    {required this.id,
-    required this.nombre,
-    required this.estado,
-    required this.tipoEstacion,
-    required this.coordenadas,
-    required this.imagen,
-    required this.idDatosEstacion,
-    required this.idObservador,
-    required this.idMunicipio});
+      {required this.id,
+      required this.nombre,
+      required this.latitud,
+      required this.longitud,
+      required this.altura,
+      required this.estado,
+      required this.tipoEstacion,
+      required this.idMunicipio});
 
-
-    factory Estacion.fromJson(Map<String, dynamic> json) {
+  factory Estacion.fromJson(Map<String, dynamic> json) {
     return Estacion(
       id: json['idEstacion'],
       nombre: json['nombre'],
+      latitud: json['latitud'],
+      longitud: json['longitud'],
+      altura: json['altura'],
       estado: json['estado'],
       tipoEstacion: json['tipoEstacion'],
-      coordenadas: json['coordenadas'],
-      imagen: json['imagen'],
-      idDatosEstacion: json['idDatosEstacion'],
-      idObservador: json['idObservador'],
       idMunicipio: json['idMunicipio'],
     );
   }
 
-    Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toJson() => {
         'idEstacion': id,
         'nombre': nombre,
+        'latitud': latitud,
+        'longitud': longitud,
+        'altura': altura,
         'estado': estado,
         'tipoEstacion': tipoEstacion,
-        'coordenadas': coordenadas,
-        'imagen': imagen,
-        'idDatosEstacion': idDatosEstacion,
-        'idObservador': idObservador,
         'idMunicipio': idMunicipio,
       };
 
   String toStringEstacion() {
-    return "Estacion [idEstacion=" + id.toString() + ", nombre=" + nombre + ", estado=" + estado.toString()
-                + ", tipoEstacion=" + tipoEstacion + ", coordenadas=" + coordenadas + ", imagen=" + imagen + ", idDatosEstacion=" + idDatosEstacion.toString() +
-                ", idObservador=" + idObservador.toString() + ", idMunicipio=" + idMunicipio.toString() +"]";
+    return "Estacion [idEstacion=" +
+        id.toString() +
+        ", nombre=" +
+        nombre +
+        ", latitud=" +
+        latitud +
+        ", longitud=" +
+        longitud +
+        ", altura=" +
+        altura +
+        ", estado=" +
+        estado.toString() +
+        ", tipoEstacion=" +
+        tipoEstacion +
+        ", idMunicipio=" +
+        idMunicipio.toString() +
+        "]";
   }
 }

@@ -6,47 +6,57 @@ import 'package:http/http.dart' as http;
 class EditarEstacionScreen extends StatefulWidget {
   // EditarEstacionScreen();
   final int estacionId;
-  final String coordenada;
-  final double dirVelViento;
-  final double pcpn;
-  final double taevap;
-  final double tempAmb;
   final double tempMax;
   final double tempMin;
+  final double tempAmb;
+  final double pcpn;
+  final double taevap;
+  final String dirViento;
+  final double velViento;
+  final int idEstacion;
 
   EditarEstacionScreen(
       {required this.estacionId,
-      required this.coordenada,
-      required this.dirVelViento,
+      required this.tempMax,
+      required this.tempMin,
+      required this.tempAmb,
       required this.pcpn,
       required this.taevap,
-      required this.tempAmb,
-      required this.tempMax,
-      required this.tempMin});
+      required this.dirViento,
+      required this.velViento,
+      required this.idEstacion,
+      
+      });
 
   @override
   _EditarEstacionScreenState createState() => _EditarEstacionScreenState();
 }
 
 class _EditarEstacionScreenState extends State<EditarEstacionScreen> {
-  TextEditingController coordenada = TextEditingController();
-  TextEditingController dirVelViento = TextEditingController();
-  TextEditingController pcpn = TextEditingController();
-  TextEditingController taevap = TextEditingController();
-  TextEditingController tempAmb = TextEditingController();
   TextEditingController tempMax = TextEditingController();
   TextEditingController tempMin = TextEditingController();
+  TextEditingController tempAmb = TextEditingController();
+  TextEditingController pcpn = TextEditingController();
+  TextEditingController taevap = TextEditingController();
+  TextEditingController dirViento= TextEditingController();
+  TextEditingController velViento = TextEditingController();
+  
+  
+  
 
   @override
   void initState() {
     super.initState();
-    coordenada.text = widget.coordenada.toString();
-    dirVelViento.text = widget.dirVelViento.toString();
-    pcpn.text = widget.pcpn.toString();
-    taevap.text = widget.taevap.toString();
-    tempAmb.text = widget.tempAmb.toString();
     tempMax.text = widget.tempMax.toString();
     tempMin.text = widget.tempMin.toString();
+    tempAmb.text = widget.tempAmb.toString();
+    pcpn.text = widget.pcpn.toString();
+    taevap.text = widget.taevap.toString();
+    dirViento.text = widget.dirViento.toString();
+    velViento.text = widget.velViento.toString();
+    
+    
+    
   }
 
   @override
@@ -61,12 +71,17 @@ class _EditarEstacionScreenState extends State<EditarEstacionScreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             TextFormField(
-              controller: coordenada,
-              decoration: InputDecoration(labelText: 'Coordenada'),
+              controller: tempMax,
+              decoration: InputDecoration(labelText: 'tempMax'),
             ),
             TextFormField(
-              controller: dirVelViento,
-              decoration: InputDecoration(labelText: 'dirVelViento'),
+              controller: tempMin,
+              decoration: InputDecoration(labelText: 'Temperatura Mínima'),
+              // Puedes establecer un valor inicial si lo deseas
+            ),
+            TextFormField(
+              controller: tempAmb,
+              decoration: InputDecoration(labelText: 'tempAmb'),
             ),
             TextFormField(
               controller: pcpn,
@@ -77,18 +92,16 @@ class _EditarEstacionScreenState extends State<EditarEstacionScreen> {
               decoration: InputDecoration(labelText: 'taevap'),
             ),
             TextFormField(
-              controller: tempAmb,
-              decoration: InputDecoration(labelText: 'tempAmb'),
+              controller: dirViento,
+              decoration: InputDecoration(labelText: 'Dir viento'),
             ),
             TextFormField(
-              controller: tempMax,
-              decoration: InputDecoration(labelText: 'tempMax'),
+              controller: velViento,
+              decoration: InputDecoration(labelText: 'Vel Viento'),
             ),
-            TextFormField(
-              controller: tempMin,
-              decoration: InputDecoration(labelText: 'Temperatura Mínima'),
-              // Puedes establecer un valor inicial si lo deseas
-            ),
+        
+            
+        
             // Agrega más TextFormField para otros campos según sea necesario
             SizedBox(height: 20),
             ElevatedButton(
@@ -109,13 +122,14 @@ class _EditarEstacionScreenState extends State<EditarEstacionScreen> {
         'http://localhost:8080/datosEstacion/updateDatosEstacion/${widget.estacionId}';
 
     Map<String, dynamic> datosActualizados = {
-      "coordenada": coordenada.text,
-      "dirVelViento": dirVelViento.text,
-      "pcpn": pcpn.text,
-      "taevap": taevap.text,
-      "tempAmb": tempAmb.text,
       "tempMax": tempMax.text,
       "tempMin": tempMin.text,
+      "tempAmb": tempAmb.text,
+      "pcpn": pcpn.text,
+      "taevap": taevap.text,
+      "dirViento": dirViento.text,
+      "velViento": velViento.text,
+      
     };
 
     try {
