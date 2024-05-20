@@ -76,6 +76,7 @@ class _ListaUsuarioEstacionScreenState
                   DataColumn(label: Text('Tipo de Estacion')),
                   DataColumn(label: Text('Nombre Observador')),
                   DataColumn(label: Text('Celular')),
+                  DataColumn(label: Text('Acciones')),
                 ],
                 rows: miModelo4.lista11.map((dato) {
                   // Usamos la lista directamente del modelo
@@ -86,9 +87,27 @@ class _ListaUsuarioEstacionScreenState
                     DataCell(Text(dato.tipoEstacion.toString())),
                     DataCell(Text(dato.nombreCompleto.toString())),
                     DataCell(Text(dato.telefono.toString())),
-
+                    DataCell(
+                      Row(
+                        children: [
+                          // Botón de editar
+                          IconButton(
+                            icon: Icon(Icons.edit),
+                            onPressed: () {
+                              // Agregar aquí la lógica para editar el dato
+                            },
+                          ),
+                          // Botón de eliminar
+                          IconButton(
+                            icon: Icon(Icons.delete),
+                            onPressed: () {
+                              // Agregar aquí la lógica para eliminar el dato
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
                     // Agrega más celdas según tus necesidades
-                  
                   ]);
                 }).toList(),
               ),
@@ -186,9 +205,8 @@ class _ListaUsuarioEstacionScreenState
               ),
             ],
           ),
-          
+
           const SizedBox(height: 20),
-          
 
           SizedBox(height: 20),
           ElevatedButton(
@@ -230,20 +248,21 @@ class _ListaUsuarioEstacionScreenState
             ),
           ),
           ElevatedButton(
-  onPressed: () {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) {
-        // Crear y proporcionar el Provider<EstacionService> aquí
-        return ChangeNotifierProvider(
-          create: (context) => EstacionService(), // Instancia del modelo
-          child: ListaEstacionScreen(),
-        );
-      }),
-    );
-  },
-  child: const Text('Datos estacion'),
-),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) {
+                  // Crear y proporcionar el Provider<EstacionService> aquí
+                  return ChangeNotifierProvider(
+                    create: (context) =>
+                        EstacionService(), // Instancia del modelo
+                    child: ListaEstacionScreen(),
+                  );
+                }),
+              );
+            },
+            child: const Text('Datos estacion'),
+          ),
           // ElevatedButton(
           //   onPressed: () {
           //     Navigator.push(context,
