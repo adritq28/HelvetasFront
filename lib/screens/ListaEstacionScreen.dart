@@ -5,6 +5,14 @@ import 'package:helvetasfront/services/EstacionService.dart';
 import 'package:provider/provider.dart';
 
 class ListaEstacionScreen extends StatefulWidget {
+  final int idUsuario;
+
+  ListaEstacionScreen({
+    required this.idUsuario,
+  });
+
+  //ListaEstacionScreen ({required this.idUsuario});
+
   @override
   _ListaEstacionScreenState createState() => _ListaEstacionScreenState();
 }
@@ -13,6 +21,8 @@ class _ListaEstacionScreenState extends State<ListaEstacionScreen> {
   final EstacionService _datosService2 =
       EstacionService(); // Instancia del servicio de datos
   late Future<List<DatosEstacion>> _futureDatosEstacion;
+
+  final EstacionService _datosService3 = EstacionService();
 
   late EstacionService miModelo4; // Futuro de la lista de personas
 
@@ -39,16 +49,49 @@ class _ListaEstacionScreenState extends State<ListaEstacionScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // miModelo = Provider.of<EstacionService>(context);
-    // cargarDatos();
-    //crear();
     return Scaffold(
-        appBar: AppBar(
-          title: const Text('Lista de Estacion'),
-        ),
-        body:
-            Container(margin: const EdgeInsets.all(10.0), child: op2(context)));
+      appBar: AppBar(
+        title: Text('Datos de Estación'),
+      ),
+      body: FutureBuilder<DatosEstacion?>(
+        future: _datosService3.obtenerDatosEstacion(widget.idUsuario),
+        builder: (context, AsyncSnapshot<DatosEstacion?> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator()); // Muestra un indicador de carga mientras se obtienen los datos
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data == null) {
+            return Center(child: Text('Este usuario no tiene datos registrados'));
+          } else {
+            final datos = snapshot.data!;
+            // Aquí puedes utilizar los datos obtenidos en snapshot.data
+            // Por ejemplo, puedes mostrarlos en un formulario de edición
+            return Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('ID: ${datos.idUsuario}'),
+                  Text('Nombre del Municipio: ${datos.nombreMunicipio}'),
+                  Text('Temp. Max: ${datos.tempMax}'),
+                  Text('Temp. Min: ${datos.tempMin}'),
+                  Text('Temp. Amb: ${datos.tempAmb}'),
+                  Text('PCPN: ${datos.pcpn}'),
+                  Text('TAEVAP: ${datos.taevap}'),
+                  Text('Dirección del Viento: ${datos.dirViento}'),
+                  Text('Velocidad del Viento: ${datos.velViento}'),
+                  Text('ID Estación: ${datos.idEstacion}'),
+                  // Otros campos según tus necesidades
+                ],
+              ),
+            );
+          }
+        },
+      ),
+    );
   }
+
+  
 
   Widget op2(BuildContext context) {
     //final miModelo = Provider.of<EstacionService>(context);
@@ -60,7 +103,7 @@ class _ListaEstacionScreenState extends State<ListaEstacionScreen> {
         children: [
           //const Text('prueba de lista estacion datos'),
           //const Text('Texto 2'),
-          formDatosEstacion(),
+          //formDatosEstacion(),
           SingleChildScrollView(
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -68,6 +111,7 @@ class _ListaEstacionScreenState extends State<ListaEstacionScreen> {
                 columnSpacing: 20,
                 columns: const [
                   DataColumn(label: Text('ID')),
+                  DataColumn(label: Text('nombreMunicipio')),
                   DataColumn(label: Text('tempMax')),
                   DataColumn(label: Text('tempMin')),
                   DataColumn(label: Text('tempAmb')),
@@ -81,7 +125,8 @@ class _ListaEstacionScreenState extends State<ListaEstacionScreen> {
                 rows: miModelo4.lista11.map((dato) {
                   // Usamos la lista directamente del modelo
                   return DataRow(cells: [
-                    DataCell(Text(dato.id.toString())),
+                    DataCell(Text(dato.idUsuario.toString())),
+                    DataCell(Text(dato.nombreMunicipio.toString())),
                     DataCell(Text(dato.tempMax.toString())),
                     DataCell(Text(dato.tempMin.toString())),
                     DataCell(Text(dato.tempAmb.toString())),
@@ -90,8 +135,7 @@ class _ListaEstacionScreenState extends State<ListaEstacionScreen> {
                     DataCell(Text(dato.dirViento)),
                     DataCell(Text(dato.velViento.toString())),
                     DataCell(Text(dato.idEstacion.toString())),
-                    
-                    
+
                     // Agrega más celdas según tus necesidades
                     DataCell(
                       Row(
@@ -105,7 +149,9 @@ class _ListaEstacionScreenState extends State<ListaEstacionScreen> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => EditarEstacionScreen(
-                                    estacionId: dato.id,
+                                    estacionId: dato.idEstacion,
+                                    idUsuario: dato.idUsuario,
+                                    nombreMunicipio: dato.nombreMunicipio,
                                     tempMax: dato.tempMax,
                                     tempMin: dato.tempMin,
                                     tempAmb: dato.tempAmb,
@@ -140,7 +186,8 @@ class _ListaEstacionScreenState extends State<ListaEstacionScreen> {
                                       TextButton(
                                         child: Text("Eliminar"),
                                         onPressed: () async {
-                                          await _datosService2.eliminarEstacion(dato.id);
+                                          await _datosService2
+                                              .eliminarEstacion(dato.idUsuario);
                                           Navigator.of(context).pop();
                                           _cargarDatosEstacion();
                                         },
@@ -187,6 +234,12 @@ class _ListaEstacionScreenState extends State<ListaEstacionScreen> {
   }
 
   final _formKey = GlobalKey<FormState>();
+  late int _idUsuario;
+  late String _nombreMunicipio;
+  late String _nombreEstacion;
+  late String _tipoEstacion;
+  late String _nombreCompleto;
+  late String _telefono;
   late double _tempMax;
   late double _tempMin;
   late double _tempAmb;
@@ -195,9 +248,6 @@ class _ListaEstacionScreenState extends State<ListaEstacionScreen> {
   late String _dirViento;
   late double _velViento;
   late int _idEstacion;
-  
-  
-
 
 //clave de acceso
   Widget formDatosEstacion() {
@@ -205,7 +255,7 @@ class _ListaEstacionScreenState extends State<ListaEstacionScreen> {
       key: _formKey,
       child: Column(
         children: <Widget>[
-           Row(
+          Row(
             children: [
               Expanded(
                 child: MyTextField(
@@ -300,20 +350,27 @@ class _ListaEstacionScreenState extends State<ListaEstacionScreen> {
                   hintText: 'Vel Viento',
                   prefixIcon: Icons.person,
                   onSaved: (value) {
-                    _idEstacion= int.tryParse(value ?? '0') ?? 0;;
+                    _idEstacion = int.tryParse(value ?? '0') ?? 0;
+                    ;
                   },
                 ),
               ),
             ],
           ),
-      
+
           SizedBox(height: 20),
           ElevatedButton(
             onPressed: () {
               if (_formKey.currentState!.validate()) {
                 _formKey.currentState!.save();
                 DatosEstacion nuevoDato = DatosEstacion(
-                  id: 0,
+                  //id: 0,
+                  idUsuario: _idUsuario,
+                  nombreMunicipio: _nombreMunicipio,
+                  nombreEstacion: _nombreEstacion,
+                  tipoEstacion: _tipoEstacion,
+                  nombreCompleto: _nombreCompleto,
+                  telefono: _telefono,
                   tempMax: _tempMax,
                   tempMin: _tempMin,
                   tempAmb: _tempAmb,
@@ -322,7 +379,6 @@ class _ListaEstacionScreenState extends State<ListaEstacionScreen> {
                   dirViento: _dirViento,
                   velViento: _velViento,
                   idEstacion: _idEstacion,
-                  
                 );
                 print(nuevoDato.toStringDatosEstacion());
 

@@ -6,6 +6,8 @@ import 'package:http/http.dart' as http;
 class EditarEstacionScreen extends StatefulWidget {
   // EditarEstacionScreen();
   final int estacionId;
+  final int idUsuario;
+  final String nombreMunicipio;
   final double tempMax;
   final double tempMin;
   final double tempAmb;
@@ -15,38 +17,40 @@ class EditarEstacionScreen extends StatefulWidget {
   final double velViento;
   final int idEstacion;
 
-  EditarEstacionScreen(
-      {required this.estacionId,
-      required this.tempMax,
-      required this.tempMin,
-      required this.tempAmb,
-      required this.pcpn,
-      required this.taevap,
-      required this.dirViento,
-      required this.velViento,
-      required this.idEstacion,
-      
-      });
+  EditarEstacionScreen({
+    required this.estacionId,
+    required this.idUsuario,
+    required this.nombreMunicipio,
+    required this.tempMax,
+    required this.tempMin,
+    required this.tempAmb,
+    required this.pcpn,
+    required this.taevap,
+    required this.dirViento,
+    required this.velViento,
+    required this.idEstacion,
+  });
 
   @override
   _EditarEstacionScreenState createState() => _EditarEstacionScreenState();
 }
 
 class _EditarEstacionScreenState extends State<EditarEstacionScreen> {
+  TextEditingController idUsuario = TextEditingController();
+  TextEditingController nombreMunicipio = TextEditingController();
   TextEditingController tempMax = TextEditingController();
   TextEditingController tempMin = TextEditingController();
   TextEditingController tempAmb = TextEditingController();
   TextEditingController pcpn = TextEditingController();
   TextEditingController taevap = TextEditingController();
-  TextEditingController dirViento= TextEditingController();
+  TextEditingController dirViento = TextEditingController();
   TextEditingController velViento = TextEditingController();
-  
-  
-  
 
   @override
   void initState() {
     super.initState();
+    idUsuario.text = widget.idUsuario.toString();
+    nombreMunicipio.text = widget.tempMax.toString();
     tempMax.text = widget.tempMax.toString();
     tempMin.text = widget.tempMin.toString();
     tempAmb.text = widget.tempAmb.toString();
@@ -54,9 +58,6 @@ class _EditarEstacionScreenState extends State<EditarEstacionScreen> {
     taevap.text = widget.taevap.toString();
     dirViento.text = widget.dirViento.toString();
     velViento.text = widget.velViento.toString();
-    
-    
-    
   }
 
   @override
@@ -99,9 +100,7 @@ class _EditarEstacionScreenState extends State<EditarEstacionScreen> {
               controller: velViento,
               decoration: InputDecoration(labelText: 'Vel Viento'),
             ),
-        
-            
-        
+
             // Agrega más TextFormField para otros campos según sea necesario
             SizedBox(height: 20),
             ElevatedButton(
@@ -122,6 +121,8 @@ class _EditarEstacionScreenState extends State<EditarEstacionScreen> {
         'http://localhost:8080/datosEstacion/updateDatosEstacion/${widget.estacionId}';
 
     Map<String, dynamic> datosActualizados = {
+      "idUsuario": idUsuario.text,
+      "nombreMunicipio": nombreMunicipio.text,
       "tempMax": tempMax.text,
       "tempMin": tempMin.text,
       "tempAmb": tempAmb.text,
@@ -129,7 +130,6 @@ class _EditarEstacionScreenState extends State<EditarEstacionScreen> {
       "taevap": taevap.text,
       "dirViento": dirViento.text,
       "velViento": velViento.text,
-      
     };
 
     try {

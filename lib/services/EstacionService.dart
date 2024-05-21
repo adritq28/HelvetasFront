@@ -5,9 +5,13 @@ import 'package:helvetasfront/model/DatosEstacion.dart';
 import 'package:http/http.dart' as http;
 
 class EstacionService extends ChangeNotifier {
-  List<DatosEstacion> _lista = [];
 
+  List<DatosEstacion> _lista = [];
   List<DatosEstacion> get lista11 => _lista;
+
+    
+  List<DatosEstacion> _lista3 = [];
+  List<DatosEstacion> get lista113 => _lista3;
 
   Future<void> getDatosEstacion() async {
     try {
@@ -44,7 +48,7 @@ class EstacionService extends ChangeNotifier {
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
 
-        _lista.sort((a, b) => b.id.compareTo(a.id));
+        _lista.sort((a, b) => b.idUsuario.compareTo(a.idUsuario));
 
         // Limita la lista a los primeros 10 elementos
         _lista = _lista.take(10).toList();
@@ -96,4 +100,50 @@ class EstacionService extends ChangeNotifier {
     throw Exception('Error al eliminar la estación');
   }
 }
+
+// Future<DatosEstacion> obtenerDatosEstacion(int id) async {
+//   final response = await http.get(Uri.parse('http://localhost:8080/datosEstacion/$id'));
+//   if (response.statusCode == 200) {
+//     return DatosEstacion.fromJson(jsonDecode(response.body));
+//   } else {
+//     throw Exception('Error al obtener datos del observador');
+//   }
+// }
+
+Future<DatosEstacion?> obtenerDatosEstacion(int id) async {
+  final response = await http.get(Uri.parse('http://localhost:8080/datosEstacion/$id'));
+  if (response.statusCode == 200) {
+    final jsonData = jsonDecode(response.body);
+    if (jsonData == null || jsonData.isEmpty) {
+      return null; // Indica que no hay datos
+    }
+    return DatosEstacion.fromJson(jsonData);
+  } else {
+    throw Exception('No se tiene datos registrados del Observador');
+  }
+}
+
+Future<void> getDatos() async {
+    try {
+      final response = await http.get(Uri.http("localhost:8080", "/datosEstacion/verDatosEstacion"));
+      //print('aaaaaaaa');
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+        
+
+        _lista3 = data.map((e) => DatosEstacion.fromJson(e)).toList();
+        print('3333333' + _lista.length.toString());
+
+        //return datosEstacion;
+        notifyListeners();
+      } else {
+        throw Exception('Failed to load personas');
+      }
+    } catch (e) {
+      throw Exception('Error: $e');
+    }
+  }
+
+
+
 }

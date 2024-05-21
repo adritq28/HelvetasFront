@@ -16,7 +16,7 @@ class _ListaUsuarioEstacionScreenState
   final UsuarioService _datosService2 =
       UsuarioService(); // Instancia del servicio de datos
   late Future<List<UsuarioEstacion>> _futureUsuarioEstacion;
-
+  final EstacionService _datosService3 = EstacionService();
   late UsuarioService miModelo4; // Futuro de la lista de personas
 
   late List<UsuarioEstacion> _usuarioEstacion = [];
@@ -94,16 +94,22 @@ class _ListaUsuarioEstacionScreenState
                           IconButton(
                             icon: Icon(Icons.edit),
                             onPressed: () {
-                              // Agregar aquí la lógica para editar el dato
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) {
+                                  // Crear y proporcionar el Provider<EstacionService> aquí
+                                  return ChangeNotifierProvider(
+                                    create: (context) =>
+                                        EstacionService(), // Instancia del modelo
+                                    child: ListaEstacionScreen(
+                                        idUsuario: dato.idUsuario),
+                                  );
+                                }),
+                              );
                             },
                           ),
+
                           // Botón de eliminar
-                          IconButton(
-                            icon: Icon(Icons.delete),
-                            onPressed: () {
-                              // Agregar aquí la lógica para eliminar el dato
-                            },
-                          ),
                         ],
                       ),
                     ),
@@ -256,7 +262,7 @@ class _ListaUsuarioEstacionScreenState
                   return ChangeNotifierProvider(
                     create: (context) =>
                         EstacionService(), // Instancia del modelo
-                    child: ListaEstacionScreen(),
+                    //child: ListaEstacionScreen(),
                   );
                 }),
               );
