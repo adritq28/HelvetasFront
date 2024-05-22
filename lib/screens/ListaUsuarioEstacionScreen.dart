@@ -13,27 +13,26 @@ class ListaUsuarioEstacionScreen extends StatefulWidget {
 
 class _ListaUsuarioEstacionScreenState
     extends State<ListaUsuarioEstacionScreen> {
-  final UsuarioService _datosService2 =
-      UsuarioService(); // Instancia del servicio de datos
+  final UsuarioService _datosService2 = UsuarioService();
   late Future<List<UsuarioEstacion>> _futureUsuarioEstacion;
   final EstacionService _datosService3 = EstacionService();
-  late UsuarioService miModelo4; // Futuro de la lista de personas
+  late UsuarioService miModelo4;
 
   late List<UsuarioEstacion> _usuarioEstacion = [];
+
   @override
   void initState() {
     super.initState();
     miModelo4 = Provider.of<UsuarioService>(context, listen: false);
-    _cargarUsuarioEstacion(); // Carga los datos al inicializar el estado
+    _cargarUsuarioEstacion();
   }
 
   Future<void> _cargarUsuarioEstacion() async {
     try {
-      //List<DatosEstacion> datos = await miModelo4.getDatosEstacion();
       await miModelo4.getUsuario();
       List<UsuarioEstacion> a = miModelo4.lista11;
       setState(() {
-        _usuarioEstacion = a; // Asigna los datos a la lista
+        _usuarioEstacion = a;
       });
     } catch (e) {
       print('Error al cargar los datos: $e');
@@ -42,27 +41,21 @@ class _ListaUsuarioEstacionScreenState
 
   @override
   Widget build(BuildContext context) {
-    // miModelo = Provider.of<EstacionService>(context);
-    // cargarDatos();
-    //crear();
     return Scaffold(
-        appBar: AppBar(
-          title: const Text('Lista de Estacion'),
-        ),
-        body:
-            Container(margin: const EdgeInsets.all(10.0), child: op2(context)));
+      appBar: AppBar(
+        title: const Text('Lista de Estacion'),
+      ),
+      body: Container(
+        margin: const EdgeInsets.all(10.0),
+        child: op2(context),
+      ),
+    );
   }
 
   Widget op2(BuildContext context) {
-    //final miModelo = Provider.of<EstacionService>(context);
-
-    //print("aaaa" + miModelo.lista11.length.toString());
-
     return SingleChildScrollView(
       child: Column(
         children: [
-          //const Text('prueba de lista estacion datos'),
-          //const Text('Texto 2'),
           formUsuarioEstacion(),
           SingleChildScrollView(
             child: SingleChildScrollView(
@@ -79,7 +72,6 @@ class _ListaUsuarioEstacionScreenState
                   DataColumn(label: Text('Acciones')),
                 ],
                 rows: miModelo4.lista11.map((dato) {
-                  // Usamos la lista directamente del modelo
                   return DataRow(cells: [
                     DataCell(Text(dato.idUsuario.toString())),
                     DataCell(Text(dato.nombreMunicipio.toString())),
@@ -90,61 +82,93 @@ class _ListaUsuarioEstacionScreenState
                     DataCell(
                       Row(
                         children: [
-                          // Botón de editar
                           IconButton(
                             icon: Icon(Icons.edit),
                             onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) {
-                                  // Crear y proporcionar el Provider<EstacionService> aquí
-                                  return ChangeNotifierProvider(
-                                    create: (context) =>
-                                        EstacionService(), // Instancia del modelo
-                                    child: ListaEstacionScreen(
-                                        idUsuario: dato.idUsuario,
-                                        nombreMunicipio: dato.nombreMunicipio,
-                                        nombreEstacion: dato.nombreEstacion,
-                                        tipoEstacion: dato.tipoEstacion,
-                                        nombreCompleto: dato.nombreCompleto,
-                                        telefono:dato.telefono,
-                                        idEstacion: dato.idEstacion),
-                                  );
-                                }),
-                              );
+                              mostrarDialogoContrasena(context, dato);
                             },
                           ),
-
-                          // Botón de eliminar
                         ],
                       ),
                     ),
-                    // Agrega más celdas según tus necesidades
                   ]);
                 }).toList(),
               ),
             ),
-          )
+          ),
         ],
       ),
+    );
+  }
+
+  void mostrarDialogoContrasena(BuildContext context, UsuarioEstacion dato) {
+    final TextEditingController _passwordController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Ingrese Contraseña'),
+          content: TextField(
+            controller: _passwordController,
+            obscureText: true,
+            decoration: InputDecoration(hintText: 'Contraseña'),
+          ),
+          actions: [
+            TextButton(
+              child: Text('Cancelar'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Aceptar'),
+              onPressed: () async {
+                final password = _passwordController.text;
+                final esValido = await _datosService3.validarContrasena(password, dato.idUsuario);
+                if (esValido) {
+                  Navigator.of(context).pop(); // Cierra el diálogo
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) {
+                      return ChangeNotifierProvider(
+                        create: (context) => EstacionService(),
+                        child: ListaEstacionScreen(
+                          idUsuario: dato.idUsuario,
+                          nombreMunicipio: dato.nombreMunicipio,
+                          nombreEstacion: dato.nombreEstacion,
+                          tipoEstacion: dato.tipoEstacion,
+                          nombreCompleto: dato.nombreCompleto,
+                          telefono: dato.telefono,
+                          idEstacion: dato.idEstacion,
+                        ),
+                      );
+                    }),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Contraseña incorrecta')),
+                  );
+                }
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 
   Future<Widget> crear(UsuarioEstacion elem) async {
     String h = await _datosService2.saveUsuario(elem);
     print("a");
-    //print(h);
     return AlertDialog(
       title: const Text('Título del Alerta'),
-      //content: Text(h),
       actions: <Widget>[
         TextButton(
           onPressed: () {
             Navigator.of(context).pop();
             setState(() {
               _cargarUsuarioEstacion();
-              //_cargarDatos();
-            }); // Cierra el diálogo
+            });
           },
           child: const Text('Aceptar'),
         ),
@@ -161,7 +185,6 @@ class _ListaUsuarioEstacionScreenState
   late String _telefono;
   late int _idEstacion;
 
-//clave de acceso
   Widget formUsuarioEstacion() {
     return Form(
       key: _formKey,
@@ -179,7 +202,7 @@ class _ListaUsuarioEstacionScreenState
                   },
                 ),
               ),
-              const SizedBox(width: 10), // Espacio entre los campos
+              const SizedBox(width: 10),
               Expanded(
                 child: MyTextField(
                   labelText: 'Estacion',
@@ -194,7 +217,7 @@ class _ListaUsuarioEstacionScreenState
           ),
           Row(
             children: [
-              const SizedBox(width: 10), // Espacio entre los campos
+              const SizedBox(width: 10),
               Expanded(
                 child: MyTextField(
                   labelText: 'Tipo estacion',
@@ -205,7 +228,7 @@ class _ListaUsuarioEstacionScreenState
                   },
                 ),
               ),
-              const SizedBox(width: 10), // Espacio entre los campos
+              const SizedBox(width: 10),
               Expanded(
                 child: MyTextField(
                   labelText: 'Nombre',
@@ -218,10 +241,7 @@ class _ListaUsuarioEstacionScreenState
               ),
             ],
           ),
-
           const SizedBox(height: 20),
-
-          SizedBox(height: 20),
           ElevatedButton(
             onPressed: () {
               if (_formKey.currentState!.validate()) {
@@ -249,14 +269,11 @@ class _ListaUsuarioEstacionScreenState
             },
             child: const Text('Guardar datos'),
             style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.all<Color>(
-                  Colors.green), // Color de fondo verde
-              foregroundColor: MaterialStateProperty.all<Color>(
-                  Colors.white), // Color de las letras en blanco
+              backgroundColor: MaterialStateProperty.all<Color>(Colors.green),
+              foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
               shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                 RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(
-                      10.0), // Modificar el radio de esquinas a 20
+                  borderRadius: BorderRadius.circular(10.0),
                 ),
               ),
             ),
@@ -266,24 +283,14 @@ class _ListaUsuarioEstacionScreenState
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) {
-                  // Crear y proporcionar el Provider<EstacionService> aquí
                   return ChangeNotifierProvider(
-                    create: (context) =>
-                        EstacionService(), // Instancia del modelo
-                    //child: ListaEstacionScreen(),
+                    create: (context) => EstacionService(),
                   );
                 }),
               );
             },
             child: const Text('Datos estacion'),
           ),
-          // ElevatedButton(
-          //   onPressed: () {
-          //     Navigator.push(context,
-          //         MaterialPageRoute(builder: (context) => GraficaScreen()));
-          //   },
-          //   child: const Text('Ir a la grafica'),
-          // ),
         ],
       ),
     );
@@ -309,16 +316,17 @@ class MyTextField extends StatelessWidget {
     return TextFormField(
       decoration: InputDecoration(
         filled: true,
-        fillColor: Colors.grey[200], // Color de fondo
+        fillColor: Color.fromARGB(255, 225, 255, 246), // Color de fondo
         hintText: hintText, // Texto de sugerencia
         hintStyle: const TextStyle(
-            color: Colors.grey), // Estilo del texto de sugerencia
+            color: Color.fromARGB(
+                255, 180, 255, 231)), // Estilo del texto de sugerencia
         labelText: labelText, // Etiqueta del campo
         labelStyle:
             const TextStyle(color: Colors.blue), // Estilo de la etiqueta
         prefixIcon: Icon(
           prefixIcon,
-          color: const Color(0xFF065E9F),
+          color: Color.fromARGB(255, 97, 173, 255),
         ), // Icono al inicio del campo
         border: OutlineInputBorder(
           // Borde del campo

@@ -11,6 +11,37 @@ class EstacionService extends ChangeNotifier {
   List<DatosEstacion> _lista3 = [];
   List<DatosEstacion> get lista113 => _lista3;
 
+  // Future<bool> validarContrasena(String contrasenaIngresada, int idUsuario) async {
+  //   // Implementa aquí la lógica para validar la contraseña con la base de datos
+  //   // Ejemplo ficticio:
+  //   const contrasenaCorrecta = 'tu_contraseña_de_base_de_datos'; // Reemplaza esto con la lógica real
+  //   return contrasenaIngresada == contrasenaCorrecta;
+  // }
+
+  final String apiUrl =
+      'http://localhost:8080/usuario'; // Reemplaza con la URL de tu API
+
+  Future<String?> obtenerTelefono(int idUsuario) async {
+    final response = await http.get(Uri.parse('$apiUrl/telefono/$idUsuario'));
+    if (response.statusCode == 200) {
+      return response
+          .body; // Asumiendo que el teléfono se devuelve como texto plano
+    } else {
+      throw Exception('Error al obtener el teléfono');
+    }
+  }
+
+  Future<bool> validarContrasena(
+      String contrasenaIngresada, int idUsuario) async {
+    try {
+      final telefono = await obtenerTelefono(idUsuario);
+      return contrasenaIngresada == telefono;
+    } catch (e) {
+      print('Error al validar la contraseña: $e');
+      return false;
+    }
+  }
+
   Future<void> getDatosEstacion() async {
     try {
       //print('saasdasd1');
@@ -100,19 +131,19 @@ class EstacionService extends ChangeNotifier {
     }
   }
 
-
-Future<List<DatosEstacion>> obtenerDatosEstacion(int id) async {
-  final response = await http.get(Uri.parse('http://localhost:8080/datosEstacion/$id'));
-  if (response.statusCode == 200) {
-    List<dynamic> jsonData = jsonDecode(response.body);
-    if (jsonData.isEmpty) {
-      return []; // Indica que no hay datos
+  Future<List<DatosEstacion>> obtenerDatosEstacion(int id) async {
+    final response =
+        await http.get(Uri.parse('http://localhost:8080/datosEstacion/$id'));
+    if (response.statusCode == 200) {
+      List<dynamic> jsonData = jsonDecode(response.body);
+      if (jsonData.isEmpty) {
+        return []; // Indica que no hay datos
+      }
+      return jsonData.map((item) => DatosEstacion.fromJson(item)).toList();
+    } else {
+      throw Exception('Error al obtener datos del observador');
     }
-    return jsonData.map((item) => DatosEstacion.fromJson(item)).toList();
-  } else {
-    throw Exception('Error al obtener datos del observador');
   }
-}
 
   Future<void> getDatos() async {
     try {
