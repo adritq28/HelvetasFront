@@ -1,14 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:helvetasfront/model/DatosEstacion.dart';
-import 'package:helvetasfront/screens/EditarEstacionScreen.dart';
 import 'package:helvetasfront/services/EstacionService.dart';
 import 'package:provider/provider.dart';
 
 class ListaEstacionScreen extends StatefulWidget {
   final int idUsuario;
+  final String nombreMunicipio;
+  final String nombreEstacion;
+  final String tipoEstacion;
+  final String nombreCompleto;
+  final String telefono;
+  final int idEstacion;
 
   ListaEstacionScreen({
     required this.idUsuario,
+    required this.nombreMunicipio,
+    required this.nombreEstacion,
+    required this.tipoEstacion,
+    required this.nombreCompleto,
+    required this.telefono,
+    required this.idEstacion,
   });
 
   //ListaEstacionScreen ({required this.idUsuario});
@@ -21,12 +32,10 @@ class _ListaEstacionScreenState extends State<ListaEstacionScreen> {
   final EstacionService _datosService2 =
       EstacionService(); // Instancia del servicio de datos
   late Future<List<DatosEstacion>> _futureDatosEstacion;
-
   final EstacionService _datosService3 = EstacionService();
-
   late EstacionService miModelo4; // Futuro de la lista de personas
-
   late List<DatosEstacion> _datosEstacion = [];
+
   @override
   void initState() {
     super.initState();
@@ -37,7 +46,7 @@ class _ListaEstacionScreenState extends State<ListaEstacionScreen> {
   Future<void> _cargarDatosEstacion() async {
     try {
       //List<DatosEstacion> datos = await miModelo4.getDatosEstacion();
-      await miModelo4.getDatosEstacion();
+      await miModelo4.obtenerDatosEstacion(widget.idUsuario);
       List<DatosEstacion> a = miModelo4.lista11;
       setState(() {
         _datosEstacion = a; // Asigna los datos a la lista
@@ -53,160 +62,67 @@ class _ListaEstacionScreenState extends State<ListaEstacionScreen> {
       appBar: AppBar(
         title: Text('Datos de Estación'),
       ),
-      body: FutureBuilder<DatosEstacion?>(
-        future: _datosService3.obtenerDatosEstacion(widget.idUsuario),
-        builder: (context, AsyncSnapshot<DatosEstacion?> snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator()); // Muestra un indicador de carga mientras se obtienen los datos
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (!snapshot.hasData || snapshot.data == null) {
-            return Center(child: Text('Este usuario no tiene datos registrados'));
-          } else {
-            final datos = snapshot.data!;
-            // Aquí puedes utilizar los datos obtenidos en snapshot.data
-            // Por ejemplo, puedes mostrarlos en un formulario de edición
-            return Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('ID: ${datos.idUsuario}'),
-                  Text('Nombre del Municipio: ${datos.nombreMunicipio}'),
-                  Text('Temp. Max: ${datos.tempMax}'),
-                  Text('Temp. Min: ${datos.tempMin}'),
-                  Text('Temp. Amb: ${datos.tempAmb}'),
-                  Text('PCPN: ${datos.pcpn}'),
-                  Text('TAEVAP: ${datos.taevap}'),
-                  Text('Dirección del Viento: ${datos.dirViento}'),
-                  Text('Velocidad del Viento: ${datos.velViento}'),
-                  Text('ID Estación: ${datos.idEstacion}'),
-                  // Otros campos según tus necesidades
-                ],
-              ),
-            );
-          }
-        },
+      body: Column(
+        children: [
+          // Aquí colocas tu formulario
+          formDatosEstacion(),
+          SizedBox(
+              height: 20), // Espacio entre el formulario y la tabla de datos
+          Expanded(
+            child: FutureBuilder<List<DatosEstacion>>(
+              future: _datosService3.obtenerDatosEstacion(widget.idUsuario),
+              builder: (context, AsyncSnapshot<List<DatosEstacion>> snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return Center(
+                      child: Text('Este usuario no tiene datos registrados'));
+                } else {
+                  final datosList = snapshot.data!;
+                  return tablaDatos(datosList);
+                }
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  
-
-  Widget op2(BuildContext context) {
-    //final miModelo = Provider.of<EstacionService>(context);
-
-    //print("aaaa" + miModelo.lista11.length.toString());
-
+  SingleChildScrollView tablaDatos(List<DatosEstacion> datosList) {
     return SingleChildScrollView(
-      child: Column(
-        children: [
-          //const Text('prueba de lista estacion datos'),
-          //const Text('Texto 2'),
-          //formDatosEstacion(),
-          SingleChildScrollView(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: DataTable(
-                columnSpacing: 20,
-                columns: const [
-                  DataColumn(label: Text('ID')),
-                  DataColumn(label: Text('nombreMunicipio')),
-                  DataColumn(label: Text('tempMax')),
-                  DataColumn(label: Text('tempMin')),
-                  DataColumn(label: Text('tempAmb')),
-                  DataColumn(label: Text('pcpn')),
-                  DataColumn(label: Text('taevap')),
-                  DataColumn(label: Text('dirViento')),
-                  DataColumn(label: Text('velViento')),
-                  DataColumn(label: Text('idEstacion')),
-                  DataColumn(label: Text('Acciones')),
-                ],
-                rows: miModelo4.lista11.map((dato) {
-                  // Usamos la lista directamente del modelo
-                  return DataRow(cells: [
-                    DataCell(Text(dato.idUsuario.toString())),
-                    DataCell(Text(dato.nombreMunicipio.toString())),
-                    DataCell(Text(dato.tempMax.toString())),
-                    DataCell(Text(dato.tempMin.toString())),
-                    DataCell(Text(dato.tempAmb.toString())),
-                    DataCell(Text(dato.pcpn.toString())),
-                    DataCell(Text(dato.taevap.toString())),
-                    DataCell(Text(dato.dirViento)),
-                    DataCell(Text(dato.velViento.toString())),
-                    DataCell(Text(dato.idEstacion.toString())),
-
-                    // Agrega más celdas según tus necesidades
-                    DataCell(
-                      Row(
-                        children: [
-                          //editar
-                          IconButton(
-                            icon: Icon(Icons.edit),
-                            onPressed: () {
-                              // Navegar a la pantalla de edición y pasar el ID de la estación como argumento
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => EditarEstacionScreen(
-                                    estacionId: dato.idEstacion,
-                                    idUsuario: dato.idUsuario,
-                                    nombreMunicipio: dato.nombreMunicipio,
-                                    tempMax: dato.tempMax,
-                                    tempMin: dato.tempMin,
-                                    tempAmb: dato.tempAmb,
-                                    pcpn: dato.pcpn,
-                                    taevap: dato.taevap,
-                                    dirViento: dato.dirViento,
-                                    velViento: dato.velViento,
-                                    idEstacion: dato.idEstacion,
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                          //eliminar
-                          IconButton(
-                            icon: Icon(Icons.delete),
-                            onPressed: () {
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    title: Text("Eliminar estación"),
-                                    content: Text(
-                                        "¿Estás seguro de que quieres eliminar esta estación?"),
-                                    actions: <Widget>[
-                                      TextButton(
-                                        child: Text("Cancelar"),
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                        },
-                                      ),
-                                      TextButton(
-                                        child: Text("Eliminar"),
-                                        onPressed: () async {
-                                          await _datosService2
-                                              .eliminarEstacion(dato.idUsuario);
-                                          Navigator.of(context).pop();
-                                          _cargarDatosEstacion();
-                                        },
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  ]);
-                }).toList(),
-              ),
-            ),
-          )
+      scrollDirection: Axis.horizontal,
+      child: DataTable(
+        columns: const [
+          DataColumn(label: Text('ID')),
+          DataColumn(label: Text('Nombre del Municipio')),
+          DataColumn(label: Text('Temp. Max')),
+          DataColumn(label: Text('Temp. Min')),
+          DataColumn(label: Text('Temp. Amb')),
+          DataColumn(label: Text('PCPN')),
+          DataColumn(label: Text('TAEVAP')),
+          DataColumn(label: Text('Dirección del Viento')),
+          DataColumn(label: Text('Velocidad del Viento')),
+          DataColumn(label: Text('ID Estación')),
+          // Otros campos según tus necesidades
         ],
+        rows: datosList.map((datos) {
+          return DataRow(cells: [
+            DataCell(Text('${datos.idUsuario}')),
+            DataCell(Text('${widget.nombreMunicipio}')),
+            DataCell(Text('${datos.tempMax}')),
+            DataCell(Text('${datos.tempMin}')),
+            DataCell(Text('${datos.tempAmb}')),
+            DataCell(Text('${datos.pcpn}')),
+            DataCell(Text('${datos.taevap}')),
+            DataCell(Text('${datos.dirViento}')),
+            DataCell(Text('${datos.velViento}')),
+            DataCell(Text('${datos.idEstacion}')),
+            // Otros campos según tus necesidades
+          ]);
+        }).toList(),
       ),
     );
   }
@@ -251,169 +167,189 @@ class _ListaEstacionScreenState extends State<ListaEstacionScreen> {
 
 //clave de acceso
   Widget formDatosEstacion() {
-    return Form(
-      key: _formKey,
-      child: Column(
-        children: <Widget>[
-          Row(
-            children: [
-              Expanded(
-                child: MyTextField(
-                  labelText: 'Temperatura maxima',
-                  hintText: 'Temperatura maxima',
-                  prefixIcon: Icons.person,
-                  onSaved: (value) {
-                    _tempMax = double.tryParse(value ?? '0') ?? 0.0;
-                  },
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Form(
+        key: _formKey,
+        child: Column(
+          children: <Widget>[
+            Row(
+              children: [
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 16.0, horizontal: 8.0),
+                    child: TextFormField(
+                      decoration: InputDecoration(
+                        labelText: 'Temperatura máxima',
+                        hintText: 'Temperatura máxima',
+                        prefixIcon: Icon(Icons.person),
+                        contentPadding: EdgeInsets.symmetric(vertical: 20.0),
+                        labelStyle: TextStyle(
+                            fontSize: 20.0, fontWeight: FontWeight.bold),
+                        hintStyle: TextStyle(fontSize: 20.0),
+                        border: OutlineInputBorder(
+                          // Define el borde de la caja
+                          borderRadius: BorderRadius.circular(
+                              10.0), // Ajusta el radio para que sea cuadrado
+                        ),
+                      ),
+                      keyboardType:
+                          TextInputType.numberWithOptions(decimal: true),
+                      textAlign:
+                          TextAlign.center, // Centra el texto dentro del campo
+                      style: TextStyle(
+                          fontSize: 24.0), // Ajusta el tamaño del texto
+                      onSaved: (value) {
+                        _tempMax = double.tryParse(value ?? '0') ?? 0.0;
+                      },
+                    ),
+                  ),
                 ),
-              ),
-              const SizedBox(width: 10), // Espacio entre los campos
-              Expanded(
-                child: MyTextField(
-                  labelText: 'Temperatura minima',
-                  hintText: 'Temperatura minima',
-                  prefixIcon: Icons.person,
-                  onSaved: (value) {
-                    _tempMin = double.tryParse(value ?? '0') ?? 0.0;
-                  },
-                ),
-              ),
-            ],
-          ),
-          Row(
-            children: [
-              const SizedBox(width: 10), // Espacio entre los campos
-              Expanded(
-                child: MyTextField(
-                  labelText: 'Temperatura ambiente',
-                  hintText: 'Temperatura ambiente',
-                  prefixIcon: Icons.person,
-                  onSaved: (value) {
-                    _tempAmb = double.tryParse(value ?? '0') ?? 0.0;
-                  },
-                ),
-              ),
-              const SizedBox(width: 10), // Espacio entre los campos
-              Expanded(
-                child: MyTextField(
-                  labelText: 'Precipitacion',
-                  hintText: 'Precipitacion',
-                  prefixIcon: Icons.person,
-                  onSaved: (value) {
-                    _pcpn = double.tryParse(value ?? '0') ?? 0.0;
-                  },
-                ),
-              ),
-            ],
-          ),
-          Row(
-            children: [
-              Expanded(
-                child: MyTextField(
-                  labelText: 'Tasa de evaporacion',
-                  hintText: 'Tasa de evaporacion',
-                  prefixIcon: Icons.person,
-                  onSaved: (value) {
-                    _taevap = double.tryParse(value ?? '0') ?? 0.0;
-                  },
-                ),
-              ),
-              const SizedBox(width: 10), // Espacio entre los campos
-              Expanded(
-                child: MyTextField(
-                  labelText: 'Dir Viento',
-                  hintText: 'Dir Viento',
-                  prefixIcon: Icons.person,
-                  onSaved: (value) {
-                    _dirViento = value!;
-                  },
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          Row(
-            children: [
-              Expanded(
-                child: MyTextField(
-                  labelText: 'Vel Viento',
-                  hintText: 'Vel Viento',
-                  prefixIcon: Icons.person,
-                  onSaved: (value) {
-                    _velViento = double.tryParse(value ?? '0') ?? 0.0;
-                  },
-                ),
-              ),
-              Expanded(
-                child: MyTextField(
-                  labelText: 'Vel Viento',
-                  hintText: 'Vel Viento',
-                  prefixIcon: Icons.person,
-                  onSaved: (value) {
-                    _idEstacion = int.tryParse(value ?? '0') ?? 0;
-                    ;
-                  },
-                ),
-              ),
-            ],
-          ),
 
-          SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: () {
-              if (_formKey.currentState!.validate()) {
-                _formKey.currentState!.save();
-                DatosEstacion nuevoDato = DatosEstacion(
-                  //id: 0,
-                  idUsuario: _idUsuario,
-                  nombreMunicipio: _nombreMunicipio,
-                  nombreEstacion: _nombreEstacion,
-                  tipoEstacion: _tipoEstacion,
-                  nombreCompleto: _nombreCompleto,
-                  telefono: _telefono,
-                  tempMax: _tempMax,
-                  tempMin: _tempMin,
-                  tempAmb: _tempAmb,
-                  pcpn: _pcpn,
-                  taevap: _taevap,
-                  dirViento: _dirViento,
-                  velViento: _velViento,
-                  idEstacion: _idEstacion,
-                );
-                print(nuevoDato.toStringDatosEstacion());
-
-                crear(nuevoDato).then((alertDialog) {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return alertDialog;
+                const SizedBox(width: 10), // Espacio entre los campos
+                Expanded(
+                  child: MyTextField(
+                    labelText: 'Temperatura minima',
+                    hintText: 'Temperatura minima',
+                    prefixIcon: Icons.person,
+                    onSaved: (value) {
+                      _tempMin = double.tryParse(value ?? '0') ?? 0.0;
                     },
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: MyTextField(
+                    labelText: 'Temperatura ambiente',
+                    hintText: 'Temperatura ambiente',
+                    prefixIcon: Icons.person,
+                    onSaved: (value) {
+                      _tempAmb = double.tryParse(value ?? '0') ?? 0.0;
+                    },
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                //const SizedBox(width: 10), // Espacio entre los campos
+                Expanded(
+                  child: MyTextField(
+                    labelText: 'Temperatura ambiente',
+                    hintText: 'Temperatura ambiente',
+                    prefixIcon: Icons.person,
+                    onSaved: (value) {
+                      _tempAmb = double.tryParse(value ?? '0') ?? 0.0;
+                    },
+                  ),
+                ),
+                const SizedBox(width: 10), // Espacio entre los campos
+                Expanded(
+                  child: MyTextField(
+                    labelText: 'Precipitacion',
+                    hintText: 'Precipitacion',
+                    prefixIcon: Icons.person,
+                    onSaved: (value) {
+                      _pcpn = double.tryParse(value ?? '0') ?? 0.0;
+                    },
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Expanded(
+                  child: MyTextField(
+                    labelText: 'Tasa de evaporacion',
+                    hintText: 'Tasa de evaporacion',
+                    prefixIcon: Icons.person,
+                    onSaved: (value) {
+                      _taevap = double.tryParse(value ?? '0') ?? 0.0;
+                    },
+                  ),
+                ),
+                const SizedBox(width: 10), // Espacio entre los campos
+                Expanded(
+                  child: MyTextField(
+                    labelText: 'Dir Viento',
+                    hintText: 'Dir Viento',
+                    prefixIcon: Icons.person,
+                    onSaved: (value) {
+                      _dirViento = value!;
+                    },
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Expanded(
+                  child: MyTextField(
+                    labelText: 'Vel Viento',
+                    hintText: 'Vel Viento',
+                    prefixIcon: Icons.person,
+                    onSaved: (value) {
+                      _velViento = double.tryParse(value ?? '0') ?? 0.0;
+                    },
+                  ),
+                ),
+                const SizedBox(width: 10),
+              ],
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                if (_formKey.currentState!.validate()) {
+                  _formKey.currentState!.save();
+                  DatosEstacion nuevoDato = DatosEstacion(
+                    //id: 0,
+                    idUsuario: widget.idUsuario,
+                    nombreMunicipio: widget.nombreMunicipio,
+                    nombreEstacion: widget.nombreEstacion,
+                    tipoEstacion: widget.tipoEstacion,
+                    nombreCompleto: widget.nombreCompleto,
+                    telefono: widget.telefono,
+                    tempMax: _tempMax,
+                    tempMin: _tempMin,
+                    tempAmb: _tempAmb,
+                    pcpn: _pcpn,
+                    taevap: _taevap,
+                    dirViento: _dirViento,
+                    velViento: _velViento,
+                    idEstacion: widget.idEstacion,
                   );
-                });
-              }
-            },
-            child: const Text('Guardar datos'),
-            style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.all<Color>(
-                  Colors.green), // Color de fondo verde
-              foregroundColor: MaterialStateProperty.all<Color>(
-                  Colors.white), // Color de las letras en blanco
-              shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(
-                      10.0), // Modificar el radio de esquinas a 20
+                  print(nuevoDato.toStringDatosEstacion());
+
+                  crear(nuevoDato).then((alertDialog) {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return alertDialog;
+                      },
+                    );
+                  });
+                }
+              },
+              child: const Text('Guardar datos'),
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all<Color>(
+                    Colors.green), // Color de fondo verde
+                foregroundColor: MaterialStateProperty.all<Color>(
+                    Colors.white), // Color de las letras en blanco
+                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(
+                        10.0), // Modificar el radio de esquinas a 20
+                  ),
                 ),
               ),
             ),
-          ),
-          // ElevatedButton(
-          //   onPressed: () {
-          //     Navigator.push(context,
-          //         MaterialPageRoute(builder: (context) => GraficaScreen()));
-          //   },
-          //   child: const Text('Ir a la grafica'),
-          // ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -438,16 +374,17 @@ class MyTextField extends StatelessWidget {
     return TextFormField(
       decoration: InputDecoration(
         filled: true,
-        fillColor: Colors.grey[200], // Color de fondo
+        fillColor: Color.fromARGB(255, 225, 255, 246), // Color de fondo
         hintText: hintText, // Texto de sugerencia
         hintStyle: const TextStyle(
-            color: Colors.grey), // Estilo del texto de sugerencia
+            color: Color.fromARGB(
+                255, 180, 255, 231)), // Estilo del texto de sugerencia
         labelText: labelText, // Etiqueta del campo
         labelStyle:
             const TextStyle(color: Colors.blue), // Estilo de la etiqueta
         prefixIcon: Icon(
           prefixIcon,
-          color: const Color(0xFF065E9F),
+          color: Color.fromARGB(255, 97, 173, 255),
         ), // Icono al inicio del campo
         border: OutlineInputBorder(
           // Borde del campo

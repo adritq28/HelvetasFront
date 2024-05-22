@@ -102,7 +102,13 @@ class _ListaUsuarioEstacionScreenState
                                     create: (context) =>
                                         EstacionService(), // Instancia del modelo
                                     child: ListaEstacionScreen(
-                                        idUsuario: dato.idUsuario),
+                                        idUsuario: dato.idUsuario,
+                                        nombreMunicipio: dato.nombreMunicipio,
+                                        nombreEstacion: dato.nombreEstacion,
+                                        tipoEstacion: dato.tipoEstacion,
+                                        nombreCompleto: dato.nombreCompleto,
+                                        telefono:dato.telefono,
+                                        idEstacion: dato.idEstacion),
                                   );
                                 }),
                               );
@@ -153,6 +159,7 @@ class _ListaUsuarioEstacionScreenState
   late String _tipoEstacion;
   late String _nombreCompleto;
   late String _telefono;
+  late int _idEstacion;
 
 //clave de acceso
   Widget formUsuarioEstacion() {
@@ -226,6 +233,7 @@ class _ListaUsuarioEstacionScreenState
                   tipoEstacion: _tipoEstacion,
                   nombreCompleto: _nombreCompleto,
                   telefono: _telefono,
+                  idEstacion: _idEstacion,
                 );
                 print(nuevoDato.toStringUsuarioEstacion());
 

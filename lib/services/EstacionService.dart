@@ -5,11 +5,9 @@ import 'package:helvetasfront/model/DatosEstacion.dart';
 import 'package:http/http.dart' as http;
 
 class EstacionService extends ChangeNotifier {
-
   List<DatosEstacion> _lista = [];
   List<DatosEstacion> get lista11 => _lista;
 
-    
   List<DatosEstacion> _lista3 = [];
   List<DatosEstacion> get lista113 => _lista3;
 
@@ -90,46 +88,39 @@ class EstacionService extends ChangeNotifier {
 
   Future<void> eliminarEstacion(int id) async {
     print('Dsddddddddddddddddde');
-  final response = await http.delete(Uri.parse('http://localhost:8080/datosEstacion/$id'));
-  if (response.statusCode == 200) {
-    // La estación se eliminó exitosamente
-    // Puedes realizar alguna acción adicional si es necesario
-    print('Datos Estacion eliminada correctamente');
-  } else {
-    // Ocurrió un error al intentar eliminar la estación
-    throw Exception('Error al eliminar la estación');
+    final response =
+        await http.delete(Uri.parse('http://localhost:8080/datosEstacion/$id'));
+    if (response.statusCode == 200) {
+      // La estación se eliminó exitosamente
+      // Puedes realizar alguna acción adicional si es necesario
+      print('Datos Estacion eliminada correctamente');
+    } else {
+      // Ocurrió un error al intentar eliminar la estación
+      throw Exception('Error al eliminar la estación');
+    }
   }
-}
 
-// Future<DatosEstacion> obtenerDatosEstacion(int id) async {
-//   final response = await http.get(Uri.parse('http://localhost:8080/datosEstacion/$id'));
-//   if (response.statusCode == 200) {
-//     return DatosEstacion.fromJson(jsonDecode(response.body));
-//   } else {
-//     throw Exception('Error al obtener datos del observador');
-//   }
-// }
 
-Future<DatosEstacion?> obtenerDatosEstacion(int id) async {
+Future<List<DatosEstacion>> obtenerDatosEstacion(int id) async {
   final response = await http.get(Uri.parse('http://localhost:8080/datosEstacion/$id'));
   if (response.statusCode == 200) {
-    final jsonData = jsonDecode(response.body);
-    if (jsonData == null || jsonData.isEmpty) {
-      return null; // Indica que no hay datos
+    List<dynamic> jsonData = jsonDecode(response.body);
+    if (jsonData.isEmpty) {
+      return []; // Indica que no hay datos
     }
-    return DatosEstacion.fromJson(jsonData);
+    return jsonData.map((item) => DatosEstacion.fromJson(item)).toList();
   } else {
-    throw Exception('No se tiene datos registrados del Observador');
+    throw Exception('Error al obtener datos del observador');
   }
 }
 
-Future<void> getDatos() async {
+  Future<void> getDatos() async {
     try {
-      final response = await http.get(Uri.http("localhost:8080", "/datosEstacion/verDatosEstacion"));
+      final response = await http
+          .get(Uri.http("localhost:8080", "/datosEstacion/verDatosEstacion"));
       //print('aaaaaaaa');
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
-        
 
         _lista3 = data.map((e) => DatosEstacion.fromJson(e)).toList();
         print('3333333' + _lista.length.toString());
@@ -143,7 +134,4 @@ Future<void> getDatos() async {
       throw Exception('Error: $e');
     }
   }
-
-
-
 }

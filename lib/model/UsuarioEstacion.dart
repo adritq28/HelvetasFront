@@ -7,6 +7,7 @@ class UsuarioEstacion {
   final String tipoEstacion;
   final String nombreCompleto;
   final String telefono;
+  final int idEstacion;
 
   UsuarioEstacion({
     required this.idUsuario,
@@ -15,6 +16,7 @@ class UsuarioEstacion {
     required this.tipoEstacion,
     required this.nombreCompleto,
     required this.telefono,
+    required this.idEstacion,
   });
 
   factory UsuarioEstacion.fromJson(Map<String, dynamic> json) {
@@ -25,6 +27,7 @@ class UsuarioEstacion {
       tipoEstacion: json['tipoEstacion'],
       nombreCompleto: json['nombreCompleto'],
       telefono: json['telefono'],
+      idEstacion: json['idEstacion'],
     );
   }
 

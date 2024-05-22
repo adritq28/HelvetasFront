@@ -9,15 +9,13 @@ class UsuarioService extends ChangeNotifier {
 
   List<UsuarioEstacion> get lista11 => _lista;
 
-  
-  
   Future<void> getUsuario() async {
     try {
-      final response = await http.get(Uri.http("localhost:8080", "/usuario/verusuarios"));
+      final response =
+          await http.get(Uri.http("localhost:8080", "/usuario/verusuarios"));
       //print('aaaaaaaa');
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
-        
 
         _lista = data.map((e) => UsuarioEstacion.fromJson(e)).toList();
         print('3333333' + _lista.length.toString());
@@ -31,8 +29,6 @@ class UsuarioService extends ChangeNotifier {
       throw Exception('Error: $e');
     }
   }
-
-
 
   Future<String> saveUsuario(UsuarioEstacion usuarioEstacion) async {
     try {
@@ -59,14 +55,15 @@ class UsuarioService extends ChangeNotifier {
 
   Future<void> eliminarEstacion(int id) async {
     print('Dsddddddddddddddddde');
-  final response = await http.delete(Uri.parse('http://localhost:8080/datosEstacion/$id'));
-  if (response.statusCode == 200) {
-    // La estación se eliminó exitosamente
-    // Puedes realizar alguna acción adicional si es necesario
-    print('Datos Estacion eliminada correctamente');
-  } else {
-    // Ocurrió un error al intentar eliminar la estación
-    throw Exception('Error al eliminar la estación');
+    final response =
+        await http.delete(Uri.parse('http://localhost:8080/datosEstacion/$id'));
+    if (response.statusCode == 200) {
+      // La estación se eliminó exitosamente
+      // Puedes realizar alguna acción adicional si es necesario
+      print('Datos Estacion eliminada correctamente');
+    } else {
+      // Ocurrió un error al intentar eliminar la estación
+      throw Exception('Error al eliminar la estación');
+    }
   }
-}
 }
