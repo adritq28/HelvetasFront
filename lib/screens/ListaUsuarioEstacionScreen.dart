@@ -17,7 +17,6 @@ class _ListaUsuarioEstacionScreenState
   late Future<List<UsuarioEstacion>> _futureUsuarioEstacion;
   final EstacionService _datosService3 = EstacionService();
   late UsuarioService miModelo4;
-
   late List<UsuarioEstacion> _usuarioEstacion = [];
 
   @override
@@ -43,57 +42,21 @@ class _ListaUsuarioEstacionScreenState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Lista de Estacion'),
+        backgroundColor: Color(0xFF164092),
+        title: Text(
+          'Observadores Meteorologicos e Hidrologicos',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 18,
+          ),
+        ),
       ),
-      body: Container(
-        margin: const EdgeInsets.all(10.0),
-        child: op2(context),
-      ),
-    );
-  }
-
-  Widget op2(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
+      body: Column(
         children: [
-          formUsuarioEstacion(),
-          SingleChildScrollView(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: DataTable(
-                columnSpacing: 20,
-                columns: const [
-                  DataColumn(label: Text('idUsuario')),
-                  DataColumn(label: Text('Municipio')),
-                  DataColumn(label: Text('Estacion')),
-                  DataColumn(label: Text('Tipo de Estacion')),
-                  DataColumn(label: Text('Nombre Observador')),
-                  DataColumn(label: Text('Celular')),
-                  DataColumn(label: Text('Acciones')),
-                ],
-                rows: miModelo4.lista11.map((dato) {
-                  return DataRow(cells: [
-                    DataCell(Text(dato.idUsuario.toString())),
-                    DataCell(Text(dato.nombreMunicipio.toString())),
-                    DataCell(Text(dato.nombreEstacion.toString())),
-                    DataCell(Text(dato.tipoEstacion.toString())),
-                    DataCell(Text(dato.nombreCompleto.toString())),
-                    DataCell(Text(dato.telefono.toString())),
-                    DataCell(
-                      Row(
-                        children: [
-                          IconButton(
-                            icon: Icon(Icons.edit),
-                            onPressed: () {
-                              mostrarDialogoContrasena(context, dato);
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  ]);
-                }).toList(),
-              ),
+          Expanded(
+            child: Container(
+              margin: const EdgeInsets.all(10.0),
+              child: op2(context),
             ),
           ),
         ],
@@ -101,57 +64,234 @@ class _ListaUsuarioEstacionScreenState
     );
   }
 
+  Widget op2(BuildContext context) {
+    return ListView.builder(
+      itemCount: (miModelo4.lista11.length / 2).ceil(),
+      itemBuilder: (context, index) {
+        int firstIndex = index * 2;
+        int secondIndex = firstIndex + 1;
+
+        var firstDato = miModelo4.lista11[firstIndex];
+        var secondDato = secondIndex < miModelo4.lista11.length
+            ? miModelo4.lista11[secondIndex]
+            : null;
+
+        return Row(
+          children: [
+            Expanded(
+              child: Container(
+                margin: const EdgeInsets.all(10),
+                padding: const EdgeInsets.all(15),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 4,
+                      spreadRadius: 2,
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: CircleAvatar(
+                        radius: 45,
+                        backgroundImage: AssetImage("images/47.jpg"),
+                      ),
+                    ),
+                    Text(
+                      "${firstDato.nombreCompleto}",
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 5),
+                    Text("Municipio: ${firstDato.nombreMunicipio}"),
+                    Text("Estación: ${firstDato.nombreEstacion}"),
+                    Text("Tipo de Estación: ${firstDato.tipoEstacion}"),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        IconButton(
+                          icon: Icon(
+                            Icons.assignment_add,
+                            size: 50,
+                          ),
+                          onPressed: () {
+                            mostrarDialogoContrasena(context, firstDato);
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            if (secondDato != null)
+              Expanded(
+                child: Container(
+                  margin: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(15),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 4,
+                        spreadRadius: 2,
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Center(
+                        child: CircleAvatar(
+                          radius: 45,
+                          backgroundImage: AssetImage("images/46.jpg"),
+                        ),
+                      ),
+                      Text(
+                        "${secondDato.nombreCompleto}",
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(height: 5),
+                      Text("Municipio: ${secondDato.nombreMunicipio}"),
+                      Text("Estación: ${secondDato.nombreEstacion}"),
+                      Text("Tipo de Estación: ${secondDato.tipoEstacion}"),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          IconButton(
+                            icon: Icon(
+                              Icons.assignment_add,
+                              size: 50,
+                            ),
+                            onPressed: () {
+                              mostrarDialogoContrasena(context, secondDato);
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+          ],
+        );
+      },
+    );
+  }
+
   void mostrarDialogoContrasena(BuildContext context, UsuarioEstacion dato) {
     final TextEditingController _passwordController = TextEditingController();
+    bool _obscureText = true;
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('Ingrese Contraseña'),
-          content: TextField(
-            controller: _passwordController,
-            obscureText: true,
-            decoration: InputDecoration(hintText: 'Contraseña'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                controller: _passwordController,
+                obscureText: _obscureText,
+                decoration: InputDecoration(
+                  hintText: 'Contraseña',
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscureText ? Icons.visibility_off : Icons.visibility,
+                      color: Colors.grey,
+                    ),
+                    onPressed: () {
+                      // Cambiar la visibilidad del texto
+                      setState(() {
+                        _obscureText = !_obscureText;
+                        print('aaaaaaaaaa');
+                      });
+                    },
+                  ),
+                ),
+              ),
+              SizedBox(
+                  height: 20), // Espacio entre el campo de texto y los botones
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  TextButton(
+                    child: Text(
+                      'Cancelar',
+                      style: TextStyle(
+                        color: Colors.red, // Cambia el color del texto a rojo
+                        fontSize: 18, // Cambia el tamaño del texto a 18
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                  TextButton(
+                    child: Text(
+                      'Aceptar',
+                      style: TextStyle(
+                        color: Colors.blue, // Cambia el color del texto a azul
+                        fontSize: 18, // Cambia el tamaño del texto a 18
+                      ),
+                    ),
+                    onPressed: () async {
+                      final password = _passwordController.text;
+                      final esValido = await _datosService3.validarContrasena(
+                          password, dato.idUsuario);
+                      if (esValido) {
+                        Navigator.of(context).pop(); // Cierra el diálogo
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) {
+                            return ChangeNotifierProvider(
+                              create: (context) => EstacionService(),
+                              child: ListaEstacionScreen(
+                                idUsuario: dato.idUsuario,
+                                nombreMunicipio: dato.nombreMunicipio,
+                                nombreEstacion: dato.nombreEstacion,
+                                tipoEstacion: dato.tipoEstacion,
+                                nombreCompleto: dato.nombreCompleto,
+                                telefono: dato.telefono,
+                                idEstacion: dato.idEstacion,
+                              ),
+                            );
+                          }),
+                        );
+                      } else {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text('Error'),
+                              content: Text('Contraseña incorrecta'),
+                              actions: [
+                                TextButton(
+                                  child: Text('Aceptar'),
+                                  onPressed: () {
+                                    Navigator.of(context)
+                                        .pop(); // Cierra el diálogo
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ],
           ),
-          actions: [
-            TextButton(
-              child: Text('Cancelar'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: Text('Aceptar'),
-              onPressed: () async {
-                final password = _passwordController.text;
-                final esValido = await _datosService3.validarContrasena(password, dato.idUsuario);
-                if (esValido) {
-                  Navigator.of(context).pop(); // Cierra el diálogo
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) {
-                      return ChangeNotifierProvider(
-                        create: (context) => EstacionService(),
-                        child: ListaEstacionScreen(
-                          idUsuario: dato.idUsuario,
-                          nombreMunicipio: dato.nombreMunicipio,
-                          nombreEstacion: dato.nombreEstacion,
-                          tipoEstacion: dato.tipoEstacion,
-                          nombreCompleto: dato.nombreCompleto,
-                          telefono: dato.telefono,
-                          idEstacion: dato.idEstacion,
-                        ),
-                      );
-                    }),
-                  );
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Contraseña incorrecta')),
-                  );
-                }
-              },
-            ),
-          ],
         );
       },
     );

@@ -1,26 +1,34 @@
-class Municipio{
-  final int id;
-  final String nombre;
-  final int id_provincia;
+class Municipio {
+  final int idMunicipio;
+  final String nombreMunicipio;
+  final int idProvincia;
 
-  Municipio({required this.id, required this.nombre, required this.id_provincia});
+  Municipio(
+      {required this.idMunicipio,
+      required this.nombreMunicipio,
+      required this.idProvincia});
 
   factory Municipio.fromJson(Map<String, dynamic> json) {
     return Municipio(
-      id: json['idEstacion'],
-      nombre: json['nombre'],
-      id_provincia: json['idProvincia'],
+      idMunicipio: json['idMunicipio'] ?? 0,
+      nombreMunicipio: (json['nombreMunicipio'] ?? ''),
+      idProvincia: json['idProvincia'] ?? 0,
     );
   }
 
-    Map<String, dynamic> toJson() => {
-        'idEstacion': id,
-        'nombre': nombre,
-        'idProvincia': id_provincia
+  Map<String, dynamic> toJson() => {
+        'idMunicipio': idMunicipio,
+        'nombreMunicipio': nombreMunicipio,
+        'idProvincia': idProvincia
       };
 
   String toStringMunicipio() {
-    return "Municipio [idMunicipio=" + id.toString() + ", nombre=" + nombre +  ", idProvincia=" + id_provincia.toString() + "]";
+    return "Municipio [idMunicipio=" +
+        idMunicipio.toString() +
+        ", nombre=" +
+        nombreMunicipio +
+        ", idProvincia=" +
+        idProvincia.toString() +
+        "]";
   }
-
 }

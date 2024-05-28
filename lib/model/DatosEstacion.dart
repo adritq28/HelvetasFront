@@ -1,3 +1,5 @@
+
+
 class DatosEstacion {
   //final int id;
   final int idUsuario;
@@ -12,6 +14,9 @@ class DatosEstacion {
   final double pcpn;
   final double taevap;
   //final DateTime fechaReg;
+  late DateTime fechaReg = DateTime.now();
+    
+
   final String dirViento;
   final double velViento;
   final int idEstacion;
@@ -29,7 +34,7 @@ class DatosEstacion {
     required this.tempAmb,
     required this.pcpn,
     required this.taevap,
-    //required this.fechaReg,
+    required this.fechaReg,
     required this.dirViento,
     required this.velViento,
     required this.idEstacion,
@@ -49,9 +54,9 @@ class DatosEstacion {
       tempAmb: (json['tempAmb'] ?? 0.0).toDouble(),
       pcpn: (json['pcpn'] ?? 0.0).toDouble(),
       taevap: (json['taevap'] ?? 0.0).toDouble(),
-      // fechaReg: json['fechaReg'] != null
-      //     ? DateTime.parse(json['fechaReg'])
-      //     : DateTime.now(),
+      fechaReg: json['fechaReg'] != null
+           ? DateTime.parse(json['fechaReg'])
+           : DateTime.now(),
       dirViento: (json['dirViento'] ?? ''),
       velViento: (json['velViento'] ?? 0.0).toDouble(),
       idEstacion: json['idEstacion'] ?? 0,
@@ -71,9 +76,9 @@ class DatosEstacion {
         'tempAmb': tempAmb,
         'pcpn': pcpn,
         'taevap': taevap,
-        // 'fechaReg': fechaReg
-        //     .toUtc()
-        //     .toIso8601String(), //fechaDatos.toIso8601String(),
+         'fechaReg': fechaReg
+             .toUtc()
+             .toIso8601String(), //fechaDatos.toIso8601String(),
         'dirViento': dirViento,
         'velViento': velViento,
         'idEstacion': idEstacion,
@@ -91,6 +96,8 @@ class DatosEstacion {
         nombreCompleto +
         ", telefono=" +
         telefono +
+        ", fechaReg=" +
+        fechaReg.toString() +
         ", tempMax=" +
         tempMax.toString() +
         ", tempMin=" +

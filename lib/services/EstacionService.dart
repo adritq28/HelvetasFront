@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:helvetasfront/model/DatosEstacion.dart';
+import 'package:helvetasfront/model/Municipio.dart';
 import 'package:http/http.dart' as http;
 
 class EstacionService extends ChangeNotifier {
@@ -11,12 +12,8 @@ class EstacionService extends ChangeNotifier {
   List<DatosEstacion> _lista3 = [];
   List<DatosEstacion> get lista113 => _lista3;
 
-  // Future<bool> validarContrasena(String contrasenaIngresada, int idUsuario) async {
-  //   // Implementa aquí la lógica para validar la contraseña con la base de datos
-  //   // Ejemplo ficticio:
-  //   const contrasenaCorrecta = 'tu_contraseña_de_base_de_datos'; // Reemplaza esto con la lógica real
-  //   return contrasenaIngresada == contrasenaCorrecta;
-  // }
+  List<Municipio> _lista4 = [];
+  List<Municipio> get lista114 => _lista4;
 
   final String apiUrl =
       'http://localhost:8080/usuario'; // Reemplaza con la URL de tu API
@@ -55,6 +52,7 @@ class EstacionService extends ChangeNotifier {
 
         _lista = data.map((e) => DatosEstacion.fromJson(e)).toList();
         print('3333333' + _lista.length.toString());
+        
 
         //return datosEstacion;
         notifyListeners();
@@ -142,6 +140,41 @@ class EstacionService extends ChangeNotifier {
       return jsonData.map((item) => DatosEstacion.fromJson(item)).toList();
     } else {
       throw Exception('Error al obtener datos del observador');
+    }
+  }
+
+  Future<List<DatosEstacion>> obtenerDatosMunicipio(int id) async {
+    final response = await http.get(
+        Uri.parse('http://localhost:8080/datosEstacion/datos_municipio/$id'));
+    if (response.statusCode == 200) {
+      List<dynamic> jsonData = jsonDecode(response.body);
+      if (jsonData.isEmpty) {
+        return []; // Indica que no hay datos
+      }
+      return jsonData.map((item) => DatosEstacion.fromJson(item)).toList();
+    } else {
+      throw Exception('Error al obtener datos del observador');
+    }
+  }
+
+  Future<void> getMunicipio() async {
+    try {
+      final response = await http
+          .get(Uri.http("localhost:8080", "/datosEstacion/vermunicipios"));
+      //print('aaaaaaaa');
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+
+        _lista4 = data.map((e) => Municipio.fromJson(e)).toList();
+        print('3333333' + _lista4.length.toString());
+
+        //return datosEstacion;
+        notifyListeners();
+      } else {
+        throw Exception('Failed to load personas');
+      }
+    } catch (e) {
+      throw Exception('Error: $e');
     }
   }
 

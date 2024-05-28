@@ -1,122 +1,105 @@
-// import 'package:flutter/material.dart';
-// import 'package:helvetasfront/model/DatosEstacion.dart';
-// import 'package:helvetasfront/services/EstacionService.dart';
-// import 'package:syncfusion_flutter_charts/charts.dart';
-// import 'package:syncfusion_flutter_charts/sparkcharts.dart';
+import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
-// // class GraficaScreen extends StatelessWidget {
-// //   @override
-// //   Widget build(BuildContext context) {
-// //     return MaterialApp(
-// //       theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: false),
-// //       home: _GraficaScreen(),
-// //     );
-// //   }
-// // }
+class GraficaScreen extends StatelessWidget {
+  final List<double> tempMaxList;
+  final List<DateTime> fechaRegList;
 
-// class GraficaScreen extends StatefulWidget {
-//   @override
-//   _GraficaScreenState createState() => _GraficaScreenState();
-// }
+  GraficaScreen({required this.tempMaxList, required this.fechaRegList});
 
-// // class _GraficaScreen extends StatefulWidget {
-// //   // ignore: prefer_const_constructors_in_immutables
-// //   _GraficaScreen({Key? key}) : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    List<FlSpot> spots = [];
 
-// //   @override
-// //   _GraficaScreenState createState() => _GraficaScreenState();
-// // }
+    for (int i = 0; i < tempMaxList.length; i++) {
+      spots.add(FlSpot(i.toDouble(), tempMaxList[i]));
+    }
 
-// final EstacionService _datosService2 =
-//     EstacionService(); // Instancia del servicio de datos
-// late Future<List<DatosEstacion>>
-//     _futureDatosEstacion; // Futuro de la lista de personas
-
-// // @override
-// // void initState() {
-// //   //_futureDatosEstacion = _datosService2.getDatosEstacion();
-// //   //crear();
-// //   //super.initState();/ Obtiene la lista de personas al iniciar el estado
-// // }
-
-// class _GraficaScreenState extends State<GraficaScreen> {
-//   late EstacionService miModelo;
-//   late List<DatosEstacion> _datosEstacion = [];
-
-//   // List<_SalesData> data = [
-//   //   _SalesData('Jan', 35),
-//   //   _SalesData('Feb', 28),
-//   //   _SalesData('Mar', 34),
-//   //   _SalesData('Apr', 32),
-//   //   _SalesData('May', 40)
-//   // ];
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     miModelo = EstacionService();
-//     _cargarDatosEstacion();
-//   }
-
-//   Future<void> _cargarDatosEstacion() async {
-//     try {
-//       await miModelo.getDatosEstacion();
-//       setState(() {
-//         _datosEstacion = miModelo.lista11;
-//       });
-//     } catch (e) {
-//       print('Error al cargar los datos: $e');
-//     }
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: const Text('Syncfusion Flutter chart'),
-//       ),
-//       body: Column(
-//         children: [
-//           SfCartesianChart(
-//             primaryXAxis: DateTimeAxis(),
-//             title: ChartTitle(text: 'Half yearly sales analysis'),
-//             legend: Legend(isVisible: true),
-//             tooltipBehavior: TooltipBehavior(enable: true),
-//             series: <CartesianSeries>[
-//               LineSeries<DatosEstacion, DateTime>(
-//                 dataSource: _datosEstacion,
-//                 xValueMapper: (DatosEstacion ventas, _) => ventas.fechaDatos,
-//                 yValueMapper: (DatosEstacion ventas, _) => ventas.tempMin,
-//                 name: 'Temperatura',
-//                 dataLabelSettings: DataLabelSettings(isVisible: true),
-//               ),
-//               // LineSeries<DatosEstacion, DateTime>(
-//               //   dataSource: _datosEstacion,
-//               //   xValueMapper: (DatosEstacion ventas, _) => ventas.fechaDatos,
-//               //   yValueMapper: (DatosEstacion ventas, _) => ventas.pcpn,
-//               //   name: 'pcpn',
-//               //   dataLabelSettings: DataLabelSettings(isVisible: true),
-//               // ),
-//             ],
-            
-//           ),
-//           Expanded(
-//             child: Padding(
-//               padding: const EdgeInsets.all(8.0),
-//               child: SfSparkLineChart(
-//                 trackball: SparkChartTrackball(
-//                   activationMode: SparkChartActivationMode.tap,
-//                 ),
-//                 marker: SparkChartMarker(
-//                   displayMode: SparkChartMarkerDisplayMode.all,
-//                 ),
-//                 labelDisplayMode: SparkChartLabelDisplayMode.all,
-//                 data: _datosEstacion.map((datos) => datos.tempMin).toList(),
-//               ),
-//             ),
-//           )
-//         ],
-//       ),
-//     );
-//   }
-// }
+    return Scaffold(
+      //backgroundColor: Color(0xFF164092),
+      appBar: AppBar(
+  title: Text('Gráfica de Temperatura Máxima'),
+  actions: [
+    Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        InkWell(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: Icon(
+            Icons.arrow_back_ios_new,
+            color: Colors.white,
+            size: 25,
+          ),
+        ),
+        Icon(
+          Icons.more_vert,
+          color: Colors.white,
+          size: 28,
+        ),
+      ],
+    ),
+  ],
+),
+      body: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: LineChart(
+          LineChartData(
+            titlesData: FlTitlesData(
+              bottomTitles: SideTitles(
+                showTitles: true,
+                getTitles: (value) {
+                  int index = value.toInt();
+                  if (index >= 0 && index < fechaRegList.length) {
+                    return DateFormat('MM/dd')
+                        .format(DateTime.parse(fechaRegList[index].toString()));
+                  }
+                  return '';
+                },
+              ),
+              leftTitles: SideTitles(
+                showTitles: true,
+                getTextStyles: (context, value) => const TextStyle(
+                  color: Color(0xff68737d),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
+                getTitles: (value) {
+                  return value.toString();
+                },
+                margin: 8,
+                reservedSize: 30,
+              ),
+            ),
+            borderData: FlBorderData(
+              show: true,
+              border: Border.all(color: const Color(0xff37434d), width: 1),
+            ),
+            minX: 0,
+            maxX: tempMaxList.length.toDouble() - 1,
+            minY:
+                tempMaxList.reduce((curr, next) => curr < next ? curr : next) -
+                    5,
+            maxY:
+                tempMaxList.reduce((curr, next) => curr > next ? curr : next) +
+                    5,
+            lineBarsData: [
+              LineChartBarData(
+                spots: spots,
+                isCurved: true,
+                colors: [Colors.blue],
+                barWidth: 4,
+                isStrokeCapRound: true,
+                belowBarData: BarAreaData(
+                  show: false,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
