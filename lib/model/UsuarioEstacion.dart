@@ -8,6 +8,7 @@ class UsuarioEstacion {
   final String nombreCompleto;
   final String telefono;
   final int idEstacion;
+  final bool codTipoEstacion;
 
   UsuarioEstacion({
     required this.idUsuario,
@@ -17,6 +18,7 @@ class UsuarioEstacion {
     required this.nombreCompleto,
     required this.telefono,
     required this.idEstacion,
+    required this.codTipoEstacion,
   });
 
   factory UsuarioEstacion.fromJson(Map<String, dynamic> json) {
@@ -28,6 +30,8 @@ class UsuarioEstacion {
       nombreCompleto: json['nombreCompleto'],
       telefono: json['telefono'],
       idEstacion: json['idEstacion'],
+      codTipoEstacion: json['codTipoEstacion'] ?? true,
+
     );
   }
 

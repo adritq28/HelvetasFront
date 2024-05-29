@@ -15,11 +15,10 @@ class DatosEstacion {
   final double taevap;
   //final DateTime fechaReg;
   late DateTime fechaReg = DateTime.now();
-    
-
   final String dirViento;
   final double velViento;
   final int idEstacion;
+  final bool codTipoEstacion;
 
   DatosEstacion({
     //required this.id,
@@ -38,6 +37,7 @@ class DatosEstacion {
     required this.dirViento,
     required this.velViento,
     required this.idEstacion,
+    required this.codTipoEstacion,
   });
 
   factory DatosEstacion.fromJson(Map<String, dynamic> json) {
@@ -60,6 +60,8 @@ class DatosEstacion {
       dirViento: (json['dirViento'] ?? ''),
       velViento: (json['velViento'] ?? 0.0).toDouble(),
       idEstacion: json['idEstacion'] ?? 0,
+      codTipoEstacion: json['codTipoEstacion'] != null ? json['codTipoEstacion'] == true : false,
+
     );
   }
 
@@ -82,6 +84,7 @@ class DatosEstacion {
         'dirViento': dirViento,
         'velViento': velViento,
         'idEstacion': idEstacion,
+        'codTipoEstacion': codTipoEstacion,
       };
 
   String toStringDatosEstacion() {
@@ -114,6 +117,8 @@ class DatosEstacion {
         velViento.toString() +
         ", idEstacion=" +
         idEstacion.toString() +
+        ", codTipoEstacion=" +
+        codTipoEstacion.toString() +
         "]";
   }
 }

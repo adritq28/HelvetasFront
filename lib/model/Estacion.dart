@@ -7,6 +7,7 @@ class Estacion {
   final bool estado;
   final String tipoEstacion;
   final int idMunicipio;
+  final bool codTipoEstacion;
 
   Estacion(
       {required this.id,
@@ -16,7 +17,8 @@ class Estacion {
       required this.altura,
       required this.estado,
       required this.tipoEstacion,
-      required this.idMunicipio});
+      required this.idMunicipio,
+      required this.codTipoEstacion});
 
   factory Estacion.fromJson(Map<String, dynamic> json) {
     return Estacion(
@@ -28,6 +30,7 @@ class Estacion {
       estado: json['estado'],
       tipoEstacion: json['tipoEstacion'],
       idMunicipio: json['idMunicipio'],
+      codTipoEstacion: json['codTipoEstacion'],
     );
   }
 
@@ -40,6 +43,7 @@ class Estacion {
         'estado': estado,
         'tipoEstacion': tipoEstacion,
         'idMunicipio': idMunicipio,
+        'codTipoEstacion': codTipoEstacion,
       };
 
   String toStringEstacion() {
@@ -59,6 +63,8 @@ class Estacion {
         tipoEstacion +
         ", idMunicipio=" +
         idMunicipio.toString() +
+        ", codTipoEstacion=" +
+        codTipoEstacion.toString() +
         "]";
   }
 }

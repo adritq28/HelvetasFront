@@ -104,17 +104,17 @@ class _MunicipiosScreenState extends State<MunicipiosScreen> {
               ],
             ),
           ),
-          SizedBox(height: 15),
+          const SizedBox(height: 15),
           Center(
             child: ListView.builder(
               shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
+              physics: const NeverScrollableScrollPhysics(),
               itemCount: miModelo4.lista114.length,
               itemBuilder: (context, index) {
                 final dato = miModelo4.lista114[index];
                 return Container(
-                  margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                  padding: EdgeInsets.all(10),
+                  margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                  padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(10),
@@ -183,9 +183,4 @@ class _MunicipiosScreenState extends State<MunicipiosScreen> {
       ),
     );
   }
-
-
-
-
-  
 }

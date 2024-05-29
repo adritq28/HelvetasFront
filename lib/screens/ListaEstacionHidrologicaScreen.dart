@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:helvetasfront/model/DatosEstacion.dart';
+import 'package:helvetasfront/model/DatosEstacionHidrologica.dart';
 import 'package:helvetasfront/screens/GraficaScreen.dart';
-import 'package:helvetasfront/services/EstacionService.dart';
+import 'package:helvetasfront/services/EstacionHidrologicaService.dart';
 import 'package:provider/provider.dart';
 
-class ListaEstacionScreen extends StatefulWidget {
+class ListaEstacionHidrologicaScreen extends StatefulWidget {
   final int idUsuario;
   final String nombreMunicipio;
   final String nombreEstacion;
@@ -13,8 +13,9 @@ class ListaEstacionScreen extends StatefulWidget {
   final String telefono;
   final int idEstacion;
   final bool codTipoEstacion;
+  //final double limnimetro;
 
-  ListaEstacionScreen({
+  ListaEstacionHidrologicaScreen({
     required this.idUsuario,
     required this.nombreMunicipio,
     required this.nombreEstacion,
@@ -23,19 +24,19 @@ class ListaEstacionScreen extends StatefulWidget {
     required this.telefono,
     required this.idEstacion,
     required this.codTipoEstacion,
+    //required this.limnimetro,
   });
 
   @override
-  _ListaEstacionScreenState createState() => _ListaEstacionScreenState();
+  _ListaEstacionHidrologicaScreenState createState() => _ListaEstacionHidrologicaScreenState();
 }
 
-class _ListaEstacionScreenState extends State<ListaEstacionScreen> {
-  final EstacionService _datosService2 =
-      EstacionService(); // Instancia del servicio de datos
-  late Future<List<DatosEstacion>> _futureDatosEstacion;
-  final EstacionService _datosService3 = EstacionService();
-  late EstacionService miModelo4; // Futuro de la lista de personas
-  late List<DatosEstacion> _datosEstacion = [];
+class _ListaEstacionHidrologicaScreenState extends State<ListaEstacionHidrologicaScreen> {
+  final EstacionHidrologicaService _datosService2 = EstacionHidrologicaService(); // Instancia del servicio de datos
+  late Future<List<DatosEstacionHidrologica>> _futureDatosEstacion;
+  final EstacionHidrologicaService _datosService3 = EstacionHidrologicaService();
+  late EstacionHidrologicaService miModelo4; // Futuro de la lista de personas
+  late List<DatosEstacionHidrologica> _datosEstacion = [];
 
   List<double> tempMaxList = [];
   List<DateTime> fechaRegList = [];
@@ -43,14 +44,14 @@ class _ListaEstacionScreenState extends State<ListaEstacionScreen> {
   @override
   void initState() {
     super.initState();
-    miModelo4 = Provider.of<EstacionService>(context, listen: false);
-    _cargarDatosEstacion(); // Carga los datos al inicializar el estado
+    miModelo4 = Provider.of<EstacionHidrologicaService>(context, listen: false);
+    _cargarDatosEstacionHidrologica(); // Carga los datos al inicializar el estado
   }
 
-  Future<void> _cargarDatosEstacion() async {
+  Future<void> _cargarDatosEstacionHidrologica() async {
     try {
-      await miModelo4.obtenerDatosEstacion(widget.idUsuario);
-      List<DatosEstacion> a = miModelo4.lista11;
+      await miModelo4.obtenerDatosHidrologica(widget.idUsuario);
+      List<DatosEstacionHidrologica> a = miModelo4.lista11;
       setState(() {
         _datosEstacion = a; // Asigna los datos a la lista
       });
@@ -63,16 +64,6 @@ class _ListaEstacionScreenState extends State<ListaEstacionScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xFF164092),
-      // appBar: AppBar(
-      //   backgroundColor: Color(0xFF164092),
-      //   title: Text(
-      //     'Registro de datos Estacion ' + widget.tipoEstacion,
-      //     style: TextStyle(
-      //       color: Colors.white,
-      //       fontSize: 20,
-      //     ),
-      //   ),
-      // ),
 
       body: SingleChildScrollView(
         child: Column(
@@ -142,9 +133,9 @@ class _ListaEstacionScreenState extends State<ListaEstacionScreen> {
             formDatosEstacion(),
             SizedBox(
                 height: 20), // Espacio entre el formulario y la tabla de datos
-            FutureBuilder<List<DatosEstacion>>(
-              future: _datosService3.obtenerDatosEstacion(widget.idUsuario),
-              builder: (context, AsyncSnapshot<List<DatosEstacion>> snapshot) {
+            FutureBuilder<List<DatosEstacionHidrologica>>(
+              future: _datosService3.obtenerDatosHidrologica(widget.idUsuario),
+              builder: (context, AsyncSnapshot<List<DatosEstacionHidrologica>> snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
@@ -165,12 +156,12 @@ class _ListaEstacionScreenState extends State<ListaEstacionScreen> {
     );
   }
 
-  SingleChildScrollView tablaDatos(List<DatosEstacion> datosList,
+  SingleChildScrollView tablaDatos(List<DatosEstacionHidrologica> datosList,
       List<double> tempMaxList, List<DateTime> fechaRegList) {
-    //_fechaReg = DateTime.now();
-    //String formattedDateTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(_fechaReg.toUtc().add(Duration(hours: 4)));
+        //_fechaReg = DateTime.now();
+        //String formattedDateTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(_fechaReg.toUtc().add(Duration(hours: 4)));
     datosList.forEach((datos) {
-      tempMaxList.add(datos.tempMax);
+      tempMaxList.add(datos.limnimetro);
       fechaRegList.add(datos.fechaReg);
     });
     return SingleChildScrollView(
@@ -197,31 +188,7 @@ class _ListaEstacionScreenState extends State<ListaEstacionScreen> {
                     style: TextStyle(
                         fontWeight: FontWeight.bold, color: Colors.white))),
             DataColumn(
-                label: Text('Temp. Max',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.white))),
-            DataColumn(
-                label: Text('Temp. Min',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.white))),
-            DataColumn(
-                label: Text('Temp. Amb',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.white))),
-            DataColumn(
-                label: Text('PCPN',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.white))),
-            DataColumn(
-                label: Text('TAEVAP',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.white))),
-            DataColumn(
-                label: Text('Dirección del Viento',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.white))),
-            DataColumn(
-                label: Text('Velocidad del Viento',
+                label: Text('Limnimetro',
                     style: TextStyle(
                         fontWeight: FontWeight.bold, color: Colors.white))),
             DataColumn(
@@ -233,7 +200,7 @@ class _ListaEstacionScreenState extends State<ListaEstacionScreen> {
                     style: TextStyle(
                         fontWeight: FontWeight.bold, color: Colors.white))),
             DataColumn(
-                label: Text('COD estacion',
+                label: Text('Delete',
                     style: TextStyle(
                         fontWeight: FontWeight.bold, color: Colors.white))),
             // Otros campos según tus necesidades
@@ -242,16 +209,10 @@ class _ListaEstacionScreenState extends State<ListaEstacionScreen> {
             return DataRow(cells: [
               DataCell(Text('${datos.idUsuario}')),
               DataCell(Text('${widget.nombreMunicipio}')),
-              DataCell(Text('${datos.tempMax}')),
-              DataCell(Text('${datos.tempMin}')),
-              DataCell(Text('${datos.tempAmb}')),
-              DataCell(Text('${datos.pcpn}')),
-              DataCell(Text('${datos.taevap}')),
-              DataCell(Text('${datos.dirViento}')),
-              DataCell(Text('${datos.velViento}')),
+              DataCell(Text('${datos.limnimetro}')),
               DataCell(Text('${datos.fechaReg}')),
               DataCell(Text('${datos.idEstacion}')),
-              DataCell(Text('${datos.codTipoEstacion}')),
+              DataCell(Text('${datos.delete}')),
               // Otros campos según tus necesidades
             ]);
           }).toList(),
@@ -260,10 +221,10 @@ class _ListaEstacionScreenState extends State<ListaEstacionScreen> {
     );
   }
 
-  Future<Widget> crear(DatosEstacion elem) async {
+  Future<Widget> crear(DatosEstacionHidrologica elem) async {
     //_fechaReg = DateTime.now();
     //String formattedDateTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(_fechaReg.toUtc().add(Duration(hours: 4)));
-    String h = await _datosService2.saveDatosEstacion(elem);
+    String h = await _datosService2.saveDatosEstacionHidrologica(elem);
     return AlertDialog(
       title: const Text('Título del Alerta'),
       content: Text(h),
@@ -272,7 +233,7 @@ class _ListaEstacionScreenState extends State<ListaEstacionScreen> {
           onPressed: () {
             Navigator.of(context).pop();
             setState(() {
-              _cargarDatosEstacion();
+              _cargarDatosEstacionHidrologica();
             }); // Cierra el diálogo
           },
           child: const Text('Aceptar'),
@@ -287,14 +248,8 @@ class _ListaEstacionScreenState extends State<ListaEstacionScreen> {
   late String _nombreEstacion;
   late String _tipoEstacion;
   late String _nombreCompleto;
-  late String _telefono;
-  late double _tempMax;
-  late double _tempMin;
-  late double _tempAmb;
-  late double _pcpn;
-  late double _taevap;
-  late String _dirViento;
-  late double _velViento;
+  late double _limnimetro;
+  late bool _delete;
   late int _idEstacion;
   late DateTime fechaReg = DateTime.now();
 
@@ -302,12 +257,11 @@ class _ListaEstacionScreenState extends State<ListaEstacionScreen> {
     return Padding(
         padding: const EdgeInsets.all(0),
         child: Container(
-          height: MediaQuery.of(context).size.height/1.5,
+          height: MediaQuery.of(context).size.height / 1.5,
           width: double.infinity,
           padding: EdgeInsets.only(
             top: 20,
             left: 15,
-            right: 15,
           ),
           decoration: BoxDecoration(
             color: Colors.white,
@@ -321,154 +275,10 @@ class _ListaEstacionScreenState extends State<ListaEstacionScreen> {
             child: Form(
               key: _formKey,
               child: Column(
-                mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 16.0, horizontal: 8.0),
-                          child: TextFormField(
-                            decoration: InputDecoration(
-                              labelText: 'Temp. Max',
-                              hintText: 'Temp. Max',
-                              prefixIcon: Icon(
-                                Icons.thermostat,
-                                color: Color(0xFF164092),
-                              ), // Color del icono
-                              contentPadding:
-                                  EdgeInsets.symmetric(vertical: 20.0),
-                              labelStyle: TextStyle(
-                                  fontSize: 16.0, fontWeight: FontWeight.bold),
-                              hintStyle: TextStyle(fontSize: 20.0),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10.0),
-                                borderSide: BorderSide(
-                                  color: Color(0xFF164092),
-                                ), // Color del borde
-                              ),
-                            ),
-                            keyboardType:
-                                TextInputType.numberWithOptions(decimal: true),
-                            textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 24.0),
-                            onSaved: (value) {  
-                              _tempMax = double.tryParse(value ?? '0') ?? 0.0;
-                            },
-                          ),
-                        ),
-                      ),
-
-                      //const SizedBox(width: 5), // Espacio entre los campos
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 16.0, horizontal: 8.0),
-                          child: TextFormField(
-                            decoration: InputDecoration(
-                              labelText: 'Temp. Min',
-                              hintText: 'Temp. Min',
-                              prefixIcon: Icon(
-                                Icons.thermostat,
-                                color: Color(0xFF164092),
-                              ),
-                              contentPadding:
-                                  EdgeInsets.symmetric(vertical: 20.0),
-                              labelStyle: TextStyle(
-                                  fontSize: 16.0, fontWeight: FontWeight.bold),
-                              hintStyle: TextStyle(fontSize: 20.0),
-                              border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10.0),
-                                  borderSide: BorderSide(
-                                    color: Color(0xFF164092),
-                                  )),
-                            ),
-                            keyboardType:
-                                TextInputType.numberWithOptions(decimal: true),
-                            textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 24.0),
-                            onSaved: (value) {
-                              _tempMin = double.tryParse(value ?? '0') ?? 0.0;
-                            },
-                          ),
-                        ),
-                      ),
-                      //const SizedBox(width: 5),
-                    ],
-                  ),
+                  
                   //const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 16.0, horizontal: 8.0),
-                          child: TextFormField(
-                            decoration: InputDecoration(
-                              labelText: 'Precipitacion',
-                              hintText: 'Precipitacion',
-                              prefixIcon: Icon(
-                                Icons.water,
-                                color: Color(0xFF164092),
-                              ),
-                              contentPadding:
-                                  EdgeInsets.symmetric(vertical: 20.0),
-                              labelStyle: TextStyle(
-                                  fontSize: 16.0, fontWeight: FontWeight.bold),
-                              hintStyle: TextStyle(fontSize: 20.0),
-                              border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10.0),
-                                  borderSide: BorderSide(
-                                    color: Color(0xFF164092),
-                                  )),
-                            ),
-                            keyboardType:
-                                TextInputType.numberWithOptions(decimal: true),
-                            textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 24.0),
-                            onSaved: (value) {
-                              _pcpn = double.tryParse(value ?? '0') ?? 0.0;
-                            },
-                          ),
-                        ),
-                      ),
-                      //const SizedBox(width: 5), // Espacio entre los campos
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 16.0, horizontal: 8.0),
-                          child: TextFormField(
-                            decoration: InputDecoration(
-                              labelText: 'Evaporacion',
-                              hintText: 'Evaporacion',
-                              prefixIcon: Icon(
-                                Icons.water_damage,
-                                color: Color(0xFF164092),
-                              ),
-                              contentPadding:
-                                  EdgeInsets.symmetric(vertical: 20.0),
-                              labelStyle: TextStyle(
-                                  fontSize: 16.0, fontWeight: FontWeight.bold),
-                              hintStyle: TextStyle(fontSize: 20.0),
-                              border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10.0),
-                                  borderSide: BorderSide(
-                                    color: Color(0xFF164092),
-                                  )),
-                            ),
-                            keyboardType:
-                                TextInputType.numberWithOptions(decimal: true),
-                            textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 24.0),
-                            onSaved: (value) {
-                              _taevap = double.tryParse(value ?? '0') ?? 0.0;
-                            },
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                  
                   //const SizedBox(height: 5),
                   Row(
                     children: [
@@ -478,8 +288,8 @@ class _ListaEstacionScreenState extends State<ListaEstacionScreen> {
                               vertical: 16.0, horizontal: 8.0),
                           child: TextFormField(
                             decoration: InputDecoration(
-                              labelText: 'Dir. Viento',
-                              hintText: 'Dir. Viento',
+                              labelText: 'Limnimetro',
+                              hintText: 'Limnimetro',
                               prefixIcon: Icon(
                                 Icons.air,
                                 color: Color(0xFF164092),
@@ -500,46 +310,13 @@ class _ListaEstacionScreenState extends State<ListaEstacionScreen> {
                             textAlign: TextAlign.center,
                             style: TextStyle(fontSize: 24.0),
                             onSaved: (value) {
-                              _dirViento = value!;
+                              _limnimetro = double.tryParse(value ?? '0') ?? 0.0;
                             },
                           ),
                         ),
                       ),
                       //const SizedBox(width: 5), // Espacio entre los campos
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 16.0, horizontal: 8.0),
-                          child: TextFormField(
-                            decoration: InputDecoration(
-                              labelText: 'Vel. Viento',
-                              hintText: 'Vel. Viento',
-                              prefixIcon: Icon(
-                                Icons.speed,
-                                color: Color(0xFF164092),
-                              ),
-                              contentPadding:
-                                  EdgeInsets.symmetric(vertical: 20.0),
-                              labelStyle: TextStyle(
-                                  fontSize: 16.0, fontWeight: FontWeight.bold),
-                              hintStyle: TextStyle(fontSize: 20.0),
-                              border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10.0),
-                                  borderSide: BorderSide(
-                                    color: Color(0xFF164092),
-                                  )),
-                            ),
-                            keyboardType:
-                                TextInputType.numberWithOptions(decimal: true),
-                            textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 24.0),
-                            onSaved: (value) {
-                              _velViento = double.tryParse(value ?? '0') ?? 0.0;
-                            },
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
+                    
                     ],
                   ),
                   //const SizedBox(width: 5),
@@ -549,8 +326,8 @@ class _ListaEstacionScreenState extends State<ListaEstacionScreen> {
                           vertical: 10.0, horizontal: 8.0),
                       child: TextFormField(
                         decoration: InputDecoration(
-                          labelText: 'Temp. Amb',
-                          hintText: 'Temp. Amb',
+                          labelText: 'Limnimetro',
+                          hintText: 'Limnimetro',
                           prefixIcon: Icon(
                             Icons.thermostat,
                             color: Color(0xFF164092),
@@ -570,7 +347,7 @@ class _ListaEstacionScreenState extends State<ListaEstacionScreen> {
                         textAlign: TextAlign.center,
                         style: TextStyle(fontSize: 24.0),
                         onSaved: (value) {
-                          _tempAmb = double.tryParse(value ?? '0') ?? 0.0;
+                          _limnimetro = double.tryParse(value ?? '0') ?? 0.0;
                         },
                       ),
                     ),
@@ -627,24 +404,17 @@ class _ListaEstacionScreenState extends State<ListaEstacionScreen> {
                           onTap: () {
                             if (_formKey.currentState!.validate()) {
                               _formKey.currentState!.save();
-                              DatosEstacion nuevoDato = DatosEstacion(
-                                  idUsuario: widget.idUsuario,
-                                  nombreMunicipio: widget.nombreMunicipio,
-                                  nombreEstacion: widget.nombreEstacion,
-                                  tipoEstacion: widget.tipoEstacion,
-                                  nombreCompleto: widget.nombreCompleto,
-                                  telefono: widget.telefono,
-                                  tempMax: _tempMax,
-                                  tempMin: _tempMin,
-                                  tempAmb: _tempAmb,
-                                  pcpn: _pcpn,
-                                  taevap: _taevap,
-                                  dirViento: _dirViento,
-                                  velViento: _velViento,
-                                  idEstacion: widget.idEstacion,
-                                  fechaReg: fechaReg
-                                    ..toUtc().subtract(Duration(hours: 8)),
-                                  codTipoEstacion: widget.codTipoEstacion);
+                              DatosEstacionHidrologica nuevoDato = DatosEstacionHidrologica(
+                                idUsuario: widget.idUsuario,
+                                nombreMunicipio: widget.nombreMunicipio,
+                                nombreEstacion: widget.nombreEstacion,
+                                tipoEstacion: widget.tipoEstacion,
+                                nombreCompleto: widget.nombreCompleto,
+                                limnimetro: _limnimetro,
+                                idEstacion: widget.idEstacion,
+                                fechaReg: fechaReg..toUtc().subtract(Duration(hours: 8)),
+                                delete: widget.codTipoEstacion
+                              );
                               crear(nuevoDato).then((alertDialog) {
                                 showDialog(
                                   context: context,

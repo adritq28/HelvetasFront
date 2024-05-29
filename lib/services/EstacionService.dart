@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:helvetasfront/model/DatosEstacion.dart';
+import 'package:helvetasfront/model/Estacion.dart';
 import 'package:helvetasfront/model/Municipio.dart';
 import 'package:http/http.dart' as http;
 
@@ -14,6 +15,9 @@ class EstacionService extends ChangeNotifier {
 
   List<Municipio> _lista4 = [];
   List<Municipio> get lista114 => _lista4;
+
+  List<Estacion> _lista5 = [];
+  List<Estacion> get lista115 => _lista5;
 
   final String apiUrl =
       'http://localhost:8080/usuario'; // Reemplaza con la URL de tu API
@@ -177,6 +181,21 @@ class EstacionService extends ChangeNotifier {
       throw Exception('Error: $e');
     }
   }
+
+  Future<List<Estacion>> getEstacion(int id) async {
+    final response = await http.get(
+        Uri.parse('http://localhost:8080/estacion/verEstaciones/$id'));
+    if (response.statusCode == 200) {
+      List<dynamic> jsonData = jsonDecode(response.body);
+      if (jsonData.isEmpty) {
+        return []; // Indica que no hay datos
+      }
+      return jsonData.map((item) => Estacion.fromJson(item)).toList();
+    } else {
+      throw Exception('Error al obtener datos del observador');
+    }
+  }
+
 
   Future<void> getDatos() async {
     try {

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:helvetasfront/model/UsuarioEstacion.dart';
+import 'package:helvetasfront/screens/ListaEstacionHidrologicaScreen.dart';
 import 'package:helvetasfront/screens/ListaEstacionScreen.dart';
+import 'package:helvetasfront/services/EstacionHidrologicaService.dart';
 import 'package:helvetasfront/services/EstacionService.dart';
 import 'package:helvetasfront/services/UsuarioService.dart';
 import 'package:provider/provider.dart';
@@ -111,6 +113,7 @@ class _ListaUsuarioEstacionScreenState
                     Text("Municipio: ${firstDato.nombreMunicipio}"),
                     Text("Estación: ${firstDato.nombreEstacion}"),
                     Text("Tipo de Estación: ${firstDato.tipoEstacion}"),
+                    Text("COD tipo estacion: ${firstDato.codTipoEstacion}"),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
@@ -163,6 +166,7 @@ class _ListaUsuarioEstacionScreenState
                       Text("Municipio: ${secondDato.nombreMunicipio}"),
                       Text("Estación: ${secondDato.nombreEstacion}"),
                       Text("Tipo de Estación: ${secondDato.tipoEstacion}"),
+                      Text("COD Estación: ${secondDato.codTipoEstacion}"),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
@@ -248,24 +252,49 @@ class _ListaUsuarioEstacionScreenState
                       final esValido = await _datosService3.validarContrasena(
                           password, dato.idUsuario);
                       if (esValido) {
-                        Navigator.of(context).pop(); // Cierra el diálogo
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) {
-                            return ChangeNotifierProvider(
-                              create: (context) => EstacionService(),
-                              child: ListaEstacionScreen(
-                                idUsuario: dato.idUsuario,
-                                nombreMunicipio: dato.nombreMunicipio,
-                                nombreEstacion: dato.nombreEstacion,
-                                tipoEstacion: dato.tipoEstacion,
-                                nombreCompleto: dato.nombreCompleto,
-                                telefono: dato.telefono,
-                                idEstacion: dato.idEstacion,
-                              ),
-                            );
-                          }),
-                        );
+                        if (dato.codTipoEstacion) {
+                          Navigator.of(context).pop(); // Cierra el diálogo
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) {
+                              return ChangeNotifierProvider(
+                                create: (context) => EstacionService(),
+                                child: ListaEstacionScreen(
+                                  idUsuario: dato.idUsuario,
+                                  nombreMunicipio: dato.nombreMunicipio,
+                                  nombreEstacion: dato.nombreEstacion,
+                                  tipoEstacion: dato.tipoEstacion,
+                                  nombreCompleto: dato.nombreCompleto,
+                                  telefono: dato.telefono,
+                                  idEstacion: dato.idEstacion,
+                                  codTipoEstacion: dato.codTipoEstacion,
+                                ),
+                              );
+                            }),
+                          );
+                        }
+                        else{
+                          Navigator.of(context).pop(); // Cierra el diálogo
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) {
+                              return ChangeNotifierProvider(
+                                create: (context) => EstacionHidrologicaService(),
+                                child: ListaEstacionHidrologicaScreen(
+                                  idUsuario: dato.idUsuario,
+                                  nombreMunicipio: dato.nombreMunicipio,
+                                  nombreEstacion: dato.nombreEstacion,
+                                  tipoEstacion: dato.tipoEstacion,
+                                  nombreCompleto: dato.nombreCompleto,
+                                  telefono: dato.telefono,
+                                  idEstacion: dato.idEstacion,
+                                  codTipoEstacion: dato.codTipoEstacion,
+        
+                                ),
+                              );
+                            }),
+                          );
+                        }
                       } else {
                         showDialog(
                           context: context,
@@ -324,6 +353,7 @@ class _ListaUsuarioEstacionScreenState
   late String _nombreCompleto;
   late String _telefono;
   late int _idEstacion;
+  late bool _codTipoEstacion;
 
   Widget formUsuarioEstacion() {
     return Form(
@@ -387,14 +417,14 @@ class _ListaUsuarioEstacionScreenState
               if (_formKey.currentState!.validate()) {
                 _formKey.currentState!.save();
                 UsuarioEstacion nuevoDato = UsuarioEstacion(
-                  idUsuario: _idUsuario,
-                  nombreMunicipio: _nombreMunicipio,
-                  nombreEstacion: _nombreEstacion,
-                  tipoEstacion: _tipoEstacion,
-                  nombreCompleto: _nombreCompleto,
-                  telefono: _telefono,
-                  idEstacion: _idEstacion,
-                );
+                    idUsuario: _idUsuario,
+                    nombreMunicipio: _nombreMunicipio,
+                    nombreEstacion: _nombreEstacion,
+                    tipoEstacion: _tipoEstacion,
+                    nombreCompleto: _nombreCompleto,
+                    telefono: _telefono,
+                    idEstacion: _idEstacion,
+                    codTipoEstacion: _codTipoEstacion);
                 print(nuevoDato.toStringUsuarioEstacion());
 
                 crear(nuevoDato).then((alertDialog) {
