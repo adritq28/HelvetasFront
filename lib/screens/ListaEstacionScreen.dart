@@ -63,16 +63,6 @@ class _ListaEstacionScreenState extends State<ListaEstacionScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xFF164092),
-      // appBar: AppBar(
-      //   backgroundColor: Color(0xFF164092),
-      //   title: Text(
-      //     'Registro de datos Estacion ' + widget.tipoEstacion,
-      //     style: TextStyle(
-      //       color: Colors.white,
-      //       fontSize: 20,
-      //     ),
-      //   ),
-      // ),
 
       body: SingleChildScrollView(
         child: Column(

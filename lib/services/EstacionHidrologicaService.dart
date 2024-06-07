@@ -16,11 +16,14 @@ class EstacionHidrologicaService extends ChangeNotifier {
   List<Municipio> _lista4 = [];
   List<Municipio> get lista114 => _lista4;
 
+  List<DatosEstacion> _lista5 = [];
+  List<DatosEstacion> get lista115 => _lista5;
+
   final String apiUrl =
       'http://localhost:8080/usuario'; // Reemplaza con la URL de tu API
 
-
-  Future<String> saveDatosEstacionHidrologica(DatosEstacionHidrologica estacion) async {
+  Future<String> saveDatosEstacionHidrologica(
+      DatosEstacionHidrologica estacion) async {
     try {
       final response = await http.post(
         Uri.http("localhost:8080", "/datosHidrologica/addDatosHidrologica"),
@@ -43,18 +46,53 @@ class EstacionHidrologicaService extends ChangeNotifier {
     }
   }
 
-
   Future<List<DatosEstacionHidrologica>> obtenerDatosHidrologica(int id) async {
-    final response =
-        await http.get(Uri.parse('http://localhost:8080/datosHidrologica/listaHidrologica/$id'));
+    final response = await http.get(Uri.parse(
+        'http://localhost:8080/datosHidrologica/listaHidrologica/$id'));
     if (response.statusCode == 200) {
       List<dynamic> jsonData = jsonDecode(response.body);
       if (jsonData.isEmpty) {
         return []; // Indica que no hay datos
       }
-      return jsonData.map((item) => DatosEstacionHidrologica.fromJson(item)).toList();
+      return jsonData
+          .map((item) => DatosEstacionHidrologica.fromJson(item))
+          .toList();
     } else {
       throw Exception('Error al obtener datos de la estacion hidrologica');
+    }
+  }
+
+  Future<List<DatosEstacionHidrologica>> obtenerListaHidrologica(int id) async {
+    final response = await http.get(
+        Uri.parse('http://localhost:8080/datosHidrologica/hidrologica/$id'));
+    if (response.statusCode == 200) {
+      List<dynamic> jsonData = jsonDecode(response.body);
+      if (jsonData.isEmpty) {
+        return []; // Indica que no hay datos
+      }
+      return jsonData
+          .map((item) => DatosEstacionHidrologica.fromJson(item))
+          .toList();
+    } else {
+      throw Exception('Error al obtener datos de la estacion hidrologica');
+    }
+  }
+
+  Future<List<DatosEstacionHidrologica>> getListaHidrologica(int id) async {
+    final response = await http.get(
+        Uri.parse('http://localhost:8080/datosHidrologica/hidrologica/$id'));
+
+    if (response.statusCode == 200) {
+      List<dynamic> jsonData = jsonDecode(response.body);
+      _lista3 =
+          jsonData.map((e) => DatosEstacionHidrologica.fromJson(e)).toList();
+      notifyListeners();
+      if (jsonData.isEmpty) {
+        return []; // Indica que no hay datos
+      }
+      return _lista3;
+    } else {
+      throw Exception('Error al obtener datos del observadooooooooor');
     }
   }
 
@@ -63,12 +101,13 @@ class EstacionHidrologicaService extends ChangeNotifier {
         Uri.parse('http://localhost:8080/datosEstacion/datos_municipio/$id'));
     if (response.statusCode == 200) {
       List<dynamic> jsonData = jsonDecode(response.body);
+      _lista5 = jsonData.map((item) => DatosEstacion.fromJson(item)).toList();
       if (jsonData.isEmpty) {
         return []; // Indica que no hay datos
       }
-      return jsonData.map((item) => DatosEstacion.fromJson(item)).toList();
+      return _lista5;
     } else {
-      throw Exception('Error al obtener datos del observador');
+      throw Exception('Error al obtener datos del observador22222112222');
     }
   }
 
@@ -101,7 +140,8 @@ class EstacionHidrologicaService extends ChangeNotifier {
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
 
-        _lista3 = data.map((e) => DatosEstacionHidrologica.fromJson(e)).toList();
+        _lista3 =
+            data.map((e) => DatosEstacionHidrologica.fromJson(e)).toList();
         print('3333333' + _lista.length.toString());
 
         //return datosEstacion;

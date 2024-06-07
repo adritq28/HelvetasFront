@@ -56,7 +56,6 @@ class EstacionService extends ChangeNotifier {
 
         _lista = data.map((e) => DatosEstacion.fromJson(e)).toList();
         print('3333333' + _lista.length.toString());
-        
 
         //return datosEstacion;
         notifyListeners();
@@ -183,19 +182,38 @@ class EstacionService extends ChangeNotifier {
   }
 
   Future<List<Estacion>> getEstacion(int id) async {
-    final response = await http.get(
-        Uri.parse('http://localhost:8080/estacion/verEstaciones/$id'));
+    final response = await http
+        .get(Uri.parse('http://localhost:8080/estacion/verEstaciones/$id'));
+
     if (response.statusCode == 200) {
       List<dynamic> jsonData = jsonDecode(response.body);
+      _lista5 = jsonData.map((e) => Estacion.fromJson(e)).toList();
+      notifyListeners();
       if (jsonData.isEmpty) {
         return []; // Indica que no hay datos
       }
-      return jsonData.map((item) => Estacion.fromJson(item)).toList();
+      return _lista5;
     } else {
       throw Exception('Error al obtener datos del observador');
     }
   }
 
+  Future<List<DatosEstacion>> getListaMetetorologica(int id) async {
+    final response = await http
+        .get(Uri.parse('http://localhost:8080/datosEstacion/obtener_estacion_meteorologica/$id'));
+
+    if (response.statusCode == 200) {
+      List<dynamic> jsonData = jsonDecode(response.body);
+      _lista3 = jsonData.map((e) => DatosEstacion.fromJson(e)).toList();
+      notifyListeners();
+      if (jsonData.isEmpty) {
+        return []; // Indica que no hay datos
+      }
+      return _lista3;
+    } else {
+      throw Exception('Error al obtener datos del observador');
+    }
+  }
 
   Future<void> getDatos() async {
     try {

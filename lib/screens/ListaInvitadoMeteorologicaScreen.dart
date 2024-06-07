@@ -3,20 +3,22 @@ import 'package:helvetasfront/model/DatosEstacion.dart';
 import 'package:helvetasfront/services/EstacionService.dart';
 import 'package:provider/provider.dart';
 
-class ListaInvidatoScreen extends StatefulWidget {
-  final int idMunicipio;
+class ListaInvitadoMeteorologicaScreen extends StatefulWidget {
+  final int idEstacion;
+  final String nombreEstacion;
   final String nombreMunicipio;
 
-  ListaInvidatoScreen({
-    required this.idMunicipio,
+  ListaInvitadoMeteorologicaScreen({
+    required this.idEstacion,
+    required this.nombreEstacion,
     required this.nombreMunicipio,
   });
 
   @override
-  _ListaInvidatoScreenState createState() => _ListaInvidatoScreenState();
+  _ListaInvitadoMeteorologicaScreenState createState() => _ListaInvitadoMeteorologicaScreenState();
 }
 
-class _ListaInvidatoScreenState extends State<ListaInvidatoScreen> {
+class _ListaInvitadoMeteorologicaScreenState extends State<ListaInvitadoMeteorologicaScreen> {
   final EstacionService _datosService2 =
       EstacionService(); // Instancia del servicio de datos
   late Future<List<DatosEstacion>> _futureDatosEstacion;
@@ -28,12 +30,12 @@ class _ListaInvidatoScreenState extends State<ListaInvidatoScreen> {
   void initState() {
     super.initState();
     miModelo4 = Provider.of<EstacionService>(context, listen: false);
-    _cargarDatosEstacion(); // Carga los datos al inicializar el estado
+    _cargarDatosMeteorologica(); // Carga los datos al inicializar el estado
   }
 
-  Future<void> _cargarDatosEstacion() async {
+  Future<void> _cargarDatosMeteorologica() async {
     try {
-      await miModelo4.obtenerDatosMunicipio(widget.idMunicipio);
+      await miModelo4.obtenerDatosMunicipio(widget.idEstacion);
       List<DatosEstacion> a = miModelo4.lista11;
       setState(() {
         _datosEstacion = a; // Asigna los datos a la lista
@@ -62,7 +64,7 @@ class _ListaInvidatoScreenState extends State<ListaInvidatoScreen> {
         child: Column(
           children: [
             // Aquí colocas tu formulario
-            
+
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
               child: Column(
@@ -114,9 +116,9 @@ class _ListaInvidatoScreenState extends State<ListaInvidatoScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 TextButton.icon(
-                  icon: Icon(Icons.feed , color: Colors.white),
-                  label:
-                      Text('Exportar Datos', style: TextStyle(color: Colors.white)),
+                  icon: Icon(Icons.feed, color: Colors.white),
+                  label: Text('Exportar Datos',
+                      style: TextStyle(color: Colors.white)),
                   style: TextButton.styleFrom(
                     backgroundColor: Colors.grey, // Color plomo
                     shape: RoundedRectangleBorder(
@@ -135,7 +137,6 @@ class _ListaInvidatoScreenState extends State<ListaInvidatoScreen> {
                     //     );
                     //   }),
                     // );
-                    
                   },
                 ),
               ],
@@ -144,7 +145,7 @@ class _ListaInvidatoScreenState extends State<ListaInvidatoScreen> {
             SizedBox(
                 height: 20), // Espacio entre el formulario y la tabla de datos
             FutureBuilder<List<DatosEstacion>>(
-              future: _datosService3.obtenerDatosMunicipio(widget.idMunicipio),
+              future: _datosService3.getListaMetetorologica(widget.idEstacion),
               builder: (context, AsyncSnapshot<List<DatosEstacion>> snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Center(child: CircularProgressIndicator());

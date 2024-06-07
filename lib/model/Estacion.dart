@@ -1,6 +1,6 @@
 class Estacion {
   final int id;
-  final String nombre;
+  final String nombreEstacion;
   final String latitud;
   final String longitud;
   final String altura;
@@ -11,7 +11,7 @@ class Estacion {
 
   Estacion(
       {required this.id,
-      required this.nombre,
+      required this.nombreEstacion,
       required this.latitud,
       required this.longitud,
       required this.altura,
@@ -22,21 +22,21 @@ class Estacion {
 
   factory Estacion.fromJson(Map<String, dynamic> json) {
     return Estacion(
-      id: json['idEstacion'],
-      nombre: json['nombre'],
-      latitud: json['latitud'],
-      longitud: json['longitud'],
-      altura: json['altura'],
-      estado: json['estado'],
-      tipoEstacion: json['tipoEstacion'],
-      idMunicipio: json['idMunicipio'],
-      codTipoEstacion: json['codTipoEstacion'],
+      id: json['idEstacion']?? 0,
+      nombreEstacion: (json['nombre']?? ''),
+      latitud: (json['latitud']?? ''),
+      longitud: (json['longitud']?? ''),
+      altura: (json['altura']?? ''),
+      estado:  json['estado'] != null ? json['estado'] == true : false,
+      tipoEstacion: (json['tipoEstacion']?? ''),
+      idMunicipio: json['idMunicipio']?? 0,
+      codTipoEstacion: json['codTipoEstacion'] != null ? json['codTipoEstacion'] == true : false,
     );
   }
 
   Map<String, dynamic> toJson() => {
         'idEstacion': id,
-        'nombre': nombre,
+        'nombreEstacion': nombreEstacion,
         'latitud': latitud,
         'longitud': longitud,
         'altura': altura,
@@ -49,8 +49,8 @@ class Estacion {
   String toStringEstacion() {
     return "Estacion [idEstacion=" +
         id.toString() +
-        ", nombre=" +
-        nombre +
+        ", nombreEstacion=" +
+        nombreEstacion +
         ", latitud=" +
         latitud +
         ", longitud=" +

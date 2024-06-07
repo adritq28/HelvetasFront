@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:helvetasfront/model/Municipio.dart';
-import 'package:helvetasfront/screens/ListaInvitadoScreen.dart';
+import 'package:helvetasfront/screens/EstacionScreen.dart';
 import 'package:helvetasfront/services/EstacionService.dart';
 import 'package:provider/provider.dart';
 
@@ -162,9 +162,10 @@ class _MunicipiosScreenState extends State<MunicipiosScreen> {
                                 MaterialPageRoute(builder: (context) {
                                   return ChangeNotifierProvider(
                                     create: (context) => EstacionService(),
-                                    child: ListaInvidatoScreen(
+                                    child: EstacionScreen(
                                       idMunicipio: dato.idMunicipio,
                                       nombreMunicipio: dato.nombreMunicipio,
+                                    
                                     ),
                                   );
                                 }),

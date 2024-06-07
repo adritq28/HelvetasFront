@@ -47,3 +47,47 @@
 
 //   await ExportToExcel(data);
 // }
+
+import 'dart:io';
+
+import 'package:excel/excel.dart';
+import 'package:helvetasfront/model/DatosEstacionHidrologica.dart';
+import 'package:path_provider/path_provider.dart';
+
+void exportToExcel(List<DatosEstacionHidrologica> datosList) async {
+  var excel = Excel.createExcel(); // Crear un nuevo archivo Excel
+  Sheet sheetObject = excel['Sheet1']; // Seleccionar la primera hoja
+  print("aaaaaa5555555aaaaaaa");
+  // Escribir los encabezados
+  sheetObject.appendRow([
+    'Nombre del Municipio',
+    'Limnimetro',
+    'Fecha Reg',
+    'ID Estación',
+    'Delete'
+  ]);
+print("pppppppppppppp");
+  // Escribir los datos
+  for (var datos in datosList) {
+     print("bbbbbbbbbbb");
+    sheetObject.appendRow([
+      datos.nombreMunicipio,
+      datos.limnimetro,
+      datos.fechaReg,
+      datos.idEstacion,
+      datos.delete
+    ]);
+  }
+
+  // Obtener el directorio de almacenamiento externo
+  Directory? directory = await getExternalStorageDirectory();
+  String filePath = "${directory?.path}/Datos.xlsx";
+ print("cccccccccc");
+  // Guardar el archivo Excel
+  var fileBytes = excel.save();
+  File(filePath)
+    ..createSync(recursive: true)
+    ..writeAsBytesSync(fileBytes!);
+
+  print('Archivo guardado en $filePath');
+}
