@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:helvetasfront/screens/ListaUsuarioEstacionScreen.dart';
 import 'package:helvetasfront/screens/MunicipiosScreen.dart';
+import 'package:helvetasfront/screens/PromotorScreen.dart';
 import 'package:helvetasfront/services/EstacionService.dart';
+import 'package:helvetasfront/services/PromotorService.dart';
 import 'package:provider/provider.dart';
+
 
 void main() {
   runApp(LoginScreen());
@@ -99,9 +102,13 @@ class LoginForm extends StatelessWidget {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => ListaUsuarioEstacionScreen(),
-                ),
+                MaterialPageRoute(builder: (context) {
+                  return ChangeNotifierProvider(
+                    create: (context) => PromotorService(),
+                    child:
+                        PromotorScreen(), // Aquí envuelve la pantalla en el Provider
+                  );
+                }),
               );
             },
             style: ElevatedButton.styleFrom(

@@ -48,46 +48,97 @@
 //   await ExportToExcel(data);
 // }
 
+// import 'dart:io';
+
+// import 'package:excel/excel.dart';
+// import 'package:helvetasfront/model/DatosEstacionHidrologica.dart';
+// import 'package:path_provider/path_provider.dart';
+
+// Future<void> exportToExcel(List<DatosEstacionHidrologica> datosList) async {
+//   var excel = Excel.createExcel(); // Crear un nuevo archivo Excel
+//   Sheet sheetObject = excel['Sheet1']; // Seleccionar la primera hoja
+
+//   // Escribir los encabezados
+//   sheetObject.appendRow([
+//     'Nombre del Municipio',
+//     'Limnimetro',
+//     'Fecha Reg',
+//     'ID Estación',
+//     'Delete'
+//   ]);
+
+//   // Escribir los datos
+//   for (var datos in datosList) {
+//     sheetObject.appendRow([
+//       datos.nombreMunicipio,
+//       datos.limnimetro,
+//       datos.fechaReg,
+//       datos.idEstacion,
+//       datos.delete
+//     ]);
+//   }
+
+//   try {
+//     // Obtener el directorio de documentos del sistema
+//     Directory directory = await getApplicationDocumentsDirectory();
+//     String filePath = "${directory.path}/Datos.xlsx";
+
+//     // Guardar el archivo Excel
+//     var fileBytes = excel.save();
+//     File(filePath)
+//       ..createSync(recursive: true)
+//       ..writeAsBytesSync(fileBytes!);
+
+//     print('Archivo guardado en $filePath');
+//   } catch (e) {
+//     print('Error al guardar el archivo: $e');
+//   }
+// }
+
+
 import 'dart:io';
 
 import 'package:excel/excel.dart';
 import 'package:helvetasfront/model/DatosEstacionHidrologica.dart';
+import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 
-void exportToExcel(List<DatosEstacionHidrologica> datosList) async {
-  var excel = Excel.createExcel(); // Crear un nuevo archivo Excel
-  Sheet sheetObject = excel['Sheet1']; // Seleccionar la primera hoja
-  print("aaaaaa5555555aaaaaaa");
-  // Escribir los encabezados
-  sheetObject.appendRow([
-    'Nombre del Municipio',
-    'Limnimetro',
-    'Fecha Reg',
-    'ID Estación',
-    'Delete'
-  ]);
-print("pppppppppppppp");
-  // Escribir los datos
-  for (var datos in datosList) {
-     print("bbbbbbbbbbb");
-    sheetObject.appendRow([
-      datos.nombreMunicipio,
-      datos.limnimetro,
-      datos.fechaReg,
-      datos.idEstacion,
-      datos.delete
-    ]);
+Future<void> exportToExcel(List<DatosEstacionHidrologica> datosList) async {
+  print('Inicio de exportación a Excel');
+  try {
+    var excel = Excel.createExcel();
+    Sheet sheetObject = excel['Sheet1'];
+
+    print('Añadiendo encabezados');
+    sheetObject.appendRow(['Nombre del Municipio', 'Limnimetro', 'Fecha Reg', 'ID Estación', 'Delete']);
+
+    for (var datos in datosList) {
+      print('Añadiendo datos: ${datos.nombreMunicipio}');
+      sheetObject.appendRow([
+        datos.nombreMunicipio,
+        datos.limnimetro,
+        datos.fechaReg,
+        datos.idEstacion,
+        datos.delete
+      ]);
+    }
+    print('Directorio obtenido: pppppppppppppp');
+    Directory directory = await getApplicationDocumentsDirectory();
+    String filePath = path.join(directory.path, 'Datos.xlsx');
+    print('Directorio obtenido: $filePath');
+
+    if (!directory.existsSync()) {
+      print('Directorio no existe, creando...');
+      directory.createSync(recursive: true);
+    }
+
+    var fileBytes = excel.save();
+    File(filePath)
+      ..createSync(recursive: true)
+      ..writeAsBytesSync(fileBytes!);
+
+    print('Archivo guardado en $filePath');
+  } catch (e) {
+    print('Error al guardar el archivo: $e');
   }
-
-  // Obtener el directorio de almacenamiento externo
-  Directory? directory = await getExternalStorageDirectory();
-  String filePath = "${directory?.path}/Datos.xlsx";
- print("cccccccccc");
-  // Guardar el archivo Excel
-  var fileBytes = excel.save();
-  File(filePath)
-    ..createSync(recursive: true)
-    ..writeAsBytesSync(fileBytes!);
-
-  print('Archivo guardado en $filePath');
 }

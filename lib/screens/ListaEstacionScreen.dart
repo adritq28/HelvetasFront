@@ -632,8 +632,7 @@ class _ListaEstacionScreenState extends State<ListaEstacionScreen> {
                                   dirViento: _dirViento,
                                   velViento: _velViento,
                                   idEstacion: widget.idEstacion,
-                                  fechaReg: fechaReg
-                                    ..toUtc().subtract(Duration(hours: 8)),
+                                  fechaReg: fechaReg..toUtc().subtract(Duration(hours: 8)),
                                   codTipoEstacion: widget.codTipoEstacion);
                               crear(nuevoDato).then((alertDialog) {
                                 showDialog(

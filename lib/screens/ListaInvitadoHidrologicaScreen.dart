@@ -1,10 +1,9 @@
-import 'dart:io';
+import 'dart:html' as html;
 
 import 'package:excel/excel.dart' as excel_pkg;
 import 'package:flutter/material.dart';
 import 'package:helvetasfront/model/DatosEstacionHidrologica.dart';
 import 'package:helvetasfront/services/EstacionHidrologicaService.dart';
-import 'package:path/path.dart' as path;
 import 'package:provider/provider.dart';
 
 class ListaInvitadoHidrologicaScreen extends StatefulWidget {
@@ -49,7 +48,7 @@ class _ListaInvitadoHidrologicaScreenState
     try {
       final datosService =
           Provider.of<EstacionHidrologicaService>(context, listen: false);
-      await datosService.obtenerDatosMunicipio(widget.idEstacion);
+      await datosService.getListaHidrologica(widget.idEstacion);
       return datosService.lista11;
     } catch (e) {
       print('Error al cargar los datos: $e');
@@ -57,56 +56,109 @@ class _ListaInvitadoHidrologicaScreenState
     }
   }
 
-  Future<void> exportToExcel(List<DatosEstacionHidrologica> datosList) async {
-    var excel = excel_pkg.Excel.createExcel();
-    excel.delete('Sheet1');
-    excel_pkg.Sheet sheetObject = excel['Estacion Data'];
+  // Future<void> exportToExcel(List<DatosEstacionHidrologica> datosList) async {
+  //   var excel = excel_pkg.Excel.createExcel();
+  //   excel.delete('Sheet1');
+  //   excel_pkg.Sheet sheetObject = excel['Estacion Data'];
 
-    // Add the headers
-    List<String> headers = [
+  //   // Add the headers
+  //   List<String> headers = [
+  //     'Nombre del Municipio',
+  //     'Limnimetro',
+  //     'Fecha Reg',
+  //     'ID Estación',
+  //     'Delete'
+  //   ];
+  //   sheetObject.appendRow(headers);
+
+  //   // Add data
+  //   for (var datos in datosList) {
+  //     List<dynamic> row = [
+  //       widget.nombreMunicipio,
+  //       datos.limnimetro,
+  //       datos.fechaReg,
+  //       datos.idEstacion,
+  //       datos.delete
+  //     ];
+  //     sheetObject.appendRow(row);
+  //   }
+
+  //   // Save the file
+  //   final directory = Directory(path.join('/Users/ADRI/Downloads'));
+  //   // if (!directory.existsSync()) {
+  //   //   await Future.microtask(() {
+  //   //     directory.createSync(recursive: true);
+  //   //   });
+  //   // }
+  //   final file = File(path.join(directory.path, 'EstacionData.xlsx'));
+
+  //   // Write to the file
+  //   List<int>? bytes = excel.save();
+  //   if (bytes != null) {
+  //     file.writeAsBytesSync(bytes, flush: true);
+  //     print('Exportado a ${file.path}');
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text('Datos exportados a Excel en ${file.path}')),
+  //     );
+  //   } else {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text('Error al guardar el archivo Excel')),
+  //     );
+  //   }
+  // }
+
+  Future<void> exportToExcel(List<DatosEstacionHidrologica> datosList) async {
+  try {
+    var excel = excel_pkg.Excel.createExcel(); // Crear un nuevo archivo Excel
+    excel_pkg.Sheet sheetObject = excel['Sheet1']; // Seleccionar la primera hoja
+
+    // Escribir los encabezados
+    sheetObject.appendRow([
       'Nombre del Municipio',
+      'Nombre del Estacion',
       'Limnimetro',
       'Fecha Reg',
       'ID Estación',
       'Delete'
-    ];
-    sheetObject.appendRow(headers);
+    ]);
 
-    // Add data
+    // Escribir los datos
     for (var datos in datosList) {
-      List<dynamic> row = [
+      sheetObject.appendRow([
         widget.nombreMunicipio,
+        widget.nombreEstacion,
         datos.limnimetro,
         datos.fechaReg,
         datos.idEstacion,
         datos.delete
-      ];
-      sheetObject.appendRow(row);
+      ]);
     }
 
-    // Save the file
-    final directory = Directory(path.join('/Users/ADRI/Downloads'));
-    // if (!directory.existsSync()) {
-    //   await Future.microtask(() {
-    //     directory.createSync(recursive: true);
-    //   });
-    // }
-    final file = File(path.join(directory.path, 'EstacionData.xlsx'));
-
-    // Write to the file
-    List<int>? bytes = excel.save();
-    if (bytes != null) {
-      file.writeAsBytesSync(bytes, flush: true);
-      print('Exportado a ${file.path}');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Datos exportados a Excel en ${file.path}')),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error al guardar el archivo Excel')),
-      );
+    // Guardar el archivo Excel en memoria
+    var fileBytes = excel.save();
+    if (fileBytes == null) {
+      throw Exception('No se pudo generar el archivo Excel.');
     }
+
+    // Crear un blob de datos
+    final blob = html.Blob([fileBytes], 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    final url = html.Url.createObjectUrlFromBlob(blob);
+    
+    // Crear un enlace de descarga y hacer clic en él
+    final anchor = html.AnchorElement(href: url)
+      ..setAttribute("download", "Datos.xlsx")
+      ..click();
+    
+    // Liberar la URL del blob
+    html.Url.revokeObjectUrl(url);
+
+    print('Archivo listo para descargar');
+  } catch (e) {
+    print('Error al guardar el archivo: $e');
   }
+}
+
+
 
   @override
   Widget build(BuildContext context) {
