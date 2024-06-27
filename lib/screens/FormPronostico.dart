@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:helvetasfront/model/Promotor.dart';
-import 'package:helvetasfront/services/PromotorService.dart';
+import 'package:helvetasfront/model/DatosPronostico.dart';
+import 'package:helvetasfront/services/PronosticoService.dart';
 import 'package:provider/provider.dart';
 
 class FormPronostico extends StatefulWidget {
@@ -24,31 +24,49 @@ class FormPronostico extends StatefulWidget {
 }
 
 class _FormPronosticoState extends State<FormPronostico> {
-  final PromotorService _datosService2 =
-      PromotorService(); // Instancia del servicio de datos
-  late Future<List<Promotor>> _futurePromotor;
-  final PromotorService _datosService3 = PromotorService();
-  late PromotorService miModelo4; // Futuro de la lista de personas
-  late List<Promotor> _Promotor = [];
+  final PronosticoService _pronosticoService2 =
+      PronosticoService(); // Instancia del servicio de datos
+  late Future<List<DatosPronostico>> _futureDatosPronostico;
+  final PronosticoService _pronosticoService3 = PronosticoService();
+  late PronosticoService miModelo4; // Futuro de la lista de personas
+  late List<DatosPronostico> _datosPronostico = [];
+
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   miModelo4 = Provider.of<PronosticoService>(context, listen: false);
+  //   // _cargarDatosMeteorologica(); // Carga los datos al inicializar el estado
+  // }
+  final _formKey = GlobalKey<FormState>();
+  late int _idUsuario;
+  late String _nombreMunicipio;
+  late String _nombreZona;
+  late String _nombreCompleto;
+  late double _tempMax;
+  late double _tempMin;
+  late double _pcpn;
+  late int _idZona;
+  late int _idFenologia;
+  late DateTime fecha = DateTime.now();
 
   @override
   void initState() {
     super.initState();
-    miModelo4 = Provider.of<PromotorService>(context, listen: false);
-    // _cargarDatosMeteorologica(); // Carga los datos al inicializar el estado
+    miModelo4 = Provider.of<PronosticoService>(context, listen: false);
+    _cargarDatosPronostico();
   }
 
-  // Future<void> _cargarDatosMeteorologica() async {
-  //   try {
-  //     await miModelo4.obtenerDatosMunicipio(widget.idZona);
-  //     List<Promotor> a = miModelo4.lista11;
-  //     setState(() {
-  //       _Promotor = a; // Asigna los datos a la lista
-  //     });
-  //   } catch (e) {
-  //     print('Error al cargar los datos: $e');
-  //   }
-  // }
+  Future<void> _cargarDatosPronostico() async {
+    try {
+      await miModelo4.obtenerDatosPronostico(widget.idUsuario);
+      List<DatosPronostico> a = miModelo4.lista11;
+      setState(() {
+        _datosPronostico = a; // Asigna los datos a la lista
+      });
+    } catch (e) {
+      print('Error al cargar los datos222: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -110,7 +128,9 @@ class _FormPronosticoState extends State<FormPronostico> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(style: TextStyle(color: Colors.white), 'REGISTRO DE DATOS')
+                      Text(
+                          style: TextStyle(color: Colors.white),
+                          'REGISTRO DE DATOS')
                     ],
                   ),
                 ],
@@ -118,32 +138,32 @@ class _FormPronosticoState extends State<FormPronostico> {
             ),
             SizedBox(height: 20),
             formDatosEstacion(),
-            // SizedBox(
-            //     height: 20), // Espacio entre el formulario y la tabla de datos
-            // FutureBuilder<List<DatosEstacionHidrologica>>(
-            //   future: _datosService3.obtenerDatosHidrologica(widget.idUsuario),
-            //   builder: (context, AsyncSnapshot<List<DatosEstacionHidrologica>> snapshot) {
-            //     if (snapshot.connectionState == ConnectionState.waiting) {
-            //       return Center(child: CircularProgressIndicator());
-            //     } else if (snapshot.hasError) {
-            //       return Center(child: Text('Error: ${snapshot.error}'));
-            //     } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            //       return Center(
-            //           child: Text('Este usuario no tiene datos registrados'));
-            //     } else {
-            //       final datosList = snapshot.data!;
+            SizedBox(
+                height: 20), // Espacio entre el formulario y la tabla de datos
+            FutureBuilder<List<DatosPronostico>>(
+              future: _pronosticoService3.obtenerDatosPronostico(widget.idUsuario),
+              builder: (context, AsyncSnapshot<List<DatosPronostico>> snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return Center(
+                      child: Text('Este usuario no tiene datos registrados'));
+                } else {
+                  final datosList = snapshot.data!;
 
-            //       return tablaDatos(datosList, tempMaxList, fechaRegList);
-            //     }
-            //   },
-            // ),
+                  return tablaDatos(datosList);
+                }
+              },
+            ),
           ],
         ),
       ),
     );
   }
 
-  SingleChildScrollView tablaDatos(List<Promotor> datosList) {
+  SingleChildScrollView tablaDatos(List<DatosPronostico> datosList) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Container(
@@ -164,6 +184,14 @@ class _FormPronosticoState extends State<FormPronostico> {
                     style: TextStyle(
                         fontWeight: FontWeight.bold, color: Colors.white))),
             DataColumn(
+                label: Text('Nombre municipio',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, color: Colors.white))),
+            DataColumn(
+                label: Text('Nombre zona',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, color: Colors.white))),
+            DataColumn(
                 label: Text('Temp. Max',
                     style: TextStyle(
                         fontWeight: FontWeight.bold, color: Colors.white))),
@@ -172,27 +200,15 @@ class _FormPronosticoState extends State<FormPronostico> {
                     style: TextStyle(
                         fontWeight: FontWeight.bold, color: Colors.white))),
             DataColumn(
-                label: Text('Temp. Amb',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.white))),
-            DataColumn(
                 label: Text('PCPN',
                     style: TextStyle(
                         fontWeight: FontWeight.bold, color: Colors.white))),
             DataColumn(
-                label: Text('TAEVAP',
+                label: Text('Fecha Reg',
                     style: TextStyle(
                         fontWeight: FontWeight.bold, color: Colors.white))),
             DataColumn(
-                label: Text('Dirección del Viento',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.white))),
-            DataColumn(
-                label: Text('Velocidad del Viento',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.white))),
-            DataColumn(
-                label: Text('ID Estación',
+                label: Text('ID Fenologia',
                     style: TextStyle(
                         fontWeight: FontWeight.bold, color: Colors.white))),
             // Otros campos según tus necesidades
@@ -200,11 +216,13 @@ class _FormPronosticoState extends State<FormPronostico> {
           rows: datosList.map((datos) {
             return DataRow(cells: [
               DataCell(Text('${datos.idUsuario}')),
-              DataCell(Text('${datos.nombreMunicipio}')),
-              DataCell(Text('${datos.nombreZona}')),
-              DataCell(Text('${datos.nombreCompleto}')),
-              DataCell(Text('${datos.idZona}')),
-              // Otros campos según tus necesidades
+              DataCell(Text('${widget.nombreMunicipio}')),
+              DataCell(Text('${widget.nombreZona}')),
+              DataCell(Text('${datos.tempMax}')),
+              DataCell(Text('${datos.tempMin}')),
+              DataCell(Text('${datos.pcpn}')),
+              DataCell(Text('${datos.fecha}')),
+              DataCell(Text('${datos.idFenologia}')),
             ]);
           }).toList(),
         ),
@@ -212,16 +230,26 @@ class _FormPronosticoState extends State<FormPronostico> {
     );
   }
 
-  final _formKey = GlobalKey<FormState>();
-  late int _idUsuario;
-  late String _nombreMunicipio;
-  late String _nombreZona;
-  late String _nombreCompleto;
-  late double _tempMax;
-  late double _tempMin;
-  late double _pcpn;
-  late int _idZona;
-  late DateTime fecha = DateTime.now();
+  Future<Widget> crear(DatosPronostico elem) async {
+    //_fechaReg = DateTime.now();
+    //String formattedDateTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(_fechaReg.toUtc().add(Duration(hours: 4)));
+    String h = await _pronosticoService2.saveDatosPronostico(elem);
+    return AlertDialog(
+      title: const Text('Título del Alerta'),
+      content: Text(h),
+      actions: <Widget>[
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+            setState(() {
+              _cargarDatosPronostico();
+            }); // Cierra el diálogo
+          },
+          child: const Text('Aceptar'),
+        ),
+      ],
+    );
+  }
 
   Widget formDatosEstacion() {
     return Padding(
@@ -357,6 +385,39 @@ class _FormPronosticoState extends State<FormPronostico> {
                           ),
                         ),
                       ),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 16.0, horizontal: 8.0),
+                          child: TextFormField(
+                            decoration: InputDecoration(
+                              labelText: 'IDFENOLOGIA',
+                              hintText: 'IDFENOLOGIA',
+                              prefixIcon: Icon(
+                                Icons.water,
+                                color: Color(0xFF164092),
+                              ),
+                              contentPadding:
+                                  EdgeInsets.symmetric(vertical: 20.0),
+                              labelStyle: TextStyle(
+                                  fontSize: 16.0, fontWeight: FontWeight.bold),
+                              hintStyle: TextStyle(fontSize: 20.0),
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                  borderSide: BorderSide(
+                                    color: Color(0xFF164092),
+                                  )),
+                            ),
+                            keyboardType:
+                                TextInputType.numberWithOptions(decimal: true),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 24.0),
+                            onSaved: (value) {
+                              _idFenologia = int.tryParse(value ?? '0') ?? 0;
+                            },
+                          ),
+                        ),
+                      ),
                       //const SizedBox(width: 5), // Espacio entre los campos
                     ],
                   ),
@@ -414,35 +475,31 @@ class _FormPronosticoState extends State<FormPronostico> {
                         ),
                         InkWell(
                           onTap: () {
-                            // if (_formKey.currentState!.validate()) {
-                            //   _formKey.currentState!.save();
-                            //   DatosPronostico nuevoDato = DatosPronostico(
-                            //       idUsuario: widget.idUsuario,
-                            //       nombreMunicipio: widget.nombreMunicipio,
-                            //       nombreEstacion: widget.nombreEstacion,
-                            //       tipoEstacion: widget.tipoEstacion,
-                            //       nombreCompleto: widget.nombreCompleto,
-                            //       telefono: widget.telefono,
-                            //       tempMax: _tempMax,
-                            //       tempMin: _tempMin,
-                            //       tempAmb: _tempAmb,
-                            //       pcpn: _pcpn,
-                            //       taevap: _taevap,
-                            //       dirViento: _dirViento,
-                            //       velViento: _velViento,
-                            //       idEstacion: widget.idEstacion,
-                            //       fechaReg: fechaReg
-                            //         ..toUtc().subtract(Duration(hours: 8)),
-                            //       codTipoEstacion: widget.codTipoEstacion);
-                            //   crear(nuevoDato).then((alertDialog) {
-                            //     showDialog(
-                            //       context: context,
-                            //       builder: (BuildContext context) {
-                            //         return alertDialog;
-                            //       },
-                            //     );
-                            //   });
-                            // }
+                            if (_formKey.currentState!.validate()) {
+                              _formKey.currentState!.save();
+                              DatosPronostico nuevoDato = DatosPronostico(
+                                idUsuario: widget.idUsuario,
+                                nombreMunicipio: widget.nombreMunicipio,
+                                nombreZona: widget.nombreZona,
+                                nombreCompleto: widget.nombreCompleto,
+                                telefono: widget.telefono,
+                                tempMax: _tempMax,
+                                tempMin: _tempMin,
+                                pcpn: _pcpn,
+                                idZona: widget.idZona,
+                                idFenologia: _idFenologia,
+                                fecha: fecha
+                                  ..toUtc().subtract(Duration(hours: 8)),
+                              );
+                              crear(nuevoDato).then((alertDialog) {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return alertDialog;
+                                  },
+                                );
+                              });
+                            }
                             SizedBox(height: 20);
                           },
                           child: Container(

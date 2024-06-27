@@ -1,5 +1,4 @@
 
-
 class Promotor {
   final int idUsuario;
   final String nombreMunicipio;

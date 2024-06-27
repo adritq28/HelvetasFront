@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:helvetasfront/model/Promotor.dart';
-import 'package:helvetasfront/screens/FormPronostico.dart';
+import 'package:helvetasfront/screens/OpcionPromotorScreen.dart';
 import 'package:helvetasfront/services/EstacionService.dart';
 import 'package:helvetasfront/services/PromotorService.dart';
 import 'package:provider/provider.dart';
@@ -32,10 +32,10 @@ class _PromotorScreenState extends State<PromotorScreen> {
         _Promotor = a;
       });
     } catch (e) {
-      print('Error al cargar los datos: $e');
+      print('Error al cargar los datossss: $e');
     }
   }
-
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -250,9 +250,10 @@ class _PromotorScreenState extends State<PromotorScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(builder: (context) {
+                            print(dato.idUsuario);
                             return ChangeNotifierProvider(
                               create: (context) => PromotorService(),
-                              child: FormPronostico(
+                              child: OpcionPromotorScreen(
                                 idUsuario: dato.idUsuario,
                                 idZona: dato.idZona,
                                 nombreZona: dato.nombreZona,
