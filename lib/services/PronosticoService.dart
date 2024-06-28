@@ -59,9 +59,9 @@ class PronosticoService extends ChangeNotifier {
 }
 
 
-  Future<List<DatosPronostico>> obtenerDatosPronostico(int id) async {
+  Future<List<DatosPronostico>> obtenerDatosPronostico(int id, int idZona) async {
     final response =
-        await http.get(Uri.parse('http://localhost:8080/datos_pronostico/$id'));
+        await http.get(Uri.parse('http://localhost:8080/datos_pronostico/$id/$idZona'));
     if (response.statusCode == 200) {
       List<dynamic> jsonData = jsonDecode(response.body);
       if (jsonData.isEmpty) {

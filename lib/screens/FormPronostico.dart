@@ -58,7 +58,7 @@ class _FormPronosticoState extends State<FormPronostico> {
 
   Future<void> _cargarDatosPronostico() async {
     try {
-      await miModelo4.obtenerDatosPronostico(widget.idUsuario);
+      await miModelo4.obtenerDatosPronostico(widget.idUsuario, widget.idZona);
       List<DatosPronostico> a = miModelo4.lista11;
       setState(() {
         _datosPronostico = a; // Asigna los datos a la lista
@@ -141,7 +141,7 @@ class _FormPronosticoState extends State<FormPronostico> {
             SizedBox(
                 height: 20), // Espacio entre el formulario y la tabla de datos
             FutureBuilder<List<DatosPronostico>>(
-              future: _pronosticoService3.obtenerDatosPronostico(widget.idUsuario),
+              future: _pronosticoService3.obtenerDatosPronostico(widget.idUsuario, widget.idZona),
               builder: (context, AsyncSnapshot<List<DatosPronostico>> snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Center(child: CircularProgressIndicator());

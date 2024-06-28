@@ -1,13 +1,31 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class FormFechaSiembra extends StatefulWidget {
-  final String nombreCompleto;
+  final int idUsuario;
+  final int idZona;
   final String nombreZona;
+  final String nombreMunicipio;
+  final String nombreCompleto;
+  final String telefono;
+  final int idCultivo;
+  final String nombreCultivo;
+  final String tipo;
 
   FormFechaSiembra({
-    required this.nombreCompleto,
+    required this.idUsuario,
+    required this.idZona,
     required this.nombreZona,
+    required this.nombreMunicipio,
+    required this.nombreCompleto,
+    required this.telefono,
+    required this.idCultivo,
+    required this.nombreCultivo,
+    required this.tipo,
   });
 
   @override
@@ -27,6 +45,45 @@ class _FormFechaSiembraState extends State<FormFechaSiembra> {
     _focusedDay = DateTime.now();
     _selectedDay = DateTime.now();
   }
+
+  Future<void> guardarFechaSiembra() async {
+  if (_fechaSeleccionada != null) {
+    final formattedDate = DateFormat('yyyy-MM-dd').format(_fechaSeleccionada!);
+    final url = Uri.parse('http://localhost:8080/cultivos/${widget.idCultivo}/fecha-siembra?fechaSiembra=$formattedDate');
+    
+    final response = await http.put(
+      url,
+      headers: {  
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'fechaSiembra': formattedDate,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Fecha $formattedDate guardada correctamente'),
+        ),
+      );
+    } else {
+      print('Error ${response.statusCode}: ${response.body}');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error al guardar la fecha'),
+        ),
+      );
+    }
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Por favor selecciona una fecha primero'),
+      ),
+    );
+  }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -79,6 +136,14 @@ class _FormFechaSiembraState extends State<FormFechaSiembra> {
                 fontWeight: FontWeight.bold,
               ),
             ),
+            SizedBox(height: 5),
+            Text(
+              "IDCULTIVO " + widget.idCultivo.toString(),
+              style: TextStyle(
+                color: Colors.white60,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             SizedBox(height: 15),
             Text(
               'REGISTRO DE DATOS',
@@ -124,7 +189,7 @@ class _FormFechaSiembraState extends State<FormFechaSiembra> {
                   setState(() {
                     _selectedDay = selectedDay;
                     _focusedDay = focusedDay;
-                    _fechaSeleccionada = selectedDay;
+                    _fechaSeleccionada = DateTime(selectedDay.year, selectedDay.month, selectedDay.day); // Asegurarse de que la fecha no tenga horas ni minutos
                   });
                 },
               ),
@@ -137,21 +202,7 @@ class _FormFechaSiembraState extends State<FormFechaSiembra> {
               ),
             SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () {
-                if (_fechaSeleccionada != null) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Fecha guardada: $_fechaSeleccionada'),
-                    ),
-                  );
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Por favor selecciona una fecha primero'),
-                    ),
-                  );
-                }
-              },
+              onPressed: guardarFechaSiembra,
               child: Text('Guardar Fecha'),
             ),
           ],

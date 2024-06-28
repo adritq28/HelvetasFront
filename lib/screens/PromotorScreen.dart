@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:helvetasfront/model/Promotor.dart';
-import 'package:helvetasfront/screens/OpcionPromotorScreen.dart';
+import 'package:helvetasfront/screens/OpcionZonaScreen.dart';
 import 'package:helvetasfront/services/EstacionService.dart';
 import 'package:helvetasfront/services/PromotorService.dart';
 import 'package:provider/provider.dart';
@@ -253,13 +253,16 @@ class _PromotorScreenState extends State<PromotorScreen> {
                             print(dato.idUsuario);
                             return ChangeNotifierProvider(
                               create: (context) => PromotorService(),
-                              child: OpcionPromotorScreen(
+                              child: OpcionZonaScreen(
                                 idUsuario: dato.idUsuario,
                                 idZona: dato.idZona,
                                 nombreZona: dato.nombreZona,
                                 nombreMunicipio: dato.nombreMunicipio,
                                 nombreCompleto: dato.nombreCompleto,
                                 telefono: dato.telefono,
+                                idCultivo: dato.idCultivo,
+                                nombreCultivo: dato.nombreCultivo,
+                                tipo: dato.tipo,
                               ),
                             );
                           }),
@@ -295,24 +298,6 @@ class _PromotorScreenState extends State<PromotorScreen> {
     );
   }
 
-  // Future<Widget> crear(Promotor elem) async {
-  //   String h = await _datosService2.saveUsuario(elem);
-  //   print("a");
-  //   return AlertDialog(
-  //     title: const Text('Título del Alerta'),
-  //     actions: <Widget>[
-  //       TextButton(
-  //         onPressed: () {
-  //           Navigator.of(context).pop();
-  //           setState(() {
-  //             _cargarPromotor();
-  //           });
-  //         },
-  //         child: const Text('Aceptar'),
-  //       ),
-  //     ],
-  //   );
-  // }
 
   final _formKey = GlobalKey<FormState>();
   late int _idUsuario;

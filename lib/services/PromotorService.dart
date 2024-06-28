@@ -54,19 +54,34 @@ class PromotorService extends ChangeNotifier {
   //   }
   // }
   Future<void> getPromotor() async {
-  try {
-    final response = await http.get(Uri.http("localhost:8080", "/promotor/lista_promotor"));
-    if (response.statusCode == 200) {
-      final List<dynamic> data = json.decode(response.body);
-      _lista = data.map((e) => Promotor.fromJson(e)).toList();
-      notifyListeners();
-    } else {
-      throw Exception('Failed to load personas');
+    try {
+      final response = await http
+          .get(Uri.http("localhost:8080", "/promotor/lista_promotor"));
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+        _lista = data.map((e) => Promotor.fromJson(e)).toList();
+        notifyListeners();
+      } else {
+        throw Exception('Failed to load personas');
+      }
+    } catch (e) {
+      throw Exception('Error: $e');
     }
-  } catch (e) {
-    throw Exception('Error: $e');
   }
-}
 
-  
+  Future<void> obtenerListaZonas(int id) async {
+    try {
+      final response = await http
+          .get(Uri.parse('http://localhost:8080/promotor/lista_zonas/$id'));
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+        _lista = data.map((e) => Promotor.fromJson(e)).toList();
+        notifyListeners();
+      } else {
+        throw Exception('Failed to load personas');
+      }
+    } catch (e) {
+      throw Exception('Error: $e');
+    }
+  }
 }

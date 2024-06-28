@@ -53,7 +53,7 @@ class DatosPronostico {
         //'idPronostico': idPronostico,
         'idUsuario': idUsuario,
         'nombreMunucipio': nombreMunicipio,
-        'nombreEstacion': nombreZona,
+        'nombreZona': nombreZona,
         'nombreCompleto': nombreCompleto,
         'telefono': telefono,
         'tempMax': tempMax,
