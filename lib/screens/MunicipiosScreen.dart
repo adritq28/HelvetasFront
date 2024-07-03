@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:helvetasfront/model/Municipio.dart';
 import 'package:helvetasfront/screens/EstacionScreen.dart';
+import 'package:helvetasfront/screens/ZonasScreen.dart';
 import 'package:helvetasfront/services/EstacionService.dart';
+import 'package:helvetasfront/services/MunicipioService.dart';
 import 'package:provider/provider.dart';
 
 class MunicipiosScreen extends StatefulWidget {
@@ -35,6 +37,60 @@ class _MunicipiosScreenState extends State<MunicipiosScreen> {
       print('Error al cargar los datos: $e');
     }
   }
+
+  void _mostrarModal(int idMunicipio, String nombreMunicipio) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          padding: EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context); // Cerrar el modal
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) {
+                      return ChangeNotifierProvider(
+                      create: (context) => EstacionService(),
+                      child: EstacionScreen(
+                        idMunicipio: idMunicipio,
+                        nombreMunicipio: nombreMunicipio,
+                      ),
+                    );
+                    }),
+                  );
+                },
+                child: Text('Estaciones Hidrometeorologicas'),
+              ),
+              SizedBox(height: 10),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context); // Cerrar el modal
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) {
+                      return ChangeNotifierProvider(
+                      create: (context) => MunicipioService(),
+                      child: ZonasScreen(
+                        idMunicipio: idMunicipio,
+                        nombreMunicipio: nombreMunicipio,
+                      ),
+                    );
+                    }),
+                  );
+                },
+                child: Text('Pronostico Agrometeorologico'),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -113,7 +169,8 @@ class _MunicipiosScreenState extends State<MunicipiosScreen> {
               itemBuilder: (context, index) {
                 final dato = miModelo4.lista114[index];
                 return Container(
-                  margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                  margin:
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -148,28 +205,15 @@ class _MunicipiosScreenState extends State<MunicipiosScreen> {
                             label: Text('Ver Datos',
                                 style: TextStyle(color: Colors.white)),
                             style: TextButton.styleFrom(
-                              backgroundColor: Colors.grey, // Color plomo
+                              backgroundColor: Colors.grey,
                               shape: RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.circular(8.0), // Border radius
+                                borderRadius: BorderRadius.circular(8.0),
                               ),
                               padding: EdgeInsets.symmetric(
                                   horizontal: 16.0, vertical: 8.0),
                             ),
                             onPressed: () async {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) {
-                                  return ChangeNotifierProvider(
-                                    create: (context) => EstacionService(),
-                                    child: EstacionScreen(
-                                      idMunicipio: dato.idMunicipio,
-                                      nombreMunicipio: dato.nombreMunicipio,
-                                    
-                                    ),
-                                  );
-                                }),
-                              );
+                              _mostrarModal(dato.idMunicipio, dato.nombreMunicipio);
                             },
                           ),
                         ],

@@ -38,30 +38,30 @@ class PronosticoService extends ChangeNotifier {
   //   }
   // }
   Future<String> saveDatosPronostico(DatosPronostico pronostico) async {
-  try {
-    final response = await http.post(
-      Uri.http("localhost:8080", "/datos_pronostico/addDatosPronostico"),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(pronostico.toJson()),
-    );
+    try {
+      final response = await http.post(
+        Uri.http("localhost:8080", "/datos_pronostico/addDatosPronostico"),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(pronostico.toJson()),
+      );
 
-    if (response.statusCode == 201) {
-      notifyListeners();
-      return response.body;
-    } else {
-      throw Exception('Err222or al guardar el pronóstico: ${response.body}');
+      if (response.statusCode == 201) {
+        notifyListeners();
+        return response.body;
+      } else {
+        throw Exception('Err222or al guardar el pronóstico: ${response.body}');
+      }
+    } catch (e) {
+      throw Exception('Erro222r al guardar el pronóstico: $e');
     }
-  } catch (e) {
-    throw Exception('Erro222r al guardar el pronóstico: $e');
   }
-}
 
-
-  Future<List<DatosPronostico>> obtenerDatosPronostico(int id, int idZona) async {
-    final response =
-        await http.get(Uri.parse('http://localhost:8080/datos_pronostico/$id/$idZona'));
+  Future<List<DatosPronostico>> obtenerDatosPronostico(
+      int id, int idZona) async {
+    final response = await http
+        .get(Uri.parse('http://localhost:8080/datos_pronostico/$id/$idZona'));
     if (response.statusCode == 200) {
       List<dynamic> jsonData = jsonDecode(response.body);
       if (jsonData.isEmpty) {
@@ -72,6 +72,22 @@ class PronosticoService extends ChangeNotifier {
       throw Exception('Error al obtener datos del observador');
     }
   }
+
+  // Future<List<DatosPronostico>> alertas(int idFenologia, int idZona) async {
+  //   final response =
+  //       await http.get(Uri.parse('http://localhost:8080/datos_pronostico/comparacion/$idFenologia/$idZona'));
+  //   if (response.statusCode == 200) {
+  //     List<dynamic> jsonData = jsonDecode(response.body);
+  //     if (jsonData.isEmpty) {
+  //       return []; // Indica que no hay datos
+  //     }
+  //     return jsonData.map((item) => DatosPronostico.fromJson(item)).toList();
+  //   } else {
+  //     throw Exception('Error al obtener datos del observador');
+  //   }
+  // }
+
+  
 
   Future<List<DatosPronostico>> getListaMetetorologica(int id) async {
     final response = await http.get(Uri.parse(
@@ -90,16 +106,15 @@ class PronosticoService extends ChangeNotifier {
     }
   }
 
-
   Future<List<int>> fetchUmbralesByZona(int idZona) async {
-  final response = await http.get(Uri.parse('http://localhost:8080/datos_pronostico/zona/$idZona'));
-  print("aaaaaaaaaaa " + idZona.toString());
-  if (response.statusCode == 200) {
-    List<dynamic> data = json.decode(response.body);
-    return List<int>.from(data);
-  } else {
-    throw Exception('Error al obtener los umbrales');
+    final response = await http
+        .get(Uri.parse('http://localhost:8080/datos_pronostico/zona/$idZona'));
+    print("aaaaaaaaaaa " + idZona.toString());
+    if (response.statusCode == 200) {
+      List<dynamic> data = json.decode(response.body);
+      return List<int>.from(data);
+    } else {
+      throw Exception('Error al obtener los umbrales');
+    }
   }
-}
-
 }

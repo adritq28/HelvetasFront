@@ -59,7 +59,7 @@ class LoginForm extends StatelessWidget {
         Container(
           margin: EdgeInsets.only(bottom: 20),
           child: Image.asset(
-            'images/logo3.png', // Ruta de la imagen
+            'images/logo4.png', // Ruta de la imagen
             width: 300, // Ancho de la imagen
           ),
         ),
