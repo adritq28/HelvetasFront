@@ -109,6 +109,7 @@ class _PromotorScreenState extends State<PromotorScreen> {
                     Text("Municipio: ${firstDato.nombreMunicipio}"),
                     Text("Zona: ${firstDato.nombreZona}"),
                     Text("ID: ${firstDato.idZona}"),
+                    //Text("ID: ${firstDato.idCultivo}"),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [

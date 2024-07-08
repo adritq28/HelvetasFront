@@ -129,9 +129,9 @@ class _ListaEstacionHidrologicaScreenState extends State<ListaEstacionHidrologic
                 ],
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             formDatosEstacion(),
-            SizedBox(
+            const SizedBox(
                 height: 20), // Espacio entre el formulario y la tabla de datos
             FutureBuilder<List<DatosEstacionHidrologica>>(
               future: _datosService3.obtenerDatosHidrologica(widget.idUsuario),

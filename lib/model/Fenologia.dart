@@ -6,7 +6,7 @@ class Fenologia {
   final String descripcion;
   final int fase;
   final int nroDias;
-  //final int idPronostico;
+  final int idCultivo;
   final double tempMax;
   final double tempMin;
   final double pcpn;
@@ -21,7 +21,7 @@ class Fenologia {
     required this.descripcion,
     required this.fase,
     required this.nroDias,
-    //required this.idPronostico,
+    required this.idCultivo,
     required this.tempMax,
     required this.tempMin,
     required this.pcpn,
@@ -38,7 +38,7 @@ class Fenologia {
       descripcion: (json['descripcion'] ?? ''),
       fase: (json['fase'] ?? ''),
       nroDias: (json['nroDias'] ?? ''),
-      //idPronostico: json['idFenologia'] ?? 0,
+      idCultivo: json['idCultivo'] ?? 0,
       tempMax: (json['tempMax'] ?? 0.0).toDouble(),
       tempMin: (json['tempMin'] ?? 0.0).toDouble(),
       pcpn: (json['pcpn'] ?? 0.0).toDouble(),
@@ -50,7 +50,7 @@ class Fenologia {
   }
 
   Map<String, dynamic> toJson() => {
-        //'idPronostico': idPronostico,
+        'idCultivo': idCultivo,
         'idMunicipio': idMunicipio,
         'descripcion': descripcion,
         'nombreMunucipio': nombreCultivo,
@@ -79,8 +79,8 @@ class Fenologia {
         nroDias.toString() +
         ", fechaSiembra=" +
         fechaSiembra.toString() +
-        //", idPronostico=" +
-        //idPronostico.toString() +
+        ", idCultivo=" +
+        idCultivo.toString() +
         ", tempMax=" +
         tempMax.toString() +
         ", tempMin=" +

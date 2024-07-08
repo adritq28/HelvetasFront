@@ -41,7 +41,7 @@ class DatosPronostico {
       tempMax: (json['tempMax'] ?? 0.0).toDouble(),
       tempMin: (json['tempMin'] ?? 0.0).toDouble(),
       pcpn: (json['pcpn'] ?? 0.0).toDouble(),
-      fecha: json['fechaReg'] != null
+      fecha: json['fecha'] != null
           ? DateTime.parse(json['fecha'])
           : DateTime.now(),
       idZona: json['idZona'] ?? 0,

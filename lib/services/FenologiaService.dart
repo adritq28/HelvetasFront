@@ -1,16 +1,31 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:helvetasfront/model/DatosPronostico.dart';
 import 'package:helvetasfront/model/Fenologia.dart';
 import 'package:http/http.dart' as http;
 
 class FenologiaService extends ChangeNotifier {
   List<Fenologia> _lista = [];
-
+  List<DatosPronostico> _lista2 = [];
   List<Fenologia> get lista11 => _lista;
+  List<DatosPronostico> get lista112 => _lista2;
   List<Fenologia> _lista5 = [];
   List<Fenologia> get lista115 => _lista5;
 
+  Future<List<DatosPronostico>> pronosticoCultivo(int idCultivo) async {
+    final response =
+        await http.get(Uri.parse('http://localhost:8080/datos_pronostico/registro/$idCultivo'));
+    if (response.statusCode == 200) {
+      List<dynamic> jsonData = jsonDecode(response.body);
+      if (jsonData.isEmpty) {
+        return []; // Indica que no hay datos
+      }
+      return jsonData.map((item) => DatosPronostico.fromJson(item)).toList();
+    } else {
+      throw Exception('Error al obtener datos del observador');
+    }
+  }
 
 
   Future<void> obtenerFenologia(int id) async {
@@ -59,5 +74,28 @@ class FenologiaService extends ChangeNotifier {
       throw Exception('Error al obtener datos del observador');
     }
   }
+
+Future<String> fetchUltimaAlerta(int cultivoId) async {
+  final url = Uri.parse('http://localhost:8080/alertas/ultima/$cultivoId');
+
+  try {
+    print('Making GET request to: $url'); // Añade esta línea para verificar la URL
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      String responseBody = response.body;
+      print('Response Body: $responseBody'); // Imprime el cuerpo de la respuesta
+      return responseBody;
+    } else {
+      print('Failed to load alert: ${response.statusCode}'); // Imprime el estado del error
+      throw Exception('Failed to load alert: ${response.statusCode}');
+    }
+  } catch (e) {
+    print('Error fetching alert: $e'); // Imprime el error capturado
+    throw Exception('Error fetching alert: $e');
+  }
+}
+
+
 
 }

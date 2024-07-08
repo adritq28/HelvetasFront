@@ -15,6 +15,21 @@ class PronosticoService extends ChangeNotifier {
   List<Municipio> _lista4 = [];
   List<Municipio> get lista114 => _lista4;
 
+
+  Future<List<String>> fetchAlertas(int cultivoId) async {
+    final response = await http
+        .get(Uri.parse('http://localhost:8080/alertas/$cultivoId'));
+
+    if (response.statusCode == 200) {
+      List<dynamic> body = jsonDecode(response.body);
+      List<String> alertas = body.map((dynamic item) => item as String).toList();
+      return alertas;
+    } else {
+      throw Exception('Failed to load alertas');
+    }
+  }
+  
+
   // Future<String> saveDatosPronostico(DatosPronostico pronostico) async {
   //   try {
   //     final response = await http.post(
