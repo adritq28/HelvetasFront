@@ -133,7 +133,7 @@ class _MunicipiosScreenState extends State<MunicipiosScreen> {
                     ),
                   ],
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 CircleAvatar(
                   radius: 35,
                   backgroundImage: AssetImage("images/47.jpg"),

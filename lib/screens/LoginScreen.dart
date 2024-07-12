@@ -1,40 +1,128 @@
 import 'package:flutter/material.dart';
+import 'package:helvetasfront/model/UsuarioEstacion.dart';
 import 'package:helvetasfront/screens/ListaUsuarioEstacionScreen.dart';
 import 'package:helvetasfront/screens/MunicipiosScreen.dart';
 import 'package:helvetasfront/screens/PromotorScreen.dart';
 import 'package:helvetasfront/services/EstacionService.dart';
 import 'package:helvetasfront/services/PromotorService.dart';
+import 'package:helvetasfront/services/UsuarioService.dart';
 import 'package:provider/provider.dart';
-
 
 void main() {
   runApp(LoginScreen());
 }
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
+  @override
+  _LoginScreenState createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+
+  final UsuarioService _datosService2 = UsuarioService();
+  late Future<List<UsuarioEstacion>> _futureUsuarioEstacion;
+  final EstacionService _datosService3 = EstacionService();
+  late UsuarioService miModelo4;
+  late List<UsuarioEstacion> _usuarioEstacion = [];
+
+  @override
+  void initState() {
+    super.initState();
+
+  }
+
+
+void _showPasswordDialog(BuildContext context) {
+  TextEditingController usernameController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('Admin Login'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: usernameController,
+              decoration: InputDecoration(labelText: 'Nombre de usuario'),
+            ),
+            SizedBox(height: 10),
+            TextField(
+              controller: passwordController,
+              obscureText: true,
+              decoration: InputDecoration(labelText: 'Contraseña'),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            child: Text('Cancelar'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+          TextButton(
+            child: Text('OK'),
+            onPressed: () async {
+              String nombreUsuario = usernameController.text;
+              String password = passwordController.text;
+
+              // Llama a la función login del servicio
+              await Provider.of<UsuarioService>(context, listen: false)
+                  .login(nombreUsuario, password, context);
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
+
+
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        // appBar: AppBar(
-        //   backgroundColor: Color.fromARGB(255, 206, 222, 255), // Color azul
-        //   title: Text(
-        //     style: TextStyle(color: Colors.black, ),
-        //     'Iniciar Sesión'),
-
-        // ),
         body: Stack(
           children: [
             // Fondo de pantalla con imagen
             Container(
               decoration: BoxDecoration(
                 image: DecorationImage(
-                  image: AssetImage(
-                      'images/fondo.jpg'), // Ruta de la imagen de fondo
-                  fit: BoxFit
-                      .cover, // Ajustar la imagen para cubrir todo el contenedor
+                  image: AssetImage('images/fondo.jpg'), // Ruta de la imagen de fondo
+                  fit: BoxFit.cover, // Ajustar la imagen para cubrir todo el contenedor
                 ),
+              ),
+            ),
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  SizedBox(height: 80),
+                  InkWell(
+                    onTap: () {
+                      _showPasswordDialog(context);
+                    },
+                    child: Row(
+                      children: [
+                        Icon(Icons.admin_panel_settings, color: Colors.white),
+                        SizedBox(width: 5), // Espacio entre el icono y el texto
+                        Text(
+                          'Admin',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(width: 20),
+                ],
               ),
             ),
             Center(
@@ -54,8 +142,9 @@ class LoginForm extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-            style: TextStyle(color: Colors.white, fontSize: 30),
-            'Iniciar Sesión'),
+          'Iniciar Sesión',
+          style: TextStyle(color: Colors.white, fontSize: 30),
+        ),
         Container(
           margin: EdgeInsets.only(bottom: 20),
           child: Image.asset(
@@ -105,8 +194,7 @@ class LoginForm extends StatelessWidget {
                 MaterialPageRoute(builder: (context) {
                   return ChangeNotifierProvider(
                     create: (context) => PromotorService(),
-                    child:
-                        PromotorScreen(), // Aquí envuelve la pantalla en el Provider
+                    child: PromotorScreen(), // Aquí envuelve la pantalla en el Provider
                   );
                 }),
               );
@@ -142,8 +230,7 @@ class LoginForm extends StatelessWidget {
                 MaterialPageRoute(builder: (context) {
                   return ChangeNotifierProvider(
                     create: (context) => EstacionService(),
-                    child:
-                        MunicipiosScreen(), // Aquí envuelve la pantalla en el Provider
+                    child: MunicipiosScreen(), // Aquí envuelve la pantalla en el Provider
                   );
                 }),
               );
@@ -169,15 +256,7 @@ class LoginForm extends StatelessWidget {
             ),
           ),
         ),
-        SizedBox(height: 16),
-        TextButton(
-          onPressed: () {
-            // Aquí iría la lógica para navegar a la pantalla de registro
-          },
-          child: Text(
-              style: TextStyle(color: Colors.white),
-              '¿No tienes una cuenta? Regístrate aquí'),
-        ),
+        SizedBox(height: 25),
       ],
     );
   }
