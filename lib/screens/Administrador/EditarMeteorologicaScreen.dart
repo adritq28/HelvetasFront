@@ -1,6 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class EditarMeteorologicaScreen extends StatefulWidget {
+  final int idDatosEst;
   final double tempMax;
   final double tempMin;
   final double pcpn;
@@ -11,6 +15,7 @@ class EditarMeteorologicaScreen extends StatefulWidget {
   final String fechaReg;
 
   const EditarMeteorologicaScreen({
+    required this.idDatosEst,
     required this.tempMax,
     required this.tempMin,
     required this.pcpn,
@@ -52,31 +57,52 @@ class _EditarMeteorologicaScreenState extends State<EditarMeteorologicaScreen> {
   }
 
   // Function to get common input decoration for text fields
-  InputDecoration _getInputDecoration(String labelText, IconData prefixIcon) {
+  InputDecoration _getInputDecoration(String labelText, IconData icon) {
     return InputDecoration(
       labelText: labelText,
-      prefixIcon: Icon(
-        prefixIcon,
-        color: Color.fromARGB(255, 201, 219, 255),
-      ),
-      contentPadding: EdgeInsets.symmetric(vertical: 20.0),
-      labelStyle: TextStyle(
-        fontSize: 16.0,
-        fontWeight: FontWeight.bold,
-        color: Color.fromARGB(255, 201, 219, 255),
-      ),
-      hintStyle: TextStyle(
-        fontSize: 20.0,
-        color: Color.fromARGB(255, 201, 219, 255),
-      ),
-      border: OutlineInputBorder(
+      prefixIcon: Icon(icon, color: Colors.white),
+      labelStyle: TextStyle(color: Colors.white),
+      filled: true,
+      fillColor: Colors.black.withOpacity(0.3),
+      enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10.0),
-        borderSide: BorderSide(
-          color: Color.fromARGB(255, 201, 219, 255),
-        ),
+        borderSide: BorderSide(color: Colors.white),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10.0),
+        borderSide: BorderSide(color: Colors.white),
       ),
     );
   }
+
+  Future<void> _guardarCambios() async {
+  final url = Uri.parse('http://localhost:8080/estacion/editar');
+  final headers = {'Content-Type': 'application/json'};
+
+  // Crear un mapa de datos a enviar, manejando los campos vacíos
+  final data = {
+    'idDatosEst': widget.idDatosEst,
+    'tempMax': tempMaxController.text.isEmpty ? null : double.parse(tempMaxController.text),
+    'tempMin': tempMinController.text.isEmpty ? null : double.parse(tempMinController.text),
+    'pcpn': pcpnController.text.isEmpty ? null : double.parse(pcpnController.text),
+    'tempAmb': tempAmbController.text.isEmpty ? null : double.parse(tempAmbController.text),
+    'dirViento': dirVientoController.text,
+    'velViento': velVientoController.text.isEmpty ? null : double.parse(velVientoController.text),
+    'taevap': taevapController.text.isEmpty ? null : double.parse(taevapController.text),
+    'fechaReg': fechaRegController.text,
+  };
+
+  final body = jsonEncode(data);
+
+  final response = await http.post(url, headers: headers, body: body);
+
+  if (response.statusCode == 200) {
+    print('Datos actualizados correctamente');
+    Navigator.pop(context, true); // Indica que se guardaron cambios
+  } else {
+    print('Error al actualizar los datos');
+  }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -102,7 +128,7 @@ class _EditarMeteorologicaScreenState extends State<EditarMeteorologicaScreen> {
                     children: [
                       InkWell(
                         onTap: () {
-                          Navigator.pop(context);
+                          Navigator.pop(context, true);
                         },
                         child: const Icon(
                           Icons.arrow_back_ios_new,
@@ -277,29 +303,7 @@ class _EditarMeteorologicaScreenState extends State<EditarMeteorologicaScreen> {
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
-                        onPressed: () {
-                          // Perform any actions on button press here
-                          print('Temp Max: ${tempMaxController.text}');
-                          print('Temp Min: ${tempMinController.text}');
-                          print('Precipitación: ${pcpnController.text}');
-                          print('Temp Ambiente: ${tempAmbController.text}');
-                          print('Dir Viento: ${dirVientoController.text}');
-                          print('Vel Viento: ${velVientoController.text}');
-                          print('Evaporación: ${taevapController.text}');
-                          print('Fecha y Hora: ${fechaRegController.text}');
-                          
-                          // Example: Sending edited data back to previous screen
-                          Navigator.pop(context, {
-                            'tempMax': double.parse(tempMaxController.text),
-                            'tempMin': double.parse(tempMinController.text),
-                            'pcpn': double.parse(pcpnController.text),
-                            'tempAmb': double.parse(tempAmbController.text),
-                            'dirViento': dirVientoController.text,
-                            'velViento': double.parse(velVientoController.text),
-                            'taevap': double.parse(taevapController.text),
-                            'fechaReg': fechaRegController.text,
-                          });
-                        },
+                        onPressed: _guardarCambios,
                         child: Text('Guardar Cambios'),
                       ),
                     ),

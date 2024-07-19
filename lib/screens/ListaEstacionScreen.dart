@@ -288,6 +288,8 @@ class _ListaEstacionScreenState extends State<ListaEstacionScreen> {
   late double _velViento;
   late int _idEstacion;
   late DateTime fechaReg = DateTime.now();
+  late bool _delete = false;
+  late bool _editar = false;
 
   Widget formDatosEstacion() {
   return Padding(
@@ -454,7 +456,9 @@ class _ListaEstacionScreenState extends State<ListaEstacionScreen> {
                                   velViento: _velViento,
                                   idEstacion: widget.idEstacion,
                                   fechaReg: fechaReg..toUtc().subtract(Duration(hours: 8)),
-                                  codTipoEstacion: widget.codTipoEstacion);
+                                  codTipoEstacion: widget.codTipoEstacion,
+                                  delete: _delete,
+                                  edit: _editar);
                               crear(nuevoDato).then((alertDialog) {
                                 showDialog(
                                   context: context,

@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:helvetasfront/screens/Administrador/EstacionHidrologica.dart';
 import 'package:helvetasfront/screens/Administrador/EstacionMeteorologica.dart';
+import 'package:helvetasfront/screens/Administrador/PronosticoScreen.dart';
 
 class AdminScreen extends StatelessWidget {
+  final int idUsuario;
   final String nombre;
   final String apeMat;
   final String apePat;
   final String ci;
 
   const AdminScreen({
+    required this.idUsuario,
     required this.nombre,
     required this.apeMat,
     required this.apePat,
@@ -20,7 +24,7 @@ class AdminScreen extends StatelessWidget {
       body: Stack(
         children: [
           Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               image: DecorationImage(
                 image: AssetImage(
                     'images/fondo.jpg'), // Ruta de la imagen de fondo
@@ -92,7 +96,7 @@ class AdminScreen extends StatelessWidget {
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) =>
-                                        EstacionMeteorologicaScreen(),
+                                        EstacionMeteorologicaScreen(idUsuario: idUsuario, nombre: nombre, apePat: apePat, apeMat: apeMat, ci: ci),
                                   ),
                                 );
                               },
@@ -125,12 +129,13 @@ class AdminScreen extends StatelessWidget {
                             height: 120, // Define el tamaño del botón
                             child: ElevatedButton.icon(
                               onPressed: () {
-                                // Navigator.push(
-                                //   context,
-                                //   MaterialPageRoute(
-                                //     builder: (context) => ListaUsuarioEstacionScreen(),
-                                //   ),
-                                // );
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        EstacionHidrologicaScreen(idUsuario: idUsuario, nombre: nombre, apePat: apePat, apeMat: apeMat, ci: ci),
+                                  ),
+                                );
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Color(0xFFF1948A),
@@ -167,12 +172,13 @@ class AdminScreen extends StatelessWidget {
                             height: 120, // Define el tamaño del botón
                             child: ElevatedButton.icon(
                               onPressed: () {
-                                // Navigator.push(
-                                //   context,
-                                //   MaterialPageRoute(
-                                //     builder: (context) => ListaUsuarioEstacionScreen(),
-                                //   ),
-                                // );
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        PronosticoScreen(idUsuario: idUsuario, nombre: nombre, apePat: apePat, apeMat: apeMat, ci: ci),
+                                  ),
+                                );
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Color(0xFFF1C40F),
@@ -230,6 +236,49 @@ class AdminScreen extends StatelessWidget {
                                   fontWeight: FontWeight.bold,
                                   color: Color.fromARGB(255, 242, 246,
                                       255), // Color del texto del botón
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 20),
+                      Wrap(
+                        spacing: 20, // Espacio horizontal entre botones
+                        runSpacing: 20, // Espacio vertical entre filas
+                        children: [
+                          Container(
+                            width: 200,
+                            height: 120, // Define el tamaño del botón
+                            child: ElevatedButton.icon(
+                              onPressed: () {
+                                // Navigator.push(
+                                //   context,
+                                //   MaterialPageRoute(
+                                //     builder: (context) => ListaUsuarioEstacionScreen(),
+                                //   ),
+                                // );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    Color.fromARGB(255, 43, 200, 190),
+                                padding: EdgeInsets.symmetric(vertical: 16),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              icon: Icon(
+                                Icons.account_circle, // Icono a agregar
+                                size: 24, // Tamaño del icono
+                                color: Color.fromARGB(
+                                    255, 63, 129, 144), // Color del icono
+                              ),
+                              label: Text(
+                                "Usuarios",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color.fromARGB(255, 242, 246, 255),
                                 ),
                               ),
                             ),

@@ -1,17 +1,17 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:helvetasfront/screens/Administrador/DatosMeteorologicaScreen.dart';
+import 'package:helvetasfront/screens/Administrador/DatosHidrologicaScreen.dart';
 import 'package:http/http.dart' as http;
 
-class EstacionMeteorologicaScreen extends StatefulWidget {
+class EstacionHidrologicaScreen extends StatefulWidget {
   final int idUsuario;
   final String nombre;
   final String apeMat;
   final String apePat;
   final String ci;
 
-  const EstacionMeteorologicaScreen({
+  const EstacionHidrologicaScreen({
     required this.idUsuario,
     required this.nombre,
     required this.apeMat,
@@ -20,44 +20,42 @@ class EstacionMeteorologicaScreen extends StatefulWidget {
   });
 
   @override
-  _EstacionMeteorologicaScreenState createState() =>
-      _EstacionMeteorologicaScreenState();
+  _EstacionHidrologicaScreenState createState() =>
+      _EstacionHidrologicaScreenState();
 }
 
-class _EstacionMeteorologicaScreenState
-    extends State<EstacionMeteorologicaScreen> {
+class _EstacionHidrologicaScreenState
+    extends State<EstacionHidrologicaScreen> {
   List<Map<String, dynamic>> estaciones = [];
   Map<String, List<Map<String, dynamic>>> estacionesPorMunicipio = {};
   String? municipioSeleccionado;
   String? estacionSeleccionada;
   int? idEstacionSeleccionada;
+  //String? tipoEstacion;
 
   @override
   void initState() {
     super.initState();
-    fetchEstaciones();
+    fetchEstacionesHidrologica();
   }
 
-  Future<void> fetchEstaciones() async {
-    try {
-      final response = await http.get(Uri.parse('http://localhost:8080/estacion/lista_meteorologica'));
-      if (response.statusCode == 200) {
-        setState(() {
-          estaciones = List<Map<String, dynamic>>.from(json.decode(response.body));
-          estacionesPorMunicipio = agruparEstacionesPorMunicipio(estaciones);
-        });
-      } else {
-        throw Exception('Failed to load estaciones');
-      }
-    } catch (e) {
-      // Manejar errores de red o de decodificación
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error al cargar las estaciones')),
-      );
+
+  Future<void> fetchEstacionesHidrologica() async {
+    final response = await http
+        .get(Uri.parse('http://localhost:8080/estacion/lista_hidrologica'));
+    if (response.statusCode == 200) {
+      setState(() {
+        estaciones =
+            List<Map<String, dynamic>>.from(json.decode(response.body));
+        estacionesPorMunicipio = agruparEstacionesPorMunicipio(estaciones);
+      });
+    } else {
+      throw Exception('Failed to load estaciones');
     }
   }
 
-  Map<String, List<Map<String, dynamic>>> agruparEstacionesPorMunicipio(List<Map<String, dynamic>> estaciones) {
+  Map<String, List<Map<String, dynamic>>> agruparEstacionesPorMunicipio(
+      List<Map<String, dynamic>> estaciones) {
     Map<String, List<Map<String, dynamic>>> agrupadas = {};
     for (var estacion in estaciones) {
       if (!agrupadas.containsKey(estacion['nombreMunicipio'])) {
@@ -68,16 +66,13 @@ class _EstacionMeteorologicaScreenState
     return agrupadas;
   }
 
-  void navigateToDatosMeteorologicaScreen() {
+  void navigateToDatosHidrologicaScreen() {
     if (idEstacionSeleccionada != null) {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => DatosMeteorologicaScreen(
-            idEstacion: idEstacionSeleccionada!,
-            nombreMunicipio: municipioSeleccionado!,
-            nombreEstacion: estacionSeleccionada!,
-          ),
+          builder: (context) =>
+              DatosHidrologicaScreen(idEstacion: idEstacionSeleccionada!, nombreMunicipio: municipioSeleccionado!, nombreEstacion: estacionSeleccionada!, ),
         ),
       );
     }
@@ -95,7 +90,6 @@ class _EstacionMeteorologicaScreenState
         ),
         child: Column(
           children: [
-            SizedBox(height: 20),
             Container(
               padding: EdgeInsets.symmetric(horizontal: 10),
               height: 60,
@@ -112,7 +106,7 @@ class _EstacionMeteorologicaScreenState
                       size: 25,
                     ),
                   ),
-                  PopupMenuButton<String>(
+                  PopupMenuButton(
                     itemBuilder: (context) => [
                       PopupMenuItem(
                         child: Text('Opción 1'),
@@ -161,16 +155,17 @@ class _EstacionMeteorologicaScreenState
                       ),
               ],
             ),
-            SizedBox(height: 20),
             Expanded(
               child: estaciones.isEmpty
                   ? Center(child: CircularProgressIndicator())
                   : ListView.builder(
                       itemCount: estacionesPorMunicipio.keys.length,
                       itemBuilder: (context, index) {
-                        String municipio = estacionesPorMunicipio.keys.elementAt(index);
+                        String municipio =
+                            estacionesPorMunicipio.keys.elementAt(index);
                         return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 8),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -184,7 +179,8 @@ class _EstacionMeteorologicaScreenState
                                     });
                                   },
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: Color.fromARGB(255, 203, 230, 255),
+                                    backgroundColor:
+                                        Color.fromARGB(255, 203, 230, 255),
                                     padding: EdgeInsets.symmetric(vertical: 16),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(10),
@@ -236,12 +232,9 @@ class _EstacionMeteorologicaScreenState
                       onChanged: (String? newValue) {
                         setState(() {
                           estacionSeleccionada = newValue;
-                          idEstacionSeleccionada =
-                              estacionesPorMunicipio[municipioSeleccionado]!
-                                  .firstWhere((element) =>
-                                      element['nombreEstacion'] ==
-                                      newValue)['idEstacion'];
-                          navigateToDatosMeteorologicaScreen();
+                          idEstacionSeleccionada = estacionesPorMunicipio[municipioSeleccionado]!
+                              .firstWhere((element) => element['nombreEstacion'] == newValue)['idEstacion'];
+                          navigateToDatosHidrologicaScreen();
                         });
                       },
                       items: estacionesPorMunicipio[municipioSeleccionado]!

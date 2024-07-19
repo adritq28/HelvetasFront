@@ -1,33 +1,34 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:helvetasfront/screens/Administrador/AnadirDatoMeteorologicoScreen.dart';
-import 'package:helvetasfront/screens/Administrador/EditarMeteorologicaScreen.dart';
-import 'package:helvetasfront/screens/Administrador/VisualizarMeteorologicaScreen.dart';
+import 'package:helvetasfront/screens/Administrador/AnadirDatoHidrologicoScreen.dart';
+import 'package:helvetasfront/screens/Administrador/EditarHidrologicaScreen.dart';
+import 'package:helvetasfront/screens/Administrador/VisualizarHidrologicaScreen.dart';
 import 'package:helvetasfront/services/EstacionService.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
-class DatosMeteorologicaScreen extends StatefulWidget {
+class DatosHidrologicaScreen extends StatefulWidget {
   final int idEstacion;
   final String nombreMunicipio;
   final String nombreEstacion;
+  //final String tipoEstacion;
 
-  const DatosMeteorologicaScreen({
+  const DatosHidrologicaScreen({
     required this.idEstacion,
     required this.nombreMunicipio,
     required this.nombreEstacion,
+    //required this.tipoEstacion
   });
 
   @override
-  _DatosMeteorologicaScreenState createState() =>
-      _DatosMeteorologicaScreenState();
+  _DatosHidrologicaScreenState createState() => _DatosHidrologicaScreenState();
 }
 
-class _DatosMeteorologicaScreenState extends State<DatosMeteorologicaScreen> {
+class _DatosHidrologicaScreenState extends State<DatosHidrologicaScreen> {
   List<Map<String, dynamic>> datos = [];
-  List<Map<String, dynamic>> datosFiltrados = [];
   bool isLoading = true;
+  List<Map<String, dynamic>> datosFiltrados = [];
   String? mesSeleccionado;
   List<String> meses = [
     'Enero',
@@ -44,18 +45,18 @@ class _DatosMeteorologicaScreenState extends State<DatosMeteorologicaScreen> {
     'Diciembre'
   ];
 
-  late EstacionService miModelo4; // Futuro de la lista de personas
+  late EstacionService miModelo4;
 
   @override
   void initState() {
     super.initState();
-    fetchDatosMeteorologicos();
+    fetchDatosHidrologico();
   }
 
-  Future<void> fetchDatosMeteorologicos() async {
+  Future<void> fetchDatosHidrologico() async {
     final response = await http.get(
       Uri.parse(
-          'http://localhost:8080/estacion/lista_datos_meteorologica/${widget.idEstacion}'),
+          'http://localhost:8080/estacion/lista_datos_hidrologica/${widget.idEstacion}'),
     );
     if (response.statusCode == 200) {
       setState(() {
@@ -81,7 +82,50 @@ class _DatosMeteorologicaScreenState extends State<DatosMeteorologicaScreen> {
     }
   }
 
+  void editarDato(int index) async {
+    // Obtener los datos del índice seleccionado
+    Map<String, dynamic> dato = datos[index];
+
+    // Navegar a la pantalla de edición pasando los datos como argumentos
+    bool cambiosGuardados = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditarHidrologicaScreen(
+          idHidrologica: dato['idHidrologica'],
+          limnimetro: dato['limnimetro'],
+          fechaReg: dato['fechaReg'],
+        ),
+      ),
+    );
+
+    // Si se guardaron cambios, actualizar la lista
+    if (cambiosGuardados == true) {
+      fetchDatosHidrologico(); // Método que carga los datos actualizados
+    }
+  }
+
+  void visualizarDato(int index) {
+    // Implementar la lógica para visualizar el dato en la posición 'index'
+    Map<String, dynamic> dato =
+        datos[index]; // Suponiendo que 'datos' es tu lista de datos
+
+    // Navegar a la pantalla de visualización pasando los datos como argumentos
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => VisualizarHidrologicaScreen(
+          idHidrologica: dato['idHidrologica'],
+          limnimetro: dato['limnimetro'],
+          fechaReg: dato['fechaReg'],
+        ),
+      ),
+    );
+
+    print('Visualizar dato en la posición $index');
+  }
+
   void filtrarDatosPorMes(String? mes) {
+    print('aaaaaaaaaaaaa');
     if (mes == null || mes.isEmpty) {
       setState(() {
         datosFiltrados = datos;
@@ -92,8 +136,10 @@ class _DatosMeteorologicaScreenState extends State<DatosMeteorologicaScreen> {
     int mesIndex = meses.indexOf(mes) + 1; // Meses son 1-indexados en DateTime
 
     setState(() {
+      print('bbbbbbbbb');
       datosFiltrados = datos.where((dato) {
         try {
+          print('ccccccccc');
           DateTime fecha = DateTime.parse(dato['fechaReg']);
           return fecha.month == mesIndex;
         } catch (e) {
@@ -104,57 +150,12 @@ class _DatosMeteorologicaScreenState extends State<DatosMeteorologicaScreen> {
     });
   }
 
-  void editarDato(int index) async {
-    Map<String, dynamic> dato = datosFiltrados[index];
-
-    bool cambiosGuardados = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => EditarMeteorologicaScreen(
-          idDatosEst: dato['idDatosEst'],
-          tempMax: dato['tempMax'],
-          tempMin: dato['tempMin'],
-          pcpn: dato['pcpn'],
-          tempAmb: dato['tempAmb'],
-          dirViento: dato['dirViento'],
-          velViento: dato['velViento'],
-          taevap: dato['taevap'],
-          fechaReg: dato['fechaReg'],
-        ),
-      ),
-    );
-
-    if (cambiosGuardados == true) {
-      fetchDatosMeteorologicos();
-    }
-  }
-
-  void visualizarDato(int index) {
-    Map<String, dynamic> dato = datosFiltrados[index];
-
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => VisualizarMeteorologicaScreen(
-          idDatosEst: dato['idDatosEst'],
-          tempMax: dato['tempMax'],
-          tempMin: dato['tempMin'],
-          pcpn: dato['pcpn'],
-          tempAmb: dato['tempAmb'],
-          dirViento: dato['dirViento'],
-          velViento: dato['velViento'],
-          taevap: dato['taevap'],
-          fechaReg: dato['fechaReg'],
-        ),
-      ),
-    );
-    print('Visualizar dato en la posición $index');
-  }
-
   void eliminarDato(int index) async {
-    Map<String, dynamic> dato = datosFiltrados[index];
-    int idDatosEst = dato['idDatosEst'];
+    // Obtener los datos del índice seleccionado
+    Map<String, dynamic> dato = datos[index];
+    int idHidrologica = dato['idHidrologica'];
 
+    // Mostrar un cuadro de diálogo de confirmación
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -171,22 +172,23 @@ class _DatosMeteorologicaScreenState extends State<DatosMeteorologicaScreen> {
             TextButton(
               child: Text('Eliminar'),
               onPressed: () async {
-                Navigator.of(context).pop();
+                Navigator.of(context).pop(); // Cerrar el cuadro de diálogo
 
-                final url = Uri.parse('http://localhost:8080/estacion/eliminar/$idDatosEst');
+                // Realizar la solicitud HTTP para eliminar lógicamente el dato
+                final url = Uri.parse(
+                    'http://localhost:8080/estacion/eliminarH/$idHidrologica');
                 final headers = {'Content-Type': 'application/json'};
                 final response = await http.delete(url, headers: headers);
 
                 if (response.statusCode == 200) {
+                  // Eliminación exitosa, actualizar la lista de datos
                   setState(() {
                     datos.removeAt(index);
-                    datosFiltrados = datosFiltrados
-                        .where((dato) => dato['idDatosEst'] != idDatosEst)
-                        .toList();
                   });
                   print('Dato eliminado correctamente');
                 } else {
                   print('Error al intentar eliminar el dato');
+                  // Manejar el error según sea necesario
                 }
               },
             ),
@@ -201,11 +203,10 @@ class _DatosMeteorologicaScreenState extends State<DatosMeteorologicaScreen> {
       context,
       MaterialPageRoute(
           builder: (context) =>
-              AnadirDatoMeteorologicoScreen(idEstacion: widget.idEstacion)),
+              AnadirDatoHidrologicoScreen(idEstacion: widget.idEstacion)),
     );
-
     if (result == true) {
-      fetchDatosMeteorologicos();
+      fetchDatosHidrologico();
     }
   }
 
@@ -266,7 +267,7 @@ class _DatosMeteorologicaScreenState extends State<DatosMeteorologicaScreen> {
                   ),
                   const SizedBox(height: 20),
                   Text(
-                    'Estación Meteorologica: ${widget.nombreEstacion}',
+                    'Estación Hidrologica: ${widget.nombreEstacion}',
                     style: const TextStyle(
                       fontSize: 15,
                       color: Color.fromARGB(208, 255, 255, 255),
@@ -298,7 +299,8 @@ class _DatosMeteorologicaScreenState extends State<DatosMeteorologicaScreen> {
                           child: Text(
                             mes,
                             style: TextStyle(
-                              color: const Color.fromARGB(255, 185, 223, 255), // Cambia el color del texto en el DropdownMenuItem
+                              color: const Color.fromARGB(255, 185, 223,
+                                  255), // Cambia el color del texto en el DropdownMenuItem
                             ),
                           ),
                         );
@@ -341,7 +343,7 @@ class _DatosMeteorologicaScreenState extends State<DatosMeteorologicaScreen> {
                             child: SingleChildScrollView(
                               scrollDirection: Axis.horizontal,
                               child: DataTable(
-                                columns: const [
+                                columns: [
                                   DataColumn(
                                     label: Text(
                                       'Fecha',
@@ -353,61 +355,7 @@ class _DatosMeteorologicaScreenState extends State<DatosMeteorologicaScreen> {
                                   ),
                                   DataColumn(
                                     label: Text(
-                                      'Temp Max',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                  DataColumn(
-                                    label: Text(
-                                      'Temp Min',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                  DataColumn(
-                                    label: Text(
-                                      'Precipitación',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                  DataColumn(
-                                    label: Text(
-                                      'Temp Ambiente',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                  DataColumn(
-                                    label: Text(
-                                      'Dir Viento',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                  DataColumn(
-                                    label: Text(
-                                      'Vel Viento',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                  DataColumn(
-                                    label: Text(
-                                      'Evaporacion',
+                                      'Limnimetro',
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         color: Colors.white,
@@ -431,49 +379,13 @@ class _DatosMeteorologicaScreenState extends State<DatosMeteorologicaScreen> {
                                       DataCell(
                                         Text(
                                           formatDateTime(
-                                              dato['fechaReg']?.toString()),
+                                              dato['fechaReg'].toString()),
                                           style: TextStyle(color: Colors.white),
                                         ),
                                       ),
                                       DataCell(
                                         Text(
-                                          dato['tempMax'].toString(),
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                      ),
-                                      DataCell(
-                                        Text(
-                                          dato['tempMin'].toString(),
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                      ),
-                                      DataCell(
-                                        Text(
-                                          dato['pcpn'].toString(),
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                      ),
-                                      DataCell(
-                                        Text(
-                                          dato['tempAmb'].toString(),
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                      ),
-                                      DataCell(
-                                        Text(
-                                          dato['dirViento'].toString(),
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                      ),
-                                      DataCell(
-                                        Text(
-                                          dato['velViento'].toString(),
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                      ),
-                                      DataCell(
-                                        Text(
-                                          dato['taevap'].toString(),
+                                          dato['limnimetro'].toString(),
                                           style: TextStyle(color: Colors.white),
                                         ),
                                       ),
@@ -482,22 +394,17 @@ class _DatosMeteorologicaScreenState extends State<DatosMeteorologicaScreen> {
                                           children: [
                                             GestureDetector(
                                               onTap: () => editarDato(index),
-                                              child: MouseRegion(
-                                                cursor:
-                                                    SystemMouseCursors.click,
-                                                child: Container(
-                                                  padding: EdgeInsets.all(7),
-                                                  decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            8),
-                                                    color: Color(0xFFF0B27A),
-                                                  ),
-                                                  child: Icon(
-                                                    Icons.edit,
-                                                    color: Colors.white,
-                                                    size: 24,
-                                                  ),
+                                              child: Container(
+                                                padding: EdgeInsets.all(7),
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                  color: Color(0xFFF0B27A),
+                                                ),
+                                                child: Icon(
+                                                  Icons.edit,
+                                                  color: Colors.white,
+                                                  size: 24,
                                                 ),
                                               ),
                                             ),
@@ -505,44 +412,34 @@ class _DatosMeteorologicaScreenState extends State<DatosMeteorologicaScreen> {
                                             GestureDetector(
                                               onTap: () =>
                                                   visualizarDato(index),
-                                              child: MouseRegion(
-                                                cursor:
-                                                    SystemMouseCursors.click,
-                                                child: Container(
-                                                  padding: EdgeInsets.all(7),
-                                                  decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            8),
-                                                    color: Color(0xFF58D68D),
-                                                  ),
-                                                  child: Icon(
-                                                    Icons.remove_red_eye_sharp,
-                                                    color: Colors.white,
-                                                    size: 24,
-                                                  ),
+                                              child: Container(
+                                                padding: EdgeInsets.all(7),
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                  color: Color(0xFF58D68D),
+                                                ),
+                                                child: Icon(
+                                                  Icons.remove_red_eye_sharp,
+                                                  color: Colors.white,
+                                                  size: 24,
                                                 ),
                                               ),
                                             ),
                                             const SizedBox(width: 5),
                                             GestureDetector(
                                               onTap: () => eliminarDato(index),
-                                              child: MouseRegion(
-                                                cursor:
-                                                    SystemMouseCursors.click,
-                                                child: Container(
-                                                  padding: EdgeInsets.all(7),
-                                                  decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            8),
-                                                    color: Color(0xFFEC7063),
-                                                  ),
-                                                  child: Icon(
-                                                    Icons.delete,
-                                                    color: Colors.white,
-                                                    size: 24,
-                                                  ),
+                                              child: Container(
+                                                padding: EdgeInsets.all(7),
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                  color: Color(0xFFEC7063),
+                                                ),
+                                                child: Icon(
+                                                  Icons.delete,
+                                                  color: Colors.white,
+                                                  size: 24,
                                                 ),
                                               ),
                                             ),

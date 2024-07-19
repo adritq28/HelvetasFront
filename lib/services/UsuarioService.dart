@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:helvetasfront/model/UsuarioEstacion.dart';
-import 'package:helvetasfront/screens/AdminScreen.dart';
+import 'package:helvetasfront/screens/Administrador/AdminScreen.dart';
 import 'package:http/http.dart' as http;
 
 class UsuarioService extends ChangeNotifier {
@@ -95,6 +95,7 @@ class UsuarioService extends ChangeNotifier {
           context,
           MaterialPageRoute(
             builder: (context) => AdminScreen(
+              idUsuario: userDetails['idUsuario'],
               nombre: userDetails['nombre'],
               apeMat: userDetails['apeMat'],
               apePat: userDetails['apePat'],

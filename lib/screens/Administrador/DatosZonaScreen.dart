@@ -1,30 +1,29 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:helvetasfront/screens/Administrador/AnadirDatoMeteorologicoScreen.dart';
 import 'package:helvetasfront/screens/Administrador/EditarMeteorologicaScreen.dart';
 import 'package:helvetasfront/screens/Administrador/VisualizarMeteorologicaScreen.dart';
-import 'package:helvetasfront/services/EstacionService.dart';
+import 'package:helvetasfront/services/PronosticoService.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
-class DatosMeteorologicaScreen extends StatefulWidget {
-  final int idEstacion;
+class DatosZonaScreen extends StatefulWidget {
+  final int idPronostico;
   final String nombreMunicipio;
-  final String nombreEstacion;
+  final String nombrePronostico;
 
-  const DatosMeteorologicaScreen({
-    required this.idEstacion,
+  const DatosZonaScreen({
+    required this.idPronostico,
     required this.nombreMunicipio,
-    required this.nombreEstacion,
+    required this.nombrePronostico,
   });
 
   @override
-  _DatosMeteorologicaScreenState createState() =>
-      _DatosMeteorologicaScreenState();
+  _DatosZonaScreenState createState() =>
+      _DatosZonaScreenState();
 }
 
-class _DatosMeteorologicaScreenState extends State<DatosMeteorologicaScreen> {
+class _DatosZonaScreenState extends State<DatosZonaScreen> {
   List<Map<String, dynamic>> datos = [];
   List<Map<String, dynamic>> datosFiltrados = [];
   bool isLoading = true;
@@ -44,18 +43,18 @@ class _DatosMeteorologicaScreenState extends State<DatosMeteorologicaScreen> {
     'Diciembre'
   ];
 
-  late EstacionService miModelo4; // Futuro de la lista de personas
+  late PronosticoService miModelo4; // Futuro de la lista de personas
 
   @override
   void initState() {
     super.initState();
-    fetchDatosMeteorologicos();
+    fetchZonas();
   }
 
-  Future<void> fetchDatosMeteorologicos() async {
+  Future<void> fetchZonas() async {
     final response = await http.get(
       Uri.parse(
-          'http://localhost:8080/estacion/lista_datos_meteorologica/${widget.idEstacion}'),
+          'http://localhost:8080/Pronostico/lista_datos_meteorologica/${widget.idPronostico}'),
     );
     if (response.statusCode == 200) {
       setState(() {
@@ -125,7 +124,7 @@ class _DatosMeteorologicaScreenState extends State<DatosMeteorologicaScreen> {
     );
 
     if (cambiosGuardados == true) {
-      fetchDatosMeteorologicos();
+      fetchZonas();
     }
   }
 
@@ -173,7 +172,7 @@ class _DatosMeteorologicaScreenState extends State<DatosMeteorologicaScreen> {
               onPressed: () async {
                 Navigator.of(context).pop();
 
-                final url = Uri.parse('http://localhost:8080/estacion/eliminar/$idDatosEst');
+                final url = Uri.parse('http://localhost:8080/Pronostico/eliminar/$idDatosEst');
                 final headers = {'Content-Type': 'application/json'};
                 final response = await http.delete(url, headers: headers);
 
@@ -197,16 +196,16 @@ class _DatosMeteorologicaScreenState extends State<DatosMeteorologicaScreen> {
   }
 
   void anadirDato() async {
-    bool? result = await Navigator.push(
-      context,
-      MaterialPageRoute(
-          builder: (context) =>
-              AnadirDatoMeteorologicoScreen(idEstacion: widget.idEstacion)),
-    );
+    // bool? result = await Navigator.push(
+    //   context,
+    //   MaterialPageRoute(
+    //       builder: (context) =>
+    //           AnadirDatoMeteorologicoScreen(idPronostico: widget.idPronostico)),
+    // );
 
-    if (result == true) {
-      fetchDatosMeteorologicos();
-    }
+    // if (result == true) {
+    //   fetchZonas();
+    // }
   }
 
   @override
@@ -266,7 +265,7 @@ class _DatosMeteorologicaScreenState extends State<DatosMeteorologicaScreen> {
                   ),
                   const SizedBox(height: 20),
                   Text(
-                    'Estación Meteorologica: ${widget.nombreEstacion}',
+                    'Estación Meteorologica: ${widget.nombrePronostico}',
                     style: const TextStyle(
                       fontSize: 15,
                       color: Color.fromARGB(208, 255, 255, 255),
