@@ -12,6 +12,8 @@ class DatosPronostico {
   late DateTime fecha = DateTime.now();
   final int idZona;
   final int idFenologia;
+  //final bool edit;
+  final bool delete;
 
   DatosPronostico({
     //required this.id,
@@ -27,6 +29,8 @@ class DatosPronostico {
     required this.fecha,
     required this.idZona,
     required this.idFenologia,
+    required this.delete,
+    //required this.edit,
   });
 
   factory DatosPronostico.fromJson(Map<String, dynamic> json) {
@@ -46,6 +50,8 @@ class DatosPronostico {
           : DateTime.now(),
       idZona: json['idZona'] ?? 0,
       idFenologia: json['idFenologia'] ?? 0,
+      //edit: json['edit'] != null ? json['edit'] == true : false,
+      delete: json['delete'] != null ? json['delete'] == true : false,
     );
   }
 
@@ -63,6 +69,8 @@ class DatosPronostico {
             fecha.toUtc().toIso8601String(), //fechaDatos.toIso8601String(),
         'idZona': idZona,
         'idFenologia': idFenologia,
+        //'edit': edit,
+        'delete': delete,
       };
 
   String toStringDatosPronostico() {
@@ -89,6 +97,10 @@ class DatosPronostico {
         idZona.toString() +
         ", idFenologia=" +
         idFenologia.toString() +
+        //", edit=" +
+        // edit.toString() +
+        ", delete=" +
+        delete.toString() +
         "]";
   }
 }

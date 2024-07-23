@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:helvetasfront/screens/Administrador/EstacionHidrologica.dart';
-import 'package:helvetasfront/screens/Administrador/EstacionMeteorologica.dart';
-import 'package:helvetasfront/screens/Administrador/PronosticoScreen.dart';
+import 'package:helvetasfront/screens/Administrador/FechaSiembra/FechaSiembraScreen.dart';
+import 'package:helvetasfront/screens/Administrador/Hidrologia/EstacionHidrologica.dart';
+import 'package:helvetasfront/screens/Administrador/Meteorologia/EstacionMeteorologica.dart';
+import 'package:helvetasfront/screens/Administrador/Pronosticos/PronosticoScreen.dart';
 
 class AdminScreen extends StatelessWidget {
   final int idUsuario;
@@ -208,12 +209,12 @@ class AdminScreen extends StatelessWidget {
                             height: 120, // Define el tamaño del botón
                             child: ElevatedButton.icon(
                               onPressed: () {
-                                // Navigator.push(
-                                //   context,
-                                //   MaterialPageRoute(
-                                //     builder: (context) => ListaUsuarioEstacionScreen(),
-                                //   ),
-                                // );
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => FechaSiembraScreen(idUsuario: idUsuario, nombre: nombre, apePat: apePat, apeMat: apeMat, ci: ci),
+                                  ),
+                                );
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Color(

@@ -458,7 +458,8 @@ class _ListaEstacionScreenState extends State<ListaEstacionScreen> {
                                   fechaReg: fechaReg..toUtc().subtract(Duration(hours: 8)),
                                   codTipoEstacion: widget.codTipoEstacion,
                                   delete: _delete,
-                                  edit: _editar);
+                                 // edit: _editar
+                                 );
                               crear(nuevoDato).then((alertDialog) {
                                 showDialog(
                                   context: context,

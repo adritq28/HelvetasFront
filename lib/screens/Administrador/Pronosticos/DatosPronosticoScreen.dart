@@ -1,29 +1,30 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:helvetasfront/screens/Administrador/EditarMeteorologicaScreen.dart';
-import 'package:helvetasfront/screens/Administrador/VisualizarMeteorologicaScreen.dart';
+import 'package:helvetasfront/screens/Administrador/Pronosticos/AnadirDatoPronosticoScreen.dart';
+import 'package:helvetasfront/screens/Administrador/Pronosticos/EditarPronosticoScreen.dart';
+import 'package:helvetasfront/screens/Administrador/Pronosticos/VisualizarPronosticoScreen.dart';
 import 'package:helvetasfront/services/PronosticoService.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
-class DatosZonaScreen extends StatefulWidget {
-  final int idPronostico;
+class DatosPronosticoScreen extends StatefulWidget {
+  final int idZona;
   final String nombreMunicipio;
-  final String nombrePronostico;
+  final String nombreZona;
 
-  const DatosZonaScreen({
-    required this.idPronostico,
+  const DatosPronosticoScreen({
+    required this.idZona,
     required this.nombreMunicipio,
-    required this.nombrePronostico,
+    required this.nombreZona,
   });
 
   @override
-  _DatosZonaScreenState createState() =>
-      _DatosZonaScreenState();
+  _DatosPronosticoScreenState createState() =>
+      _DatosPronosticoScreenState();
 }
 
-class _DatosZonaScreenState extends State<DatosZonaScreen> {
+class _DatosPronosticoScreenState extends State<DatosPronosticoScreen> {
   List<Map<String, dynamic>> datos = [];
   List<Map<String, dynamic>> datosFiltrados = [];
   bool isLoading = true;
@@ -54,7 +55,7 @@ class _DatosZonaScreenState extends State<DatosZonaScreen> {
   Future<void> fetchZonas() async {
     final response = await http.get(
       Uri.parse(
-          'http://localhost:8080/Pronostico/lista_datos_meteorologica/${widget.idPronostico}'),
+          'http://localhost:8080/datos_pronostico/lista_datos_zona/${widget.idZona}'),
     );
     if (response.statusCode == 200) {
       setState(() {
@@ -93,10 +94,10 @@ class _DatosZonaScreenState extends State<DatosZonaScreen> {
     setState(() {
       datosFiltrados = datos.where((dato) {
         try {
-          DateTime fecha = DateTime.parse(dato['fechaReg']);
+          DateTime fecha = DateTime.parse(dato['fecha']);
           return fecha.month == mesIndex;
         } catch (e) {
-          print('Error al parsear la fecha: ${dato['fechaReg']}');
+          print('Error al parsear la fecha: ${dato['fecha']}');
           return false;
         }
       }).toList();
@@ -104,21 +105,17 @@ class _DatosZonaScreenState extends State<DatosZonaScreen> {
   }
 
   void editarDato(int index) async {
-    Map<String, dynamic> dato = datosFiltrados[index];
+    Map<String, dynamic> dato = datos[index];
 
     bool cambiosGuardados = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => EditarMeteorologicaScreen(
-          idDatosEst: dato['idDatosEst'],
+        builder: (context) => EditarPronosticoScreen(
+          idPonostico: dato['idPronostico'],
           tempMax: dato['tempMax'],
           tempMin: dato['tempMin'],
           pcpn: dato['pcpn'],
-          tempAmb: dato['tempAmb'],
-          dirViento: dato['dirViento'],
-          velViento: dato['velViento'],
-          taevap: dato['taevap'],
-          fechaReg: dato['fechaReg'],
+          fecha: dato['fecha'],
         ),
       ),
     );
@@ -129,21 +126,17 @@ class _DatosZonaScreenState extends State<DatosZonaScreen> {
   }
 
   void visualizarDato(int index) {
-    Map<String, dynamic> dato = datosFiltrados[index];
+    Map<String, dynamic> dato = datos[index];
 
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => VisualizarMeteorologicaScreen(
-          idDatosEst: dato['idDatosEst'],
+        builder: (context) => VisualizarPronosticoScreen(
+          idPronostico: dato['idPronostico'],
           tempMax: dato['tempMax'],
           tempMin: dato['tempMin'],
           pcpn: dato['pcpn'],
-          tempAmb: dato['tempAmb'],
-          dirViento: dato['dirViento'],
-          velViento: dato['velViento'],
-          taevap: dato['taevap'],
-          fechaReg: dato['fechaReg'],
+          fecha: dato['fecha'],
         ),
       ),
     );
@@ -152,7 +145,7 @@ class _DatosZonaScreenState extends State<DatosZonaScreen> {
 
   void eliminarDato(int index) async {
     Map<String, dynamic> dato = datosFiltrados[index];
-    int idDatosEst = dato['idDatosEst'];
+    int idPronostico = dato['idPronostico'];
 
     showDialog(
       context: context,
@@ -172,7 +165,7 @@ class _DatosZonaScreenState extends State<DatosZonaScreen> {
               onPressed: () async {
                 Navigator.of(context).pop();
 
-                final url = Uri.parse('http://localhost:8080/Pronostico/eliminar/$idDatosEst');
+                final url = Uri.parse('http://localhost:8080/datos_pronostico/eliminar/$idPronostico');
                 final headers = {'Content-Type': 'application/json'};
                 final response = await http.delete(url, headers: headers);
 
@@ -180,7 +173,7 @@ class _DatosZonaScreenState extends State<DatosZonaScreen> {
                   setState(() {
                     datos.removeAt(index);
                     datosFiltrados = datosFiltrados
-                        .where((dato) => dato['idDatosEst'] != idDatosEst)
+                        .where((dato) => dato['idPronostico'] != idPronostico)
                         .toList();
                   });
                   print('Dato eliminado correctamente');
@@ -196,16 +189,16 @@ class _DatosZonaScreenState extends State<DatosZonaScreen> {
   }
 
   void anadirDato() async {
-    // bool? result = await Navigator.push(
-    //   context,
-    //   MaterialPageRoute(
-    //       builder: (context) =>
-    //           AnadirDatoMeteorologicoScreen(idPronostico: widget.idPronostico)),
-    // );
+    bool? result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) =>
+              AnadirDatoPronosticoScreen(idZona: widget.idZona)),
+    );
 
-    // if (result == true) {
-    //   fetchZonas();
-    // }
+    if (result == true) {
+      fetchZonas();
+    }
   }
 
   @override
@@ -265,7 +258,7 @@ class _DatosZonaScreenState extends State<DatosZonaScreen> {
                   ),
                   const SizedBox(height: 20),
                   Text(
-                    'Estación Meteorologica: ${widget.nombrePronostico}',
+                    'Zona: ${widget.nombreZona}',
                     style: const TextStyle(
                       fontSize: 15,
                       color: Color.fromARGB(208, 255, 255, 255),
@@ -377,42 +370,7 @@ class _DatosZonaScreenState extends State<DatosZonaScreen> {
                                       ),
                                     ),
                                   ),
-                                  DataColumn(
-                                    label: Text(
-                                      'Temp Ambiente',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                  DataColumn(
-                                    label: Text(
-                                      'Dir Viento',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                  DataColumn(
-                                    label: Text(
-                                      'Vel Viento',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                  DataColumn(
-                                    label: Text(
-                                      'Evaporacion',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
+                                  
                                   DataColumn(
                                     label: Text(
                                       'Acciones',
@@ -430,7 +388,7 @@ class _DatosZonaScreenState extends State<DatosZonaScreen> {
                                       DataCell(
                                         Text(
                                           formatDateTime(
-                                              dato['fechaReg']?.toString()),
+                                              dato['fecha']?.toString()),
                                           style: TextStyle(color: Colors.white),
                                         ),
                                       ),
@@ -452,30 +410,7 @@ class _DatosZonaScreenState extends State<DatosZonaScreen> {
                                           style: TextStyle(color: Colors.white),
                                         ),
                                       ),
-                                      DataCell(
-                                        Text(
-                                          dato['tempAmb'].toString(),
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                      ),
-                                      DataCell(
-                                        Text(
-                                          dato['dirViento'].toString(),
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                      ),
-                                      DataCell(
-                                        Text(
-                                          dato['velViento'].toString(),
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                      ),
-                                      DataCell(
-                                        Text(
-                                          dato['taevap'].toString(),
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                      ),
+                                      
                                       DataCell(
                                         Row(
                                           children: [

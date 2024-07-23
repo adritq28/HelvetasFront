@@ -1,30 +1,30 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:helvetasfront/screens/Administrador/AnadirDatoMeteorologicoScreen.dart';
-import 'package:helvetasfront/screens/Administrador/EditarMeteorologicaScreen.dart';
-import 'package:helvetasfront/screens/Administrador/VisualizarMeteorologicaScreen.dart';
-import 'package:helvetasfront/services/EstacionService.dart';
+import 'package:helvetasfront/screens/Administrador/FechaSiembra/AnadirCultivoScreen.dart';
+import 'package:helvetasfront/screens/Administrador/FechaSiembra/EditarCultivoScreen.dart';
+import 'package:helvetasfront/screens/Administrador/FechaSiembra/VisualizarCultivoScreen.dart';
+import 'package:helvetasfront/services/PronosticoService.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
-class DatosMeteorologicaScreen extends StatefulWidget {
-  final int idEstacion;
+class DatosFechaSiembraScreen extends StatefulWidget {
+  final int idZona;
   final String nombreMunicipio;
-  final String nombreEstacion;
+  final String nombreZona;
 
-  const DatosMeteorologicaScreen({
-    required this.idEstacion,
+  const DatosFechaSiembraScreen({
+    required this.idZona,
     required this.nombreMunicipio,
-    required this.nombreEstacion,
+    required this.nombreZona,
   });
 
   @override
-  _DatosMeteorologicaScreenState createState() =>
-      _DatosMeteorologicaScreenState();
+  _DatosFechaSiembraScreenState createState() =>
+      _DatosFechaSiembraScreenState();
 }
 
-class _DatosMeteorologicaScreenState extends State<DatosMeteorologicaScreen> {
+class _DatosFechaSiembraScreenState extends State<DatosFechaSiembraScreen> {
   List<Map<String, dynamic>> datos = [];
   List<Map<String, dynamic>> datosFiltrados = [];
   bool isLoading = true;
@@ -44,18 +44,18 @@ class _DatosMeteorologicaScreenState extends State<DatosMeteorologicaScreen> {
     'Diciembre'
   ];
 
-  late EstacionService miModelo4; // Futuro de la lista de personas
+  late PronosticoService miModelo4; // Futuro de la lista de personas
 
   @override
   void initState() {
     super.initState();
-    fetchDatosMeteorologicos();
+    fetchZonas();
   }
 
-  Future<void> fetchDatosMeteorologicos() async {
+  Future<void> fetchZonas() async {
     final response = await http.get(
       Uri.parse(
-          'http://localhost:8080/estacion/lista_datos_meteorologica/${widget.idEstacion}'),
+          'http://localhost:8080/cultivos/lista_datos_cultivo/${widget.idZona}'),
     );
     if (response.statusCode == 200) {
       setState(() {
@@ -81,70 +81,64 @@ class _DatosMeteorologicaScreenState extends State<DatosMeteorologicaScreen> {
     }
   }
 
-  void filtrarDatosPorMes(String? mes) {
-    if (mes == null || mes.isEmpty) {
-      setState(() {
-        datosFiltrados = datos;
-      });
-      return;
-    }
+  // void filtrarDatosPorMes(String? mes) {
+  //   if (mes == null || mes.isEmpty) {
+  //     setState(() {
+  //       datosFiltrados = datos;
+  //     });
+  //     return;
+  //   }
 
-    int mesIndex = meses.indexOf(mes) + 1; // Meses son 1-indexados en DateTime
+  //   int mesIndex = meses.indexOf(mes) + 1; // Meses son 1-indexados en DateTime
 
-    setState(() {
-      datosFiltrados = datos.where((dato) {
-        try {
-          DateTime fecha = DateTime.parse(dato['fechaReg']);
-          return fecha.month == mesIndex;
-        } catch (e) {
-          print('Error al parsear la fecha: ${dato['fechaReg']}');
-          return false;
-        }
-      }).toList();
-    });
-  }
+  //   setState(() {
+  //     datosFiltrados = datos.where((dato) {
+  //       try {
+  //         DateTime fecha = DateTime.parse(dato['fecha']);
+  //         return fecha.month == mesIndex;
+  //       } catch (e) {
+  //         print('Error al parsear la fecha: ${dato['fecha']}');
+  //         return false;
+  //       }
+  //     }).toList();
+  //   });
+  // }
 
   void editarDato(int index) async {
-    Map<String, dynamic> dato = datosFiltrados[index];
+  Map<String, dynamic> dato = datos[index];
 
-    bool cambiosGuardados = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => EditarMeteorologicaScreen(
-          idDatosEst: dato['idDatosEst'],
-          tempMax: dato['tempMax'],
-          tempMin: dato['tempMin'],
-          pcpn: dato['pcpn'],
-          tempAmb: dato['tempAmb'],
-          dirViento: dato['dirViento'],
-          velViento: dato['velViento'],
-          taevap: dato['taevap'],
-          fechaReg: dato['fechaReg'],
-        ),
+  bool cambiosGuardados = await Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => EditarCultivoScreen(
+        idCultivo: dato['idCultivo'],
+        nombre: dato['nombre'],
+        fechaSiembra: dato['fechaSiembra'] ?? '',
+        fechaReg: dato['fechaReg'] ?? '',
+        tipo: dato['tipo'],
       ),
-    );
+    ),
+  );
 
-    if (cambiosGuardados == true) {
-      fetchDatosMeteorologicos();
-    }
+  if (cambiosGuardados == true) {
+    await fetchZonas(); // Asegúrate de que fetchZonas se complete antes de continuar
+    setState(() {}); // Actualiza el estado de la pantalla
   }
+}
+
 
   void visualizarDato(int index) {
-    Map<String, dynamic> dato = datosFiltrados[index];
+    Map<String, dynamic> dato = datos[index];
 
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => VisualizarMeteorologicaScreen(
-          idDatosEst: dato['idDatosEst'],
-          tempMax: dato['tempMax'],
-          tempMin: dato['tempMin'],
-          pcpn: dato['pcpn'],
-          tempAmb: dato['tempAmb'],
-          dirViento: dato['dirViento'],
-          velViento: dato['velViento'],
-          taevap: dato['taevap'],
-          fechaReg: dato['fechaReg'],
+        builder: (context) => VisualizarCultivoScreen(
+          idCultivo: dato['idCultivo'],
+          nombre: dato['nombre'],
+          fechaSiembra: dato['fechaSiembra'] ?? '',
+          fechaReg: dato['fechaReg'] ?? '',
+          tipo: dato['tipo'],
         ),
       ),
     );
@@ -153,7 +147,7 @@ class _DatosMeteorologicaScreenState extends State<DatosMeteorologicaScreen> {
 
   void eliminarDato(int index) async {
     Map<String, dynamic> dato = datosFiltrados[index];
-    int idDatosEst = dato['idDatosEst'];
+    int idCultivo = dato['idCultivo'];
 
     showDialog(
       context: context,
@@ -173,7 +167,7 @@ class _DatosMeteorologicaScreenState extends State<DatosMeteorologicaScreen> {
               onPressed: () async {
                 Navigator.of(context).pop();
 
-                final url = Uri.parse('http://localhost:8080/estacion/eliminar/$idDatosEst');
+                final url = Uri.parse('http://localhost:8080/cultivos/eliminar/$idCultivo');
                 final headers = {'Content-Type': 'application/json'};
                 final response = await http.delete(url, headers: headers);
 
@@ -181,7 +175,7 @@ class _DatosMeteorologicaScreenState extends State<DatosMeteorologicaScreen> {
                   setState(() {
                     datos.removeAt(index);
                     datosFiltrados = datosFiltrados
-                        .where((dato) => dato['idDatosEst'] != idDatosEst)
+                        .where((dato) => dato['idCultivo'] != idCultivo)
                         .toList();
                   });
                   print('Dato eliminado correctamente');
@@ -201,11 +195,11 @@ class _DatosMeteorologicaScreenState extends State<DatosMeteorologicaScreen> {
       context,
       MaterialPageRoute(
           builder: (context) =>
-              AnadirDatoMeteorologicoScreen(idEstacion: widget.idEstacion)),
+              AnadirCultivoScreen(idZona: widget.idZona)),
     );
 
     if (result == true) {
-      fetchDatosMeteorologicos();
+      fetchZonas();
     }
   }
 
@@ -266,7 +260,7 @@ class _DatosMeteorologicaScreenState extends State<DatosMeteorologicaScreen> {
                   ),
                   const SizedBox(height: 20),
                   Text(
-                    'Estación Meteorologica: ${widget.nombreEstacion}',
+                    'Zona: ${widget.nombreZona}',
                     style: const TextStyle(
                       fontSize: 15,
                       color: Color.fromARGB(208, 255, 255, 255),
@@ -274,45 +268,45 @@ class _DatosMeteorologicaScreenState extends State<DatosMeteorologicaScreen> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  Container(
-                    width: MediaQuery.of(context).size.width *
-                        0.5, // Ajusta el ancho según tus necesidades
-                    child: DropdownButton<String>(
-                      value: mesSeleccionado,
-                      hint: Text(
-                        'Seleccione un mes',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          mesSeleccionado = newValue;
-                          filtrarDatosPorMes(newValue);
-                        });
-                      },
-                      items: meses.map<DropdownMenuItem<String>>((String mes) {
-                        return DropdownMenuItem<String>(
-                          value: mes,
-                          child: Text(
-                            mes,
-                            style: TextStyle(
-                              color: const Color.fromARGB(255, 185, 223, 255), // Cambia el color del texto en el DropdownMenuItem
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                      dropdownColor: Colors.grey[
-                          800], // Cambia el color de fondo del menú desplegable
-                      style: const TextStyle(
-                        color: Colors
-                            .white, // Cambia el color del texto del DropdownButton
-                      ),
-                      iconEnabledColor:
-                          Colors.white, // Cambia el color del icono desplegable
-                    ),
-                  ),
+                  // Container(
+                  //   width: MediaQuery.of(context).size.width *
+                  //       0.5, // Ajusta el ancho según tus necesidades
+                  //   child: DropdownButton<String>(
+                  //     value: mesSeleccionado,
+                  //     hint: Text(
+                  //       'Seleccione un mes',
+                  //       style: TextStyle(
+                  //         color: Colors.white,
+                  //         fontWeight: FontWeight.bold,
+                  //       ),
+                  //     ),
+                  //     onChanged: (String? newValue) {
+                  //       setState(() {
+                  //         mesSeleccionado = newValue;
+                  //         filtrarDatosPorMes(newValue);
+                  //       });
+                  //     },
+                  //     items: meses.map<DropdownMenuItem<String>>((String mes) {
+                  //       return DropdownMenuItem<String>(
+                  //         value: mes,
+                  //         child: Text(
+                  //           mes,
+                  //           style: TextStyle(
+                  //             color: const Color.fromARGB(255, 185, 223, 255), // Cambia el color del texto en el DropdownMenuItem
+                  //           ),
+                  //         ),
+                  //       );
+                  //     }).toList(),
+                  //     dropdownColor: Colors.grey[
+                  //         800], // Cambia el color de fondo del menú desplegable
+                  //     style: const TextStyle(
+                  //       color: Colors
+                  //           .white, // Cambia el color del texto del DropdownButton
+                  //     ),
+                  //     iconEnabledColor:
+                  //         Colors.white, // Cambia el color del icono desplegable
+                  //   ),
+                  // ),
                   const SizedBox(height: 20),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
@@ -344,7 +338,7 @@ class _DatosMeteorologicaScreenState extends State<DatosMeteorologicaScreen> {
                                 columns: const [
                                   DataColumn(
                                     label: Text(
-                                      'Fecha',
+                                      'Fecha Siembra',
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         color: Colors.white,
@@ -353,7 +347,7 @@ class _DatosMeteorologicaScreenState extends State<DatosMeteorologicaScreen> {
                                   ),
                                   DataColumn(
                                     label: Text(
-                                      'Temp Max',
+                                      'Nombre Cultivo',
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         color: Colors.white,
@@ -362,7 +356,7 @@ class _DatosMeteorologicaScreenState extends State<DatosMeteorologicaScreen> {
                                   ),
                                   DataColumn(
                                     label: Text(
-                                      'Temp Min',
+                                      'Tipo',
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         color: Colors.white,
@@ -371,43 +365,7 @@ class _DatosMeteorologicaScreenState extends State<DatosMeteorologicaScreen> {
                                   ),
                                   DataColumn(
                                     label: Text(
-                                      'Precipitación',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                  DataColumn(
-                                    label: Text(
-                                      'Temp Ambiente',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                  DataColumn(
-                                    label: Text(
-                                      'Dir Viento',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                  DataColumn(
-                                    label: Text(
-                                      'Vel Viento',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                  DataColumn(
-                                    label: Text(
-                                      'Evaporacion',
+                                      'Fecha Reg',
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         color: Colors.white,
@@ -431,52 +389,30 @@ class _DatosMeteorologicaScreenState extends State<DatosMeteorologicaScreen> {
                                       DataCell(
                                         Text(
                                           formatDateTime(
+                                              dato['fechaSiembra']?.toString()),
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                      ),
+                                      DataCell(
+                                        Text(
+                                          dato['nombre'].toString(),
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                      ),
+                                      DataCell(
+                                        Text(
+                                          dato['tipo'].toString(),
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                      ),
+                                      DataCell(
+                                        Text(
+                                          formatDateTime(
                                               dato['fechaReg']?.toString()),
                                           style: TextStyle(color: Colors.white),
                                         ),
                                       ),
-                                      DataCell(
-                                        Text(
-                                          dato['tempMax'].toString(),
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                      ),
-                                      DataCell(
-                                        Text(
-                                          dato['tempMin'].toString(),
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                      ),
-                                      DataCell(
-                                        Text(
-                                          dato['pcpn'].toString(),
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                      ),
-                                      DataCell(
-                                        Text(
-                                          dato['tempAmb'].toString(),
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                      ),
-                                      DataCell(
-                                        Text(
-                                          dato['dirViento'].toString(),
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                      ),
-                                      DataCell(
-                                        Text(
-                                          dato['velViento'].toString(),
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                      ),
-                                      DataCell(
-                                        Text(
-                                          dato['taevap'].toString(),
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                      ),
+                                      
                                       DataCell(
                                         Row(
                                           children: [

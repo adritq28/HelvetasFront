@@ -1,17 +1,17 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:helvetasfront/screens/Administrador/DatosMeteorologicaScreen.dart';
+import 'package:helvetasfront/screens/Administrador/FechaSiembra/DatosFechaSiembraScreen.dart';
 import 'package:http/http.dart' as http;
 
-class EstacionMeteorologicaScreen extends StatefulWidget {
+class FechaSiembraScreen extends StatefulWidget {
   final int idUsuario;
   final String nombre;
   final String apeMat;
   final String apePat;
   final String ci;
 
-  const EstacionMeteorologicaScreen({
+  const FechaSiembraScreen({
     required this.idUsuario,
     required this.nombre,
     required this.apeMat,
@@ -20,63 +20,63 @@ class EstacionMeteorologicaScreen extends StatefulWidget {
   });
 
   @override
-  _EstacionMeteorologicaScreenState createState() =>
-      _EstacionMeteorologicaScreenState();
+  _FechaSiembraScreenState createState() =>
+      _FechaSiembraScreenState();
 }
 
-class _EstacionMeteorologicaScreenState
-    extends State<EstacionMeteorologicaScreen> {
-  List<Map<String, dynamic>> estaciones = [];
-  Map<String, List<Map<String, dynamic>>> estacionesPorMunicipio = {};
+class _FechaSiembraScreenState
+    extends State<FechaSiembraScreen> {
+  List<Map<String, dynamic>> zonas = [];
+  Map<String, List<Map<String, dynamic>>> zonasPorMunicipio = {};
   String? municipioSeleccionado;
-  String? estacionSeleccionada;
-  int? idEstacionSeleccionada;
+  String? zonaSeleccionada;
+  int? idzonaSeleccionada;
 
   @override
   void initState() {
     super.initState();
-    fetchEstaciones();
+    fetchzonas();
   }
 
-  Future<void> fetchEstaciones() async {
+  Future<void> fetchzonas() async {
     try {
-      final response = await http.get(Uri.parse('http://localhost:8080/estacion/lista_meteorologica'));
+      final response = await http.get(Uri.parse('http://localhost:8080/datos_pronostico/lista_zonas'));
       if (response.statusCode == 200) {
         setState(() {
-          estaciones = List<Map<String, dynamic>>.from(json.decode(response.body));
-          estacionesPorMunicipio = agruparEstacionesPorMunicipio(estaciones);
+          zonas = List<Map<String, dynamic>>.from(json.decode(response.body));
+          zonasPorMunicipio = agruparzonasPorMunicipio(zonas);
         });
       } else {
-        throw Exception('Failed to load estaciones');
+        throw Exception('Failed to load zonas');
       }
     } catch (e) {
       // Manejar errores de red o de decodificación
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error al cargar las estaciones')),
+        SnackBar(content: Text('Error al cargar las zonas')),
       );
     }
   }
 
-  Map<String, List<Map<String, dynamic>>> agruparEstacionesPorMunicipio(List<Map<String, dynamic>> estaciones) {
+  Map<String, List<Map<String, dynamic>>> agruparzonasPorMunicipio(List<Map<String, dynamic>> zonas) {
     Map<String, List<Map<String, dynamic>>> agrupadas = {};
-    for (var estacion in estaciones) {
-      if (!agrupadas.containsKey(estacion['nombreMunicipio'])) {
-        agrupadas[estacion['nombreMunicipio']] = [];
+    for (var zona in zonas) {
+      if (!agrupadas.containsKey(zona['nombreMunicipio'])) {
+        agrupadas[zona['nombreMunicipio']] = [];
       }
-      agrupadas[estacion['nombreMunicipio']]!.add(estacion);
+      agrupadas[zona['nombreMunicipio']]!.add(zona);
     }
     return agrupadas;
   }
 
-  void navigateToDatosMeteorologicaScreen() {
-    if (idEstacionSeleccionada != null) {
+  void navigateToDatosFechaSiembraScreen() {
+    if (idzonaSeleccionada != null) {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => DatosMeteorologicaScreen(
-            idEstacion: idEstacionSeleccionada!,
+          builder: (context) => DatosFechaSiembraScreen(
+            idZona: idzonaSeleccionada!,
             nombreMunicipio: municipioSeleccionado!,
-            nombreEstacion: estacionSeleccionada!,
+            nombreZona: zonaSeleccionada!,
           ),
         ),
       );
@@ -163,12 +163,12 @@ class _EstacionMeteorologicaScreenState
             ),
             SizedBox(height: 20),
             Expanded(
-              child: estaciones.isEmpty
+              child: zonas.isEmpty
                   ? Center(child: CircularProgressIndicator())
                   : ListView.builder(
-                      itemCount: estacionesPorMunicipio.keys.length,
+                      itemCount: zonasPorMunicipio.keys.length,
                       itemBuilder: (context, index) {
-                        String municipio = estacionesPorMunicipio.keys.elementAt(index);
+                        String municipio = zonasPorMunicipio.keys.elementAt(index);
                         return Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                           child: Row(
@@ -180,7 +180,7 @@ class _EstacionMeteorologicaScreenState
                                   onPressed: () {
                                     setState(() {
                                       municipioSeleccionado = municipio;
-                                      estacionSeleccionada = null;
+                                      zonaSeleccionada = null;
                                     });
                                   },
                                   style: ElevatedButton.styleFrom(
@@ -224,7 +224,7 @@ class _EstacionMeteorologicaScreenState
                     ),
                     SizedBox(height: 10),
                     DropdownButton<String>(
-                      value: estacionSeleccionada,
+                      value: zonaSeleccionada,
                       hint: Text(
                         'Seleccione una estación',
                         style: TextStyle(
@@ -235,21 +235,21 @@ class _EstacionMeteorologicaScreenState
                       ),
                       onChanged: (String? newValue) {
                         setState(() {
-                          estacionSeleccionada = newValue;
-                          idEstacionSeleccionada =
-                              estacionesPorMunicipio[municipioSeleccionado]!
+                          zonaSeleccionada = newValue;
+                          idzonaSeleccionada =
+                              zonasPorMunicipio[municipioSeleccionado]!
                                   .firstWhere((element) =>
-                                      element['nombreEstacion'] ==
-                                      newValue)['idEstacion'];
-                          navigateToDatosMeteorologicaScreen();
+                                      element['nombreZona'] ==
+                                      newValue)['idZona'];
+                          navigateToDatosFechaSiembraScreen();
                         });
                       },
-                      items: estacionesPorMunicipio[municipioSeleccionado]!
+                      items: zonasPorMunicipio[municipioSeleccionado]!
                           .map<DropdownMenuItem<String>>(
-                              (Map<String, dynamic> estacion) {
+                              (Map<String, dynamic> zona) {
                         return DropdownMenuItem<String>(
-                          value: estacion['nombreEstacion'],
-                          child: Text(estacion['nombreEstacion']),
+                          value: zona['nombreZona'],
+                          child: Text(zona['nombreZona']),
                         );
                       }).toList(),
                     ),

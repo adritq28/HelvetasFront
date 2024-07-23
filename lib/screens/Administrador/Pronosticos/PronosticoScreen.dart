@@ -1,17 +1,17 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:helvetasfront/screens/Administrador/DatosHidrologicaScreen.dart';
+import 'package:helvetasfront/screens/Administrador/Pronosticos/DatosPronosticoScreen.dart';
 import 'package:http/http.dart' as http;
 
-class EstacionHidrologicaScreen extends StatefulWidget {
+class PronosticoScreen extends StatefulWidget {
   final int idUsuario;
   final String nombre;
   final String apeMat;
   final String apePat;
   final String ci;
 
-  const EstacionHidrologicaScreen({
+  const PronosticoScreen({
     required this.idUsuario,
     required this.nombre,
     required this.apeMat,
@@ -20,59 +20,64 @@ class EstacionHidrologicaScreen extends StatefulWidget {
   });
 
   @override
-  _EstacionHidrologicaScreenState createState() =>
-      _EstacionHidrologicaScreenState();
+  _PronosticoScreenState createState() =>
+      _PronosticoScreenState();
 }
 
-class _EstacionHidrologicaScreenState
-    extends State<EstacionHidrologicaScreen> {
-  List<Map<String, dynamic>> estaciones = [];
-  Map<String, List<Map<String, dynamic>>> estacionesPorMunicipio = {};
+class _PronosticoScreenState
+    extends State<PronosticoScreen> {
+  List<Map<String, dynamic>> zonas = [];
+  Map<String, List<Map<String, dynamic>>> zonasPorMunicipio = {};
   String? municipioSeleccionado;
-  String? estacionSeleccionada;
-  int? idEstacionSeleccionada;
-  //String? tipoEstacion;
+  String? zonaSeleccionada;
+  int? idzonaSeleccionada;
 
   @override
   void initState() {
     super.initState();
-    fetchEstacionesHidrologica();
+    fetchzonas();
   }
 
-
-  Future<void> fetchEstacionesHidrologica() async {
-    final response = await http
-        .get(Uri.parse('http://localhost:8080/estacion/lista_hidrologica'));
-    if (response.statusCode == 200) {
-      setState(() {
-        estaciones =
-            List<Map<String, dynamic>>.from(json.decode(response.body));
-        estacionesPorMunicipio = agruparEstacionesPorMunicipio(estaciones);
-      });
-    } else {
-      throw Exception('Failed to load estaciones');
+  Future<void> fetchzonas() async {
+    try {
+      final response = await http.get(Uri.parse('http://localhost:8080/datos_pronostico/lista_zonas'));
+      if (response.statusCode == 200) {
+        setState(() {
+          zonas = List<Map<String, dynamic>>.from(json.decode(response.body));
+          zonasPorMunicipio = agruparzonasPorMunicipio(zonas);
+        });
+      } else {
+        throw Exception('Failed to load zonas');
+      }
+    } catch (e) {
+      // Manejar errores de red o de decodificación
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al cargar las zonas')),
+      );
     }
   }
 
-  Map<String, List<Map<String, dynamic>>> agruparEstacionesPorMunicipio(
-      List<Map<String, dynamic>> estaciones) {
+  Map<String, List<Map<String, dynamic>>> agruparzonasPorMunicipio(List<Map<String, dynamic>> zonas) {
     Map<String, List<Map<String, dynamic>>> agrupadas = {};
-    for (var estacion in estaciones) {
-      if (!agrupadas.containsKey(estacion['nombreMunicipio'])) {
-        agrupadas[estacion['nombreMunicipio']] = [];
+    for (var zona in zonas) {
+      if (!agrupadas.containsKey(zona['nombreMunicipio'])) {
+        agrupadas[zona['nombreMunicipio']] = [];
       }
-      agrupadas[estacion['nombreMunicipio']]!.add(estacion);
+      agrupadas[zona['nombreMunicipio']]!.add(zona);
     }
     return agrupadas;
   }
 
-  void navigateToDatosHidrologicaScreen() {
-    if (idEstacionSeleccionada != null) {
+  void navigateToDatosPronosticoScreen() {
+    if (idzonaSeleccionada != null) {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) =>
-              DatosHidrologicaScreen(idEstacion: idEstacionSeleccionada!, nombreMunicipio: municipioSeleccionado!, nombreEstacion: estacionSeleccionada!, ),
+          builder: (context) => DatosPronosticoScreen(
+            idZona: idzonaSeleccionada!,
+            nombreMunicipio: municipioSeleccionado!,
+            nombreZona: zonaSeleccionada!,
+          ),
         ),
       );
     }
@@ -90,6 +95,7 @@ class _EstacionHidrologicaScreenState
         ),
         child: Column(
           children: [
+            SizedBox(height: 20),
             Container(
               padding: EdgeInsets.symmetric(horizontal: 10),
               height: 60,
@@ -106,7 +112,7 @@ class _EstacionHidrologicaScreenState
                       size: 25,
                     ),
                   ),
-                  PopupMenuButton(
+                  PopupMenuButton<String>(
                     itemBuilder: (context) => [
                       PopupMenuItem(
                         child: Text('Opción 1'),
@@ -155,17 +161,16 @@ class _EstacionHidrologicaScreenState
                       ),
               ],
             ),
+            SizedBox(height: 20),
             Expanded(
-              child: estaciones.isEmpty
+              child: zonas.isEmpty
                   ? Center(child: CircularProgressIndicator())
                   : ListView.builder(
-                      itemCount: estacionesPorMunicipio.keys.length,
+                      itemCount: zonasPorMunicipio.keys.length,
                       itemBuilder: (context, index) {
-                        String municipio =
-                            estacionesPorMunicipio.keys.elementAt(index);
+                        String municipio = zonasPorMunicipio.keys.elementAt(index);
                         return Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 8),
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -175,12 +180,11 @@ class _EstacionHidrologicaScreenState
                                   onPressed: () {
                                     setState(() {
                                       municipioSeleccionado = municipio;
-                                      estacionSeleccionada = null;
+                                      zonaSeleccionada = null;
                                     });
                                   },
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor:
-                                        Color.fromARGB(255, 203, 230, 255),
+                                    backgroundColor: Color.fromARGB(255, 203, 230, 255),
                                     padding: EdgeInsets.symmetric(vertical: 16),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(10),
@@ -220,7 +224,7 @@ class _EstacionHidrologicaScreenState
                     ),
                     SizedBox(height: 10),
                     DropdownButton<String>(
-                      value: estacionSeleccionada,
+                      value: zonaSeleccionada,
                       hint: Text(
                         'Seleccione una estación',
                         style: TextStyle(
@@ -231,18 +235,21 @@ class _EstacionHidrologicaScreenState
                       ),
                       onChanged: (String? newValue) {
                         setState(() {
-                          estacionSeleccionada = newValue;
-                          idEstacionSeleccionada = estacionesPorMunicipio[municipioSeleccionado]!
-                              .firstWhere((element) => element['nombreEstacion'] == newValue)['idEstacion'];
-                          navigateToDatosHidrologicaScreen();
+                          zonaSeleccionada = newValue;
+                          idzonaSeleccionada =
+                              zonasPorMunicipio[municipioSeleccionado]!
+                                  .firstWhere((element) =>
+                                      element['nombreZona'] ==
+                                      newValue)['idZona'];
+                          navigateToDatosPronosticoScreen();
                         });
                       },
-                      items: estacionesPorMunicipio[municipioSeleccionado]!
+                      items: zonasPorMunicipio[municipioSeleccionado]!
                           .map<DropdownMenuItem<String>>(
-                              (Map<String, dynamic> estacion) {
+                              (Map<String, dynamic> zona) {
                         return DropdownMenuItem<String>(
-                          value: estacion['nombreEstacion'],
-                          child: Text(estacion['nombreEstacion']),
+                          value: zona['nombreZona'],
+                          child: Text(zona['nombreZona']),
                         );
                       }).toList(),
                     ),

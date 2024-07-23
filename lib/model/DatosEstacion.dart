@@ -19,7 +19,7 @@ class DatosEstacion {
   final double velViento;
   final int idEstacion;
   final bool codTipoEstacion;
-  final bool edit;
+  //final bool edit;
   final bool delete;
 
   DatosEstacion({
@@ -40,7 +40,7 @@ class DatosEstacion {
     required this.velViento,
     required this.idEstacion,
     required this.codTipoEstacion,
-    required this.edit,
+    //required this.edit,
     required this.delete,
   });
 
@@ -65,7 +65,7 @@ class DatosEstacion {
       velViento: (json['velViento'] ?? 0.0).toDouble(),
       idEstacion: json['idEstacion'] ?? 0,
       codTipoEstacion: json['codTipoEstacion'] != null ? json['codTipoEstacion'] == true : false,
-      edit: json['edit'] != null ? json['edit'] == true : false,
+      //edit: json['edit'] != null ? json['edit'] == true : false,
       delete: json['delete'] != null ? json['delete'] == true : false,
 
     );
@@ -91,7 +91,7 @@ class DatosEstacion {
         'velViento': velViento,
         'idEstacion': idEstacion,
         'codTipoEstacion': codTipoEstacion,
-        'edit': edit,
+        //'edit': edit,
         'delete': delete,
       };
 
@@ -128,8 +128,8 @@ class DatosEstacion {
         ", codTipoEstacion=" +
         codTipoEstacion.toString() +
         ", edit=" +
-        edit.toString() +
-        ", delete=" +
+        //edit.toString() +
+        //", delete=" +
         delete.toString() +
         "]";
   }

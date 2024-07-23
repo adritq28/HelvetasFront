@@ -1,9 +1,9 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:helvetasfront/screens/Administrador/AnadirDatoHidrologicoScreen.dart';
-import 'package:helvetasfront/screens/Administrador/EditarHidrologicaScreen.dart';
-import 'package:helvetasfront/screens/Administrador/VisualizarHidrologicaScreen.dart';
+import 'package:helvetasfront/screens/Administrador/Hidrologia/AnadirDatoHidrologicoScreen.dart';
+import 'package:helvetasfront/screens/Administrador/Hidrologia/EditarHidrologicaScreen.dart';
+import 'package:helvetasfront/screens/Administrador/Hidrologia/VisualizarHidrologicaScreen.dart';
 import 'package:helvetasfront/services/EstacionService.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
@@ -106,8 +106,7 @@ class _DatosHidrologicaScreenState extends State<DatosHidrologicaScreen> {
 
   void visualizarDato(int index) {
     // Implementar la lógica para visualizar el dato en la posición 'index'
-    Map<String, dynamic> dato =
-        datos[index]; // Suponiendo que 'datos' es tu lista de datos
+    Map<String, dynamic> dato = datos[index]; // Suponiendo que 'datos' es tu lista de datos
 
     // Navegar a la pantalla de visualización pasando los datos como argumentos
     Navigator.push(

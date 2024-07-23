@@ -1,27 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
-class VisualizarMeteorologicaScreen extends StatelessWidget {
-  final int idDatosEst;
-  final double tempMax;
-  final double tempMin;
-  final double pcpn;
-  final double tempAmb;
-  final String dirViento;
-  final double velViento;
-  final double taevap;
+class VisualizarCultivoScreen extends StatelessWidget {
+  final int idCultivo;
+  final String nombre;
+  final String fechaSiembra;
   final String fechaReg;
+  final String tipo;
 
-  const VisualizarMeteorologicaScreen({
-    required this.idDatosEst,
-    required this.tempMax,
-    required this.tempMin,
-    required this.pcpn,
-    required this.tempAmb,
-    required this.dirViento,
-    required this.velViento,
-    required this.taevap,
-    required this.fechaReg,
-  });
+  const VisualizarCultivoScreen(
+      {required this.idCultivo,
+      required this.nombre,
+      required this.fechaSiembra,
+      required this.fechaReg,
+      required this.tipo});
+
+  String formatDateTime(String? dateTimeString) {
+    if (dateTimeString == null || dateTimeString.isEmpty) {
+      return 'Fecha no disponible';
+    }
+    try {
+      DateTime dateTime = DateTime.parse(dateTimeString);
+      return DateFormat('dd/MM/yyyy HH:mm:ss').format(dateTime);
+    } catch (e) {
+      print('Error al parsear la fecha: $dateTimeString');
+      return 'Fecha inválida';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,14 +68,13 @@ class VisualizarMeteorologicaScreen extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 10),
-                  _buildDataRow('Temperatura Máxima', '${tempMax.toString()} °C', Icons.thermostat),
-                  _buildDataRow('Temperatura Mínima', '${tempMin.toString()} °C', Icons.thermostat),
-                  _buildDataRow('Precipitación', '${pcpn.toString()} mm', Icons.water),
-                  _buildDataRow('Temperatura Ambiente', '${tempAmb.toString()} °C', Icons.thermostat),
-                  _buildDataRow('Dirección Viento', dirViento, Icons.air),
-                  _buildDataRow('Velocidad Viento', '${velViento.toString()} km/h', Icons.speed),
-                  _buildDataRow('Evaporación', '${taevap.toString()} mm', Icons.speed),
-                  _buildDataRow('Fecha y Hora', fechaReg, Icons.calendar_today),
+                  _buildDataRow(
+                      'Nombre', '${nombre.toString()} °C', Icons.thermostat),
+                  _buildDataRow('Tipo', '${tipo.toString()} mm', Icons.water),
+                  _buildDataRow('Fecha y Hora de Siembra',
+                      formatDateTime(fechaSiembra), Icons.calendar_today),
+                  _buildDataRow('Fecha y Hora de Registro',
+                      formatDateTime(fechaReg), Icons.calendar_today),
                   SizedBox(height: 20),
                 ],
               ),

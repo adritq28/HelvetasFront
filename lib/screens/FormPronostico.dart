@@ -47,6 +47,8 @@ class _FormPronosticoState extends State<FormPronostico> {
   late double _pcpn;
   late int _idZona;
   late int _idFenologia;
+  late bool _delete = false;
+  late bool _editar = false;
   late DateTime fecha = DateTime.now();
 
   @override
@@ -488,6 +490,8 @@ class _FormPronosticoState extends State<FormPronostico> {
                                 pcpn: _pcpn,
                                 idZona: widget.idZona,
                                 idFenologia: _idFenologia,
+                                delete: _delete,
+                                //edit: _editar,
                                 fecha: fecha
                                   ..toUtc().subtract(Duration(hours: 8)),
                               );
