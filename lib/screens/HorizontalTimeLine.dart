@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:helvetasfront/screens/TimeLineEvent.dart';
 import 'package:intl/intl.dart';
-
 class HorizontalTimeline extends StatelessWidget {
   final List<TimelineEvent> events;
 
@@ -12,7 +11,6 @@ class HorizontalTimeline extends StatelessWidget {
     return Center(
       child: Container(
         height: 250, // Ajusta según tus necesidades
-        //width: 500,
         child: ListView.builder(
           scrollDirection: Axis.horizontal,
           itemCount: events.length,
@@ -29,7 +27,7 @@ class HorizontalTimeline extends StatelessWidget {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10), // Borde redondeado opcional
                       image: DecorationImage(
-                        image: AssetImage("images/fenologia.jpg"), // Ruta de la imagen
+                        image: AssetImage(event.imagen), // Usar la ruta de la imagen del evento
                         fit: BoxFit.cover, // Ajuste para cubrir el contenedor
                       ),
                     ),

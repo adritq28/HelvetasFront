@@ -39,6 +39,7 @@ dependencies:
   table_calendar: ^3.0.0
   speech_to_text: ^6.6.2
   timelines: ^0.1.0
+  flutter_file_saver: ^0.6.2
   #flutter_charts: ^0.5.2
   #charts_flutter: ^0.17.0
 

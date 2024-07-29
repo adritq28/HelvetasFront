@@ -75,26 +75,24 @@ class FenologiaService extends ChangeNotifier {
     }
   }
 
-Future<String> fetchUltimaAlerta(int cultivoId) async {
+Future<Map<String, dynamic>> fetchUltimaAlerta(int cultivoId) async {
   final url = Uri.parse('http://localhost:8080/alertas/ultima/$cultivoId');
 
   try {
-    print('Making GET request to: $url'); // Añade esta línea para verificar la URL
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
-      String responseBody = response.body;
-      print('Response Body: $responseBody'); // Imprime el cuerpo de la respuesta
-      return responseBody;
+      return jsonDecode(response.body) as Map<String, dynamic>;
     } else {
-      print('Failed to load alert: ${response.statusCode}'); // Imprime el estado del error
       throw Exception('Failed to load alert: ${response.statusCode}');
     }
   } catch (e) {
-    print('Error fetching alert: $e'); // Imprime el error capturado
     throw Exception('Error fetching alert: $e');
   }
 }
+
+
+
 
 
 

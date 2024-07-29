@@ -25,7 +25,8 @@ class _PronosticoAgrometeorologicoState
     extends State<PronosticoAgrometeorologico> {
   late Future<void> _futureObtenerZonas;
   late FenologiaService miModelo5;
-  late Future<String>? _futureUltimaAlerta;
+  late Future<Map<String, dynamic>>? _futureUltimaAlerta;
+
   late Future<List> _futurePronosticoCultivo;
 
   @override
@@ -139,31 +140,158 @@ class _PronosticoAgrometeorologicoState
                       ],
                     ),
                   ),
-                  if (_futureUltimaAlerta != null)
-                    FutureBuilder<String>(
-                      future: _futureUltimaAlerta,
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return Center(child: CircularProgressIndicator());
-                        } else if (snapshot.hasError) {
-                          return Center(
-                            child: Text(
-                              'Error: ${snapshot.error}',
-                              style: TextStyle(color: Colors.red),
-                            ),
-                          );
-                        } else {
-                          return Center(
-                            child: Text(
-                              'Última Alerta: ${snapshot.data}',
-                              style: TextStyle(color: Colors.white),
-                            ),
-                          );
-                        }
-                      },
+                   const SizedBox(height: 10),
+                  Container(
+                    width: double
+                        .infinity, // Asegura que el contenedor ocupe todo el ancho disponible
+                    padding: EdgeInsets.all(
+                        16.0), // Espaciado alrededor del texto // Fondo azul para contrastar el texto blanco
+                    child: const Column(
+                      mainAxisAlignment: MainAxisAlignment
+                          .center, // Centra el contenido verticalmente
+                      crossAxisAlignment: CrossAxisAlignment
+                          .center, // Centra el contenido horizontalmente
+                      children: [
+                        Text(
+                          'PRONOSTICO AGROMETEOROLOGICO',
+                          style: TextStyle(
+                            fontSize: 24.0, // Tamaño de la letra
+                            color: Colors.white, // Color de la letra
+                          ),
+                          textAlign: TextAlign.center, // Centrar el texto
+                        ),
+                      ],
                     ),
-                  const SizedBox(height: 15),
+                  ),
+                  //SizedBox(height: 10),
+                  if (_futureUltimaAlerta != null)
+                    Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                                color: Colors.grey), // Borde opcional
+                            borderRadius: BorderRadius.circular(
+                                10), // Borde redondeado opcional
+                          ),
+                          child: FutureBuilder<Map<String, dynamic>>(
+                            future: _futureUltimaAlerta,
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return Center(
+                                    child: CircularProgressIndicator());
+                              } else if (snapshot.hasError) {
+                                return Center(
+                                  child: Text(
+                                    'Error: ${snapshot.error}',
+                                    style: TextStyle(color: Colors.red),
+                                  ),
+                                );
+                              } else if (snapshot.hasData) {
+                                final alertData = snapshot.data!;
+                                // Convertir a Map<String, String>
+                                final alertMessages = {
+                                  'TempMax': alertData['TempMax']?.toString() ??
+                                      'No alert',
+                                  'TempMin': alertData['TempMin']?.toString() ??
+                                      'No alert',
+                                  'Pcpn': alertData['Pcpn']?.toString() ??
+                                      'No alert',
+                                  //'General':
+                                  // alertData['General']?.toString() ?? 'No alert',
+                                };
+
+                                return Column(
+                                  children: alertMessages.entries.map((entry) {
+                                    final alertType = entry.key;
+                                    final alertMessage = entry.value;
+
+                                    Color alertColor;
+                                    if (alertMessage.contains("ROJA")) {
+                                      alertColor = const Color.fromARGB(
+                                          255, 255, 139, 131);
+                                    } else if (alertMessage
+                                        .contains("AMARILLA")) {
+                                      alertColor = const Color.fromARGB(
+                                          255, 255, 247, 174);
+                                    } else if (alertMessage.contains("VERDE")) {
+                                      alertColor = const Color.fromARGB(
+                                          255, 161, 255, 164);
+                                    } else {
+                                      alertColor = Colors.white;
+                                    }
+
+                                    return Container(
+                                      padding: EdgeInsets.all(8.0),
+                                      margin:
+                                          EdgeInsets.symmetric(vertical: 4.0),
+                                      child: Row(
+                                        children: [
+                                          // Círculo de color
+
+                                          Container(
+                                            width: 30.0,
+                                            height: 30.0,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: alertColor,
+                                            ),
+                                          ),
+                                          SizedBox(
+                                              width:
+                                                  8.0), // Espacio entre el círculo y el texto
+                                          // Texto de la alerta
+                                          Expanded(
+                                            child: Text(
+                                              '$alertType: $alertMessage',
+                                              style: TextStyle(
+                                                  color: Colors.white),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  }).toList(),
+                                );
+                              } else {
+                                return Center(
+                                  child: Text(
+                                    'No hay alertas disponibles',
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                );
+                              }
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                  const SizedBox(height: 10),
+                  Container(
+                    width: double
+                        .infinity, // Asegura que el contenedor ocupe todo el ancho disponible
+                    padding: EdgeInsets.all(
+                        16.0), // Espaciado alrededor del texto // Fondo azul para contrastar el texto blanco
+                    child: const Column(
+                      mainAxisAlignment: MainAxisAlignment
+                          .center, // Centra el contenido verticalmente
+                      crossAxisAlignment: CrossAxisAlignment
+                          .center, // Centra el contenido horizontalmente
+                      children: [
+                        Text(
+                          'FENOLOGIA',
+                          style: TextStyle(
+                            fontSize: 24.0, // Tamaño de la letra
+                            color: Colors.white, // Color de la letra
+                          ),
+                          textAlign: TextAlign.center, // Centrar el texto
+                        ),
+                      ],
+                    ),
+                  ),
+                  //SizedBox(height: 10),
                   Center(
                     child: Padding(
                       padding:
@@ -183,8 +311,8 @@ class _PronosticoAgrometeorologicoState
                   Container(
                     width: double
                         .infinity, // Asegura que el contenedor ocupe todo el ancho disponible
-                    padding:
-                        EdgeInsets.all(16.0), // Espaciado alrededor del texto // Fondo azul para contrastar el texto blanco
+                    padding: EdgeInsets.all(
+                        16.0), // Espaciado alrededor del texto // Fondo azul para contrastar el texto blanco
                     child: const Column(
                       mainAxisAlignment: MainAxisAlignment
                           .center, // Centra el contenido verticalmente
@@ -344,10 +472,10 @@ class _PronosticoAgrometeorologicoState
     // Definir los títulos de las columnas que se convertirán en filas
     final columnHeaders = [
       'Temp. optima',
+      'Temp. Letal maxima',
       'Temp. Letal minima',
-      'Temp. Letal max',
-      'Umbral termico inf',
       'Umbral termico sup',
+      'Umbral termico inf',
       'Precipitacion',
     ];
 
@@ -359,10 +487,16 @@ class _PronosticoAgrometeorologicoState
         ...datosList.map((datos) {
           switch (index) {
             case 0:
-              return '${datos.tempMax}';
+              return '${datos.tempOpt}';
             case 1:
-              return '${datos.tempMin}';
+              return '${datos.tempMax}';
             case 2:
+              return '${datos.tempMin}';
+            case 3:
+              return '${datos.umbSup}';
+            case 4:
+              return '${datos.umbInf}';
+            case 5:
               return '${datos.pcpn}';
             default:
               return '';
@@ -379,7 +513,8 @@ class _PronosticoAgrometeorologicoState
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10), // Borde redondeado
             border: Border.all(
-                color: const Color.fromARGB(255, 255, 185, 185)), // Borde gris alrededor de la tabla
+                color: const Color.fromARGB(
+                    255, 255, 185, 185)), // Borde gris alrededor de la tabla
           ),
           child: DataTable(
             columns: [
@@ -516,7 +651,8 @@ class _PronosticoAgrometeorologicoState
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10), // Borde redondeado
           border: Border.all(
-              color: Color.fromARGB(255, 156, 245, 219)), // Borde gris alrededor de la tabla
+              color: Color.fromARGB(
+                  255, 156, 245, 219)), // Borde gris alrededor de la tabla
         ),
         child: DataTable(
           // Color de fondo de las filas de datos
@@ -524,19 +660,31 @@ class _PronosticoAgrometeorologicoState
             DataColumn(
                 label: Text('Temp. Max',
                     style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.white, fontSize: 20,))),
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      fontSize: 20,
+                    ))),
             DataColumn(
                 label: Text('Temp. Min',
                     style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.white, fontSize: 20,))),
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      fontSize: 20,
+                    ))),
             DataColumn(
                 label: Text('PCPN',
                     style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.white, fontSize: 20,))),
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      fontSize: 20,
+                    ))),
             DataColumn(
                 label: Text('FECHA',
                     style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.white, fontSize: 20,))),
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      fontSize: 20,
+                    ))),
 
             // Otros campos según tus necesidades
           ],
@@ -573,13 +721,14 @@ class _PronosticoAgrometeorologicoState
 
     DateTime fechaAcumulada = fenologiaList[0].fechaSiembra;
     //String dias;
-
+    var aux = 1;
     for (int i = 0; i < fenologiaList.length; i++) {
       var dato = fenologiaList[i];
+      
       //dias = dato.nroDias.toString();
       // Aquí decides qué imagen mostrar basada en tus datos
-      String imagenPath = 'images/fenologia.jpg'; // Ejemplo de ruta de imagen
-
+      String imagenPath = 'images/$aux.jpg'; // Ejemplo de ruta de imagen
+      
       timelineEvents.add(TimelineEvent(
           imagen: imagenPath,
           fecha: fechaAcumulada,
@@ -600,6 +749,7 @@ class _PronosticoAgrometeorologicoState
             description: 'Fecha final',
             dias: ' '));
       }
+      aux++;
     }
     return timelineEvents;
   }

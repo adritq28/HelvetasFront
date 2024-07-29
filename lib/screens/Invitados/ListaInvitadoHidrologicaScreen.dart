@@ -1,20 +1,22 @@
+import 'dart:convert';
 import 'dart:html' as html;
 
 import 'package:excel/excel.dart' as excel_pkg;
 import 'package:flutter/material.dart';
 import 'package:helvetasfront/model/DatosEstacionHidrologica.dart';
 import 'package:helvetasfront/services/EstacionHidrologicaService.dart';
-import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
 class ListaInvitadoHidrologicaScreen extends StatefulWidget {
   final int idEstacion;
-  final String nombreEstacion;
   final String nombreMunicipio;
+  final String nombreEstacion;
 
-  ListaInvitadoHidrologicaScreen({
+  const ListaInvitadoHidrologicaScreen({
     required this.idEstacion,
-    required this.nombreEstacion,
     required this.nombreMunicipio,
+    required this.nombreEstacion,
   });
 
   @override
@@ -27,151 +29,160 @@ class _ListaInvitadoHidrologicaScreenState
   final EstacionHidrologicaService _datosService2 =
       EstacionHidrologicaService(); // Instancia del servicio de datos
   late Future<List<DatosEstacionHidrologica>> _futureDatosEstacion;
-  final EstacionHidrologicaService _datosService3 =
-      EstacionHidrologicaService();
-  late EstacionHidrologicaService miModelo4; // Futuro de la lista de personas
-  late List<DatosEstacionHidrologica> _datosEstacion = [];
+  late List<Map<String, dynamic>> datos = [];
+  bool isLoading = true;
+  List<Map<String, dynamic>> datosFiltrados = [];
+  String? mesSeleccionado;
+  List<String> meses = [
+    'Enero',
+    'Febrero',
+    'Marzo',
+    'Abril',
+    'Mayo',
+    'Junio',
+    'Julio',
+    'Agosto',
+    'Septiembre',
+    'Octubre',
+    'Noviembre',
+    'Diciembre'
+  ];
 
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   miModelo4 = Provider.of<EstacionHidrologicaService>(context, listen: false);
-  //   _cargarDatosMeteorologica(); // Carga los datos al inicializar el estado
-  // }
   @override
   void initState() {
     super.initState();
-    _futureDatosEstacion = _cargarDatosMeteorologica(); // Inicializa el Future
+    fetchDatosHidrologico();
   }
 
-  Future<List<DatosEstacionHidrologica>> _cargarDatosMeteorologica() async {
+  Future<void> fetchDatosHidrologico() async {
+    final response = await http.get(
+      Uri.parse(
+          'http://localhost:8080/estacion/lista_datos_hidrologica/${widget.idEstacion}'),
+    );
+    if (response.statusCode == 200) {
+      setState(() {
+        datos = List<Map<String, dynamic>>.from(json.decode(response.body));
+        datosFiltrados = datos; // Inicialmente, no se filtra nada
+        isLoading = false;
+      });
+    } else {
+      throw Exception('Failed to load datos hidrologicos');
+    }
+  }
+
+  Future<void> exportToExcel(List<Map<String, dynamic>> datosList) async {
     try {
-      final datosService =
-          Provider.of<EstacionHidrologicaService>(context, listen: false);
-      await datosService.getListaHidrologica(widget.idEstacion);
-      return datosService.lista11;
-    } catch (e) {
-      print('Error al cargar los datos: $e');
-      return [];
-    }
-  }
+      var excel = excel_pkg.Excel.createExcel(); // Crear un nuevo archivo Excel
+      excel_pkg.Sheet sheetObject =
+          excel['Sheet1']; // Seleccionar la primera hoja
 
-  // Future<void> exportToExcel(List<DatosEstacionHidrologica> datosList) async {
-  //   var excel = excel_pkg.Excel.createExcel();
-  //   excel.delete('Sheet1');
-  //   excel_pkg.Sheet sheetObject = excel['Estacion Data'];
-
-  //   // Add the headers
-  //   List<String> headers = [
-  //     'Nombre del Municipio',
-  //     'Limnimetro',
-  //     'Fecha Reg',
-  //     'ID Estación',
-  //     'Delete'
-  //   ];
-  //   sheetObject.appendRow(headers);
-
-  //   // Add data
-  //   for (var datos in datosList) {
-  //     List<dynamic> row = [
-  //       widget.nombreMunicipio,
-  //       datos.limnimetro,
-  //       datos.fechaReg,
-  //       datos.idEstacion,
-  //       datos.delete
-  //     ];
-  //     sheetObject.appendRow(row);
-  //   }
-
-  //   // Save the file
-  //   final directory = Directory(path.join('/Users/ADRI/Downloads'));
-  //   // if (!directory.existsSync()) {
-  //   //   await Future.microtask(() {
-  //   //     directory.createSync(recursive: true);
-  //   //   });
-  //   // }
-  //   final file = File(path.join(directory.path, 'EstacionData.xlsx'));
-
-  //   // Write to the file
-  //   List<int>? bytes = excel.save();
-  //   if (bytes != null) {
-  //     file.writeAsBytesSync(bytes, flush: true);
-  //     print('Exportado a ${file.path}');
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(content: Text('Datos exportados a Excel en ${file.path}')),
-  //     );
-  //   } else {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(content: Text('Error al guardar el archivo Excel')),
-  //     );
-  //   }
-  // }
-
-  Future<void> exportToExcel(List<DatosEstacionHidrologica> datosList) async {
-  try {
-    var excel = excel_pkg.Excel.createExcel(); // Crear un nuevo archivo Excel
-    excel_pkg.Sheet sheetObject = excel['Sheet1']; // Seleccionar la primera hoja
-
-    // Escribir los encabezados
-    sheetObject.appendRow([
-      'Nombre del Municipio',
-      'Nombre del Estacion',
-      'Limnimetro',
-      'Fecha Reg',
-      'ID Estación',
-      'Delete'
-    ]);
-
-    // Escribir los datos
-    for (var datos in datosList) {
+      // Escribir los encabezados
       sheetObject.appendRow([
-        widget.nombreMunicipio,
-        widget.nombreEstacion,
-        datos.limnimetro,
-        datos.fechaReg,
-        datos.idEstacion,
-        datos.delete
+        'Nombre del Municipio',
+        'Nombre del Estacion',
+        'Limnimetro',
+        'Fecha Reg',
+        'ID Estación',
+        'Delete'
       ]);
+
+      // Escribir los datos
+      for (var dato in datosList) {
+        sheetObject.appendRow([
+          widget.nombreMunicipio,
+          widget.nombreEstacion,
+          dato['limnimetro'],
+          dato['fechaReg'],
+          dato['idEstacion'],
+          dato['delete']
+        ]);
+      }
+
+      // Guardar el archivo Excel en memoria
+      var fileBytes = excel.save();
+      if (fileBytes == null) {
+        throw Exception('No se pudo generar el archivo Excel.');
+      }
+
+      // Crear un blob de datos
+      final blob = html.Blob([fileBytes],
+          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      final url = html.Url.createObjectUrlFromBlob(blob);
+
+      // Crear un enlace de descarga y hacer clic en él
+      final anchor = html.AnchorElement(href: url)
+        ..setAttribute("download", "DatosHidrologicos.xlsx")
+        ..click();
+
+      // Liberar la URL del blob
+      html.Url.revokeObjectUrl(url);
+
+      print('Archivo listo para descargar');
+    } catch (e) {
+      print('Error al guardar el archivo: $e');
     }
-
-    // Guardar el archivo Excel en memoria
-    var fileBytes = excel.save();
-    if (fileBytes == null) {
-      throw Exception('No se pudo generar el archivo Excel.');
-    }
-
-    // Crear un blob de datos
-    final blob = html.Blob([fileBytes], 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    final url = html.Url.createObjectUrlFromBlob(blob);
-    
-    // Crear un enlace de descarga y hacer clic en él
-    final anchor = html.AnchorElement(href: url)
-      ..setAttribute("download", "Datos.xlsx")
-      ..click();
-    
-    // Liberar la URL del blob
-    html.Url.revokeObjectUrl(url);
-
-    print('Archivo listo para descargar');
-  } catch (e) {
-    print('Error al guardar el archivo: $e');
   }
-}
 
+  void exportarDato() {
+    exportToExcel(datosFiltrados);
+  }
 
+  String formatDateTime(String? dateTimeString) {
+    if (dateTimeString == null || dateTimeString.isEmpty) {
+      return 'Fecha no disponible';
+    }
+    try {
+      DateTime dateTime = DateTime.parse(dateTimeString);
+      return DateFormat('dd/MM/yyyy HH:mm:ss').format(dateTime);
+    } catch (e) {
+      print('Error al parsear la fecha: $dateTimeString');
+      return 'Fecha inválida';
+    }
+  }
+
+  void filtrarDatosPorMes(String? mes) {
+    if (mes == null || mes.isEmpty) {
+      setState(() {
+        datosFiltrados = datos;
+      });
+      return;
+    }
+
+    int mesIndex = meses.indexOf(mes) + 1; // Meses son 1-indexados en DateTime
+
+    setState(() {
+      datosFiltrados = datos.where((dato) {
+        try {
+          DateTime fecha = DateTime.parse(dato['fechaReg']);
+          return fecha.month == mesIndex;
+        } catch (e) {
+          print('Error al parsear la fecha: ${dato['fechaReg']}');
+          return false;
+        }
+      }).toList();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF164092),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Padding(
+      body: Stack(
+        children: [
+          Container(
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage(
+                    'images/fondo.jpg'), // Ruta de la imagen de fondo
+                fit: BoxFit.cover, // Ajustar la imagen para cubrir todo el contenedor
+              ),
+            ),
+          ),
+          SafeArea(
+            child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
               child: Column(
                 children: [
-                  SizedBox(height: 10),
+                  const SizedBox(height: 15),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -179,153 +190,160 @@ class _ListaInvitadoHidrologicaScreenState
                         onTap: () {
                           Navigator.pop(context);
                         },
-                        child: Icon(
+                        child: const Icon(
                           Icons.arrow_back_ios_new,
                           color: Colors.white,
                           size: 25,
                         ),
                       ),
-                      Icon(
+                      const Icon(
                         Icons.more_vert,
                         color: Colors.white,
                         size: 28,
                       ),
                     ],
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
+                  const CircleAvatar(
+                    radius: 35,
+                    backgroundImage: AssetImage("images/47.jpg"),
+                  ),
+                  const SizedBox(height: 5),
                   Text(
-                    "Municipio de " + widget.nombreMunicipio,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 25,
+                    'Municipio de: ${widget.nombreMunicipio}',
+                    style: const TextStyle(
+                      fontSize: 15,
+                      color: Color.fromARGB(208, 255, 255, 255),
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 15),
+                  const SizedBox(height: 20),
+                  Text(
+                    'Estación Hidrologica: ${widget.nombreEstacion}',
+                    style: const TextStyle(
+                      fontSize: 15,
+                      color: Color.fromARGB(208, 255, 255, 255),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Container(
+                    width: MediaQuery.of(context).size.width *
+                        0.5, // Ajusta el ancho según tus necesidades
+                    child: DropdownButton<String>(
+                      value: mesSeleccionado,
+                      hint: Text(
+                        'Seleccione un mes',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          mesSeleccionado = newValue;
+                          filtrarDatosPorMes(newValue);
+                        });
+                      },
+                      items: meses.map<DropdownMenuItem<String>>((String mes) {
+                        return DropdownMenuItem<String>(
+                          value: mes,
+                          child: Text(
+                            mes,
+                            style: TextStyle(
+                              color: const Color.fromARGB(255, 185, 223,
+                                  255), // Cambia el color del texto en el DropdownMenuItem
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                      dropdownColor: Colors.grey[
+                          800], // Cambia el color de fondo del menú desplegable
+                      style: const TextStyle(
+                        color: Colors
+                            .white, // Cambia el color del texto del DropdownButton
+                      ),
+                      iconEnabledColor:
+                          Colors.white, // Cambia el color del icono desplegable
+                    ),
+                  ),
+                  const SizedBox(height: 20),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      Text(
-                          style: TextStyle(color: Colors.white),
-                          'DATOS REGISTRADOS')
+                      TextButton.icon(
+                        onPressed: exportarDato,
+                        icon: Icon(Icons.add, color: Colors.white),
+                        label: Text(
+                          'Exportar datos',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        style: TextButton.styleFrom(
+                          backgroundColor: Color.fromARGB(255, 142, 146, 143),
+                        ),
+                      ),
                     ],
                   ),
+                  
+                  const SizedBox(height: 10),
+                  isLoading
+                      ? const CircularProgressIndicator()
+                      : Expanded(
+                          child: SingleChildScrollView(
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: DataTable(
+                                columns: [
+                                  DataColumn(
+                                    label: Text(
+                                      'Fecha',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                  DataColumn(
+                                    label: Text(
+                                      'Limnimetro',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                                rows: datosFiltrados.map((dato) {
+                                  return DataRow(
+                                    cells: [
+                                      DataCell(
+                                        Text(
+                                          formatDateTime(
+                                              dato['fechaReg'].toString()),
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                      ),
+                                      DataCell(
+                                        Text(
+                                          dato['limnimetro'].toString(),
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                }).toList(),
+                              ),
+                            ),
+                          ),
+                        ),
                 ],
               ),
             ),
-            SizedBox(height: 20),
-            SizedBox(height: 20),
-            FutureBuilder<List<DatosEstacionHidrologica>>(
-              future: _datosService3.getListaHidrologica(widget.idEstacion),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}'));
-                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return Center(
-                      child: Text('Este usuario no tiene datos registrados'));
-                } else {
-                  _datosEstacion = snapshot.data!;
-                  return Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          TextButton.icon(
-                            icon: Icon(Icons.feed, color: Colors.white),
-                            label: Text('Exportar Datos',
-                                style: TextStyle(color: Colors.white)),
-                            style: TextButton.styleFrom(
-                              backgroundColor: Colors.grey, // Color plomo
-                              shape: RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.circular(8.0), // Border radius
-                              ),
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 16.0, vertical: 8.0),
-                            ),
-                            onPressed: () async {
-                              if (_datosEstacion.isNotEmpty) {
-                                await exportToExcel(_datosEstacion);
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                      content:
-                                          Text('Datos exportados a Excel')),
-                                );
-                              } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                      content:
-                                          Text('No hay datos para exportar')),
-                                );
-                              }
-                            },
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 20),
-                      tablaDatos(_datosEstacion),
-                    ],
-                  );
-                }
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  SingleChildScrollView tablaDatos(List<DatosEstacionHidrologica> datosList) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10), // Borde redondeado
-          border: Border.all(
-              color: Colors.grey), // Borde gris alrededor de la tabla
-        ),
-        child: DataTable(
-          headingRowColor: MaterialStateColor.resolveWith((states) =>
-              Color.fromARGB(255, 178, 197,
-                  255)!), // Color de fondo de la fila de encabezado
-          dataRowColor: MaterialStateColor.resolveWith((states) =>
-              Colors.grey[100]!), // Color de fondo de las filas de datos
-          columns: const [
-            DataColumn(
-                label: Text('Nombre del Municipio',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.white))),
-            DataColumn(
-                label: Text('Limnimetro',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.white))),
-            DataColumn(
-                label: Text('Fecha Reg',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.white))),
-            DataColumn(
-                label: Text('ID Estación',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.white))),
-            DataColumn(
-                label: Text('Delete',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.white))),
-            // Otros campos según tus necesidades
-          ],
-          rows: datosList.map((datos) {
-            return DataRow(cells: [
-              DataCell(Text('${widget.nombreMunicipio}')),
-              DataCell(Text('${datos.limnimetro}')),
-              DataCell(Text('${datos.fechaReg}')),
-              DataCell(Text('${datos.idEstacion}')),
-              DataCell(Text('${datos.delete}')),
-              // Otros campos según tus necesidades
-            ]);
-          }).toList(),
-        ),
+          ),
+        ],
       ),
     );
   }

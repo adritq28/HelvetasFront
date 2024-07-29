@@ -1,75 +1,195 @@
+import 'dart:convert';
+import 'dart:html' as html;
+
+import 'package:excel/excel.dart' as excel_pkg;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
-import 'package:helvetasfront/model/DatosEstacion.dart';
+import 'package:helvetasfront/screens/Administrador/Meteorologia/GraficaScreen.dart';
 import 'package:helvetasfront/services/EstacionService.dart';
-import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
 class ListaInvitadoMeteorologicaScreen extends StatefulWidget {
   final int idEstacion;
-  final String nombreEstacion;
   final String nombreMunicipio;
+  final String nombreEstacion;
 
-  ListaInvitadoMeteorologicaScreen({
+  const ListaInvitadoMeteorologicaScreen({
     required this.idEstacion,
-    required this.nombreEstacion,
     required this.nombreMunicipio,
+    required this.nombreEstacion,
   });
 
   @override
-  _ListaInvitadoMeteorologicaScreenState createState() => _ListaInvitadoMeteorologicaScreenState();
+  _ListaInvitadoMeteorologicaScreenState createState() =>
+      _ListaInvitadoMeteorologicaScreenState();
 }
 
-class _ListaInvitadoMeteorologicaScreenState extends State<ListaInvitadoMeteorologicaScreen> {
-  final EstacionService _datosService2 =
-      EstacionService(); // Instancia del servicio de datos
-  late Future<List<DatosEstacion>> _futureDatosEstacion;
-  final EstacionService _datosService3 = EstacionService();
+class _ListaInvitadoMeteorologicaScreenState
+    extends State<ListaInvitadoMeteorologicaScreen> {
+  List<Map<String, dynamic>> datos = [];
+  bool isLoading = true;
+  List<Map<String, dynamic>> datosFiltrados = [];
+  String? mesSeleccionado;
+  List<String> meses = [
+    'Enero',
+    'Febrero',
+    'Marzo',
+    'Abril',
+    'Mayo',
+    'Junio',
+    'Julio',
+    'Agosto',
+    'Septiembre',
+    'Octubre',
+    'Noviembre',
+    'Diciembre'
+  ];
+
+  final ScrollController _horizontalScrollController = ScrollController();
+  final ScrollController _verticalScrollController = ScrollController();
+
   late EstacionService miModelo4; // Futuro de la lista de personas
-  late List<DatosEstacion> _datosEstacion = [];
 
   @override
   void initState() {
     super.initState();
-    miModelo4 = Provider.of<EstacionService>(context, listen: false);
-    _cargarDatosMeteorologica(); // Carga los datos al inicializar el estado
+    fetchDatosMeteorologicos();
   }
 
-  Future<void> _cargarDatosMeteorologica() async {
-    try {
-      await miModelo4.obtenerDatosMunicipio(widget.idEstacion);
-      List<DatosEstacion> a = miModelo4.lista11;
+  Future<void> fetchDatosMeteorologicos() async {
+    final response = await http.get(
+      Uri.parse(
+          'http://localhost:8080/estacion/lista_datos_meteorologica/${widget.idEstacion}'),
+    );
+    if (response.statusCode == 200) {
       setState(() {
-        _datosEstacion = a; // Asigna los datos a la lista
+        datos = List<Map<String, dynamic>>.from(json.decode(response.body));
+        datosFiltrados = datos; // Inicialmente, no se filtra nada
+        isLoading = false;
       });
-    } catch (e) {
-      print('Error al cargar los datos: $e');
+    } else {
+      throw Exception('Failed to load datos meteorologicos');
     }
+  }
+
+  String formatDateTime(String? dateTimeString) {
+    if (dateTimeString == null || dateTimeString.isEmpty) {
+      return 'Fecha no disponible';
+    }
+    try {
+      DateTime dateTime = DateTime.parse(dateTimeString);
+      return DateFormat('dd/MM/yyyy HH:mm:ss').format(dateTime);
+    } catch (e) {
+      print('Error al parsear la fecha: $dateTimeString');
+      return 'Fecha inválida';
+    }
+  }
+
+  void filtrarDatosPorMes(String? mes) {
+    if (mes == null || mes.isEmpty) {
+      setState(() {
+        datosFiltrados = datos;
+      });
+      return;
+    }
+
+    int mesIndex = meses.indexOf(mes) + 1; // Meses son 1-indexados en DateTime
+
+    setState(() {
+      datosFiltrados = datos.where((dato) {
+        try {
+          DateTime fecha = DateTime.parse(dato['fechaReg']);
+          return fecha.month == mesIndex;
+        } catch (e) {
+          print('Error al parsear la fecha: ${dato['fechaReg']}');
+          return false;
+        }
+      }).toList();
+    });
+  }
+
+  Future<void> exportToExcel(List<Map<String, dynamic>> datosList) async {
+    try {
+      var excel = excel_pkg.Excel.createExcel(); // Crear un nuevo archivo Excel
+      var sheet = excel['Sheet1']; // Seleccionar la primera hoja
+
+      // Escribir los encabezados
+      sheet.appendRow([
+        'Fecha',
+        'Temp Max',
+        'Temp Min',
+        'Precipitación',
+        'Temp Ambiente',
+        'Dir Viento',
+        'Vel Viento',
+        'Evaporación'
+      ]);
+
+      // Agrega los datos filtrados
+      for (var dato in datosList) {
+        sheet.appendRow([
+          formatDateTime(dato['fechaReg']?.toString()),
+          dato['tempMax']?.toString() ?? '',
+          dato['tempMin']?.toString() ?? '',
+          dato['pcpn']?.toString() ?? '',
+          dato['tempAmb']?.toString() ?? '',
+          dato['dirViento']?.toString() ?? '',
+          dato['velViento']?.toString() ?? '',
+          dato['taevap']?.toString() ?? '',
+        ]);
+      }
+
+      // Guardar el archivo Excel en memoria
+      var fileBytes = excel.save();
+      if (fileBytes == null) {
+        throw Exception('No se pudo generar el archivo Excel.');
+      }
+
+      // Crear un blob de datos
+      final blob = html.Blob([fileBytes],
+          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      final url = html.Url.createObjectUrlFromBlob(blob);
+
+      // Crear un enlace de descarga y hacer clic en él
+      final anchor = html.AnchorElement(href: url)
+        ..setAttribute("download", "DatosMeteorologicos.xlsx")
+        ..click();
+
+      // Liberar la URL del blob
+      html.Url.revokeObjectUrl(url);
+
+      print('Archivo listo para descargar');
+    } catch (e) {
+      print('Error al guardar el archivo: $e');
+    }
+  }
+
+  void exportarDato() {
+    exportToExcel(datosFiltrados);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF164092),
-      // appBar: AppBar(
-      //   backgroundColor: Color(0xFF164092),
-      //   title: Text(
-      //     'Registro de datos Estacion ' + widget.tipoEstacion,
-      //     style: TextStyle(
-      //       color: Colors.white,
-      //       fontSize: 20,
-      //     ),
-      //   ),
-      // ),
-
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // Aquí colocas tu formulario
-
-            Padding(
+      body: Stack(
+        children: [
+          Container(
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage(
+                    'images/fondo.jpg'), // Ruta de la imagen de fondo
+                fit: BoxFit
+                    .cover, // Ajustar la imagen para cubrir todo el contenedor
+              ),
+            ),
+          ),
+          SafeArea(
+            child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
               child: Column(
                 children: [
-                  SizedBox(height: 10),
+                  const SizedBox(height: 15),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -77,164 +197,458 @@ class _ListaInvitadoMeteorologicaScreenState extends State<ListaInvitadoMeteorol
                         onTap: () {
                           Navigator.pop(context);
                         },
-                        child: Icon(
+                        child: const Icon(
                           Icons.arrow_back_ios_new,
                           color: Colors.white,
                           size: 25,
                         ),
                       ),
-                      Icon(
+                      const Icon(
                         Icons.more_vert,
                         color: Colors.white,
                         size: 28,
                       ),
                     ],
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
+                  const CircleAvatar(
+                    radius: 35,
+                    backgroundImage: AssetImage("images/47.jpg"),
+                  ),
+                  const SizedBox(height: 5),
                   Text(
-                    "Municipio de " + widget.nombreMunicipio,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 25,
+                    'Municipio de: ${widget.nombreMunicipio}',
+                    style: const TextStyle(
+                      fontSize: 15,
+                      color: Color.fromARGB(208, 255, 255, 255),
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 15),
+                  const SizedBox(height: 20),
+                  Text(
+                    'Estación Meteorológica: ${widget.nombreEstacion}',
+                    style: const TextStyle(
+                      fontSize: 15,
+                      color: Color.fromARGB(208, 255, 255, 255),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Container(
+                    width: MediaQuery.of(context).size.width *
+                        0.5, // Ajusta el ancho según tus necesidades
+                    child: DropdownButton<String>(
+                      value: mesSeleccionado,
+                      hint: Text(
+                        'Seleccione un mes',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          mesSeleccionado = newValue;
+                          filtrarDatosPorMes(newValue);
+                        });
+                      },
+                      items: meses.map<DropdownMenuItem<String>>((String mes) {
+                        return DropdownMenuItem<String>(
+                          value: mes,
+                          child: Text(
+                            mes,
+                            style: TextStyle(
+                              color: const Color.fromARGB(255, 185, 223,
+                                  255), // Cambia el color del texto en el DropdownMenuItem
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                      dropdownColor: Colors.grey[
+                          800], // Cambia el color de fondo del menú desplegable
+                      style: const TextStyle(
+                        color: Colors
+                            .white, // Cambia el color del texto del DropdownButton
+                      ),
+                      iconEnabledColor:
+                          Colors.white, // Cambia el color del icono desplegable
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  // Dentro de tu Widget build donde tienes los botones
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      Text(
-                          style: TextStyle(color: Colors.white),
-                          'DATOS REGISTRADOS')
+                      TextButton.icon(
+                        onPressed: exportarDato,
+                        icon: Icon(Icons.add, color: Colors.white),
+                        label: Text(
+                          'Exportar datos',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        style: TextButton.styleFrom(
+                          backgroundColor: Color.fromARGB(255, 142, 146, 143),
+                        ),
+                      ),
+                      const SizedBox(width: 5),
+                      TextButton.icon(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  GraficaScreen(datos: datosFiltrados),
+                            ),
+                          );
+                        },
+                        icon: Icon(Icons.show_chart, color: Colors.white),
+                        label: Text(
+                          'Gráfica',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        style: TextButton.styleFrom(
+                          backgroundColor: Color.fromARGB(255, 142, 146, 143),
+                        ),
+                      ),
                     ],
                   ),
+
+                  const SizedBox(height: 10),
+                  isLoading
+                      ? const CircularProgressIndicator()
+                      : Expanded(
+                          child: kIsWeb
+                              ? Scrollbar(
+                                  thumbVisibility:
+                                      true, // Mostrar la barra de desplazamiento en la web
+                                  controller: _horizontalScrollController,
+                                  child: SingleChildScrollView(
+                                    controller: _horizontalScrollController,
+                                    scrollDirection: Axis.horizontal,
+                                    child: Scrollbar(
+                                      thumbVisibility: true,
+                                      controller: _verticalScrollController,
+                                      child: SingleChildScrollView(
+                                        controller: _verticalScrollController,
+                                        scrollDirection: Axis.vertical,
+                                        child: DataTable(
+                                          columns: const [
+                                            DataColumn(
+                                              label: Text(
+                                                'Fecha',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                            DataColumn(
+                                              label: Text(
+                                                'Temp Max',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                            DataColumn(
+                                              label: Text(
+                                                'Temp Min',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                            DataColumn(
+                                              label: Text(
+                                                'Precipitación',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                            DataColumn(
+                                              label: Text(
+                                                'Temp Ambiente',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                            DataColumn(
+                                              label: Text(
+                                                'Dir Viento',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                            DataColumn(
+                                              label: Text(
+                                                'Vel Viento',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                            DataColumn(
+                                              label: Text(
+                                                'Evaporación',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                          rows: datosFiltrados.map((dato) {
+                                            int index =
+                                                datosFiltrados.indexOf(dato);
+                                            return DataRow(
+                                              cells: [
+                                                DataCell(
+                                                  Text(
+                                                    formatDateTime(
+                                                        dato['fechaReg']
+                                                            ?.toString()),
+                                                    style: TextStyle(
+                                                        color: Colors.white),
+                                                  ),
+                                                ),
+                                                DataCell(
+                                                  Text(
+                                                    dato['tempMax'].toString(),
+                                                    style: TextStyle(
+                                                        color: Colors.white),
+                                                  ),
+                                                ),
+                                                DataCell(
+                                                  Text(
+                                                    dato['tempMin'].toString(),
+                                                    style: TextStyle(
+                                                        color: Colors.white),
+                                                  ),
+                                                ),
+                                                DataCell(
+                                                  Text(
+                                                    dato['pcpn'].toString(),
+                                                    style: TextStyle(
+                                                        color: Colors.white),
+                                                  ),
+                                                ),
+                                                DataCell(
+                                                  Text(
+                                                    dato['tempAmb'].toString(),
+                                                    style: TextStyle(
+                                                        color: Colors.white),
+                                                  ),
+                                                ),
+                                                DataCell(
+                                                  Text(
+                                                    dato['dirViento']
+                                                        .toString(),
+                                                    style: TextStyle(
+                                                        color: Colors.white),
+                                                  ),
+                                                ),
+                                                DataCell(
+                                                  Text(
+                                                    dato['velViento']
+                                                        .toString(),
+                                                    style: TextStyle(
+                                                        color: Colors.white),
+                                                  ),
+                                                ),
+                                                DataCell(
+                                                  Text(
+                                                    dato['taevap'].toString(),
+                                                    style: TextStyle(
+                                                        color: Colors.white),
+                                                  ),
+                                                ),
+                                              ],
+                                            );
+                                          }).toList(),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              : SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: Scrollbar(
+                                    thumbVisibility: true,
+                                    controller: _horizontalScrollController,
+                                    child: SingleChildScrollView(
+                                      controller: _horizontalScrollController,
+                                      scrollDirection: Axis.horizontal,
+                                      child: SingleChildScrollView(
+                                        scrollDirection: Axis.vertical,
+                                        child: DataTable(
+                                          columns: const [
+                                            DataColumn(
+                                              label: Text(
+                                                'Fecha',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                            DataColumn(
+                                              label: Text(
+                                                'Temp Max',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                            DataColumn(
+                                              label: Text(
+                                                'Temp Min',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                            DataColumn(
+                                              label: Text(
+                                                'Precipitación',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                            DataColumn(
+                                              label: Text(
+                                                'Temp Ambiente',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                            DataColumn(
+                                              label: Text(
+                                                'Dir Viento',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                            DataColumn(
+                                              label: Text(
+                                                'Vel Viento',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                            DataColumn(
+                                              label: Text(
+                                                'Evaporación',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                          rows: datosFiltrados.map((dato) {
+                                            int index =
+                                                datosFiltrados.indexOf(dato);
+                                            return DataRow(
+                                              cells: [
+                                                DataCell(
+                                                  Text(
+                                                    formatDateTime(
+                                                        dato['fechaReg']
+                                                            ?.toString()),
+                                                    style: TextStyle(
+                                                        color: Colors.white),
+                                                  ),
+                                                ),
+                                                DataCell(
+                                                  Text(
+                                                    dato['tempMax'].toString(),
+                                                    style: TextStyle(
+                                                        color: Colors.white),
+                                                  ),
+                                                ),
+                                                DataCell(
+                                                  Text(
+                                                    dato['tempMin'].toString(),
+                                                    style: TextStyle(
+                                                        color: Colors.white),
+                                                  ),
+                                                ),
+                                                DataCell(
+                                                  Text(
+                                                    dato['pcpn'].toString(),
+                                                    style: TextStyle(
+                                                        color: Colors.white),
+                                                  ),
+                                                ),
+                                                DataCell(
+                                                  Text(
+                                                    dato['tempAmb'].toString(),
+                                                    style: TextStyle(
+                                                        color: Colors.white),
+                                                  ),
+                                                ),
+                                                DataCell(
+                                                  Text(
+                                                    dato['dirViento']
+                                                        .toString(),
+                                                    style: TextStyle(
+                                                        color: Colors.white),
+                                                  ),
+                                                ),
+                                                DataCell(
+                                                  Text(
+                                                    dato['velViento']
+                                                        .toString(),
+                                                    style: TextStyle(
+                                                        color: Colors.white),
+                                                  ),
+                                                ),
+                                                DataCell(
+                                                  Text(
+                                                    dato['taevap'].toString(),
+                                                    style: TextStyle(
+                                                        color: Colors.white),
+                                                  ),
+                                                ),
+                                              ],
+                                            );
+                                          }).toList(),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                        ),
                 ],
               ),
             ),
-            SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                TextButton.icon(
-                  icon: Icon(Icons.feed, color: Colors.white),
-                  label: Text('Exportar Datos',
-                      style: TextStyle(color: Colors.white)),
-                  style: TextButton.styleFrom(
-                    backgroundColor: Colors.grey, // Color plomo
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.0), // Border radius
-                    ),
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                  ),
-                  onPressed: () async {
-                    // Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(builder: (context) {
-                    //     return ChangeNotifierProvider(
-                    //       create: (context) => EstacionService(),
-                    //       child: ExportToExcel(_datosEstacion);
-                    //     );
-                    //   }),
-                    // );
-                  },
-                ),
-              ],
-            ),
-            SizedBox(height: 20),
-            SizedBox(
-                height: 20), // Espacio entre el formulario y la tabla de datos
-            FutureBuilder<List<DatosEstacion>>(
-              future: _datosService3.getListaMetetorologica(widget.idEstacion),
-              builder: (context, AsyncSnapshot<List<DatosEstacion>> snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}'));
-                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return Center(
-                      child: Text('Este usuario no tiene datos registrados'));
-                } else {
-                  final datosList = snapshot.data!;
-                  return tablaDatos(datosList);
-                }
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  SingleChildScrollView tablaDatos(List<DatosEstacion> datosList) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10), // Borde redondeado
-          border: Border.all(
-              color: Colors.grey), // Borde gris alrededor de la tabla
-        ),
-        child: DataTable(
-          headingRowColor: MaterialStateColor.resolveWith((states) =>
-              Color.fromARGB(255, 178, 197,
-                  255)!), // Color de fondo de la fila de encabezado
-          dataRowColor: MaterialStateColor.resolveWith((states) =>
-              Colors.grey[100]!), // Color de fondo de las filas de datos
-          columns: const [
-            DataColumn(
-                label: Text('ID',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.white))),
-            DataColumn(
-                label: Text('Temp. Max',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.white))),
-            DataColumn(
-                label: Text('Temp. Min',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.white))),
-            DataColumn(
-                label: Text('Temp. Amb',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.white))),
-            DataColumn(
-                label: Text('PCPN',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.white))),
-            DataColumn(
-                label: Text('TAEVAP',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.white))),
-            DataColumn(
-                label: Text('Dirección del Viento',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.white))),
-            DataColumn(
-                label: Text('Velocidad del Viento',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.white))),
-            DataColumn(
-                label: Text('ID Estación',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.white))),
-            // Otros campos según tus necesidades
-          ],
-          rows: datosList.map((datos) {
-            return DataRow(cells: [
-              DataCell(Text('${datos.idUsuario}')),
-              DataCell(Text('${datos.tempMax}')),
-              DataCell(Text('${datos.tempMin}')),
-              DataCell(Text('${datos.tempAmb}')),
-              DataCell(Text('${datos.pcpn}')),
-              DataCell(Text('${datos.taevap}')),
-              DataCell(Text('${datos.dirViento}')),
-              DataCell(Text('${datos.velViento}')),
-              DataCell(Text('${datos.idEstacion}')),
-              // Otros campos según tus necesidades
-            ]);
-          }).toList(),
-        ),
+          ),
+        ],
       ),
     );
   }

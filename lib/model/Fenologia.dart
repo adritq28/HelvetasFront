@@ -12,6 +12,9 @@ class Fenologia {
   final double pcpn;
   late DateTime fechaSiembra = DateTime.now();
   final int idFenologia;
+  final double tempOpt;
+  final double umbInf;
+  final double umbSup;
 
   Fenologia({
     //required this.id,
@@ -27,6 +30,9 @@ class Fenologia {
     required this.pcpn,
     required this.fechaSiembra,
     required this.idFenologia,
+    required this.tempOpt,
+    required this.umbInf,
+    required this.umbSup,
   });
 
   factory Fenologia.fromJson(Map<String, dynamic> json) {
@@ -46,6 +52,9 @@ class Fenologia {
           ? DateTime.parse(json['fechaSiembra'])
           : DateTime.now(),
       idFenologia: json['idFenologia'] ?? 0,
+      tempOpt: (json['tempOpt'] ?? 0.0).toDouble(),
+      umbSup: (json['umbSup'] ?? 0.0).toDouble(),
+      umbInf: (json['umbInf'] ?? 0.0).toDouble(),
     );
   }
 
@@ -60,9 +69,13 @@ class Fenologia {
         'tempMax': tempMax,
         'tempMin': tempMin,
         'pcpn': pcpn,
-        'fechaSiembra':
-            fechaSiembra.toUtc().toIso8601String(), //fechaSiembraDatos.toIso8601String(),
+        'fechaSiembra': fechaSiembra
+            .toUtc()
+            .toIso8601String(), //fechaSiembraDatos.toIso8601String(),
         'idFenologia': idFenologia,
+        'tempOpt': tempOpt,
+        'umbSup': umbSup,
+        'umbInf': umbInf,
       };
 
   String toStringFenologia() {
