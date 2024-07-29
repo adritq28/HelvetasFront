@@ -22,8 +22,9 @@ class EstacionService extends ChangeNotifier {
   final String apiUrl =
       'http://localhost:8080/usuario'; // Reemplaza con la URL de tu API
 
-  Future<String?> obtenerTelefono(int idUsuario) async {
-    final response = await http.get(Uri.parse('$apiUrl/telefono/$idUsuario'));
+  Future<String?> obtenerCi(int idUsuario) async {
+    //final response = await http.get(Uri.parse('$apiUrl/ci/$idUsuario'));
+    final response = await http.get(Uri.parse('http://localhost:8080/usuario/ci/$idUsuario'));
     if (response.statusCode == 200) {
       return response
           .body; // Asumiendo que el teléfono se devuelve como texto plano
@@ -35,7 +36,7 @@ class EstacionService extends ChangeNotifier {
   Future<bool> validarContrasena(
       String contrasenaIngresada, int idUsuario) async {
     try {
-      final telefono = await obtenerTelefono(idUsuario);
+      final telefono = await obtenerCi(idUsuario);
       return contrasenaIngresada == telefono;
     } catch (e) {
       print('Error al validar la contraseña: $e');
@@ -48,8 +49,7 @@ class EstacionService extends ChangeNotifier {
       //print('saasdasd1');
       //final url = Uri.http("localhost:8080", "/personas");
       //print('aaaaaaaa0');
-      final response = await http
-          .get(Uri.http("localhost:8080", "/datosEstacion/listaDatosEstacion"));
+      final response = await http.get(Uri.http("localhost:8080", "/datosEstacion/listaDatosEstacion"));
       //print('aaaaaaaa');
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
@@ -63,7 +63,7 @@ class EstacionService extends ChangeNotifier {
         throw Exception('Failed to load personas');
       }
     } catch (e) {
-      throw Exception('Error: $e');
+      throw Exception('Erroraaaaa: $e');
     }
   }
 
@@ -133,8 +133,7 @@ class EstacionService extends ChangeNotifier {
   }
 
   Future<List<DatosEstacion>> obtenerDatosEstacion(int id) async {
-    final response =
-        await http.get(Uri.parse('http://localhost:8080/datosEstacion/$id'));
+    final response = await http.get(Uri.parse('http://localhost:8080/datosEstacion/$id'));
     if (response.statusCode == 200) {
       List<dynamic> jsonData = jsonDecode(response.body);
       if (jsonData.isEmpty) {
@@ -232,7 +231,7 @@ class EstacionService extends ChangeNotifier {
         throw Exception('Failed to load personas');
       }
     } catch (e) {
-      throw Exception('Error: $e');
+      throw Exception('Erroreeee: $e');
     }
   }
 }

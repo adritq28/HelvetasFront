@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:helvetasfront/model/Municipio.dart';
-import 'package:helvetasfront/screens/EstacionScreen.dart';
-import 'package:helvetasfront/screens/ZonasScreen.dart';
+import 'package:helvetasfront/screens/Invitados/EstacionScreen.dart';
+import 'package:helvetasfront/screens/Invitados/ZonasScreen.dart';
 import 'package:helvetasfront/services/EstacionService.dart';
 import 'package:helvetasfront/services/MunicipioService.dart';
 import 'package:provider/provider.dart';

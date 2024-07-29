@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:helvetasfront/model/UsuarioEstacion.dart';
-import 'package:helvetasfront/screens/ListaEstacionHidrologicaScreen.dart';
-import 'package:helvetasfront/screens/ListaEstacionScreen.dart';
+import 'package:helvetasfront/screens/Hidrologia/ListaEstacionHidrologicaScreen.dart';
+import 'package:helvetasfront/screens/Meteorologia/ListaEstacionScreen.dart';
 import 'package:helvetasfront/services/EstacionHidrologicaService.dart';
 import 'package:helvetasfront/services/EstacionService.dart';
 import 'package:helvetasfront/services/UsuarioService.dart';
@@ -46,7 +46,7 @@ class _ListaUsuarioEstacionScreenState
       appBar: AppBar(
         backgroundColor: Color(0xFF164092),
         title: Text(
-          'Observadores Meteorologicos e Hidrologicos',
+          'ObservadoreEs Meteorologicos e Hidrologicos',
           style: TextStyle(
             color: Colors.white,
             fontSize: 18,

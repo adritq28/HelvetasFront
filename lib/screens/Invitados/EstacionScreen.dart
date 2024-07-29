@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:helvetasfront/model/Estacion.dart';
-import 'package:helvetasfront/screens/ListaInvitadoHidrologicaScreen.dart';
-import 'package:helvetasfront/screens/ListaInvitadoMeteorologicaScreen.dart';
+import 'package:helvetasfront/screens/Invitados/ListaInvitadoHidrologicaScreen.dart';
+import 'package:helvetasfront/screens/Invitados/ListaInvitadoMeteorologicaScreen.dart';
 import 'package:helvetasfront/services/EstacionHidrologicaService.dart';
 import 'package:helvetasfront/services/EstacionService.dart';
 import 'package:provider/provider.dart';

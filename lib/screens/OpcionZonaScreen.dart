@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:helvetasfront/model/Promotor.dart';
-import 'package:helvetasfront/screens/FormFechaSiembra.dart';
-import 'package:helvetasfront/screens/FormPronostico.dart';
+import 'package:helvetasfront/screens/Promotor/FormFechaSiembra.dart';
+import 'package:helvetasfront/screens/Promotor/FormPronostico.dart';
 import 'package:helvetasfront/services/PromotorService.dart';
 import 'package:helvetasfront/services/PronosticoService.dart';
 import 'package:provider/provider.dart';

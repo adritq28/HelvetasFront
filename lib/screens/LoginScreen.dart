@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:helvetasfront/model/UsuarioEstacion.dart';
-import 'package:helvetasfront/screens/ListaUsuarioEstacionScreen.dart';
-import 'package:helvetasfront/screens/MunicipiosScreen.dart';
-import 'package:helvetasfront/screens/PromotorScreen.dart';
+import 'package:helvetasfront/screens/Invitados/MunicipiosScreen.dart';
+import 'package:helvetasfront/screens/Meteorologia/ListaUsuarioEstacionScreen.dart';
+import 'package:helvetasfront/screens/Promotor/PromotorScreen.dart';
 import 'package:helvetasfront/services/EstacionService.dart';
 import 'package:helvetasfront/services/PromotorService.dart';
 import 'package:helvetasfront/services/UsuarioService.dart';

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:helvetasfront/model/Municipio.dart';
-import 'package:helvetasfront/screens/PronosticoAgrometeorologico.dart';
+import 'package:helvetasfront/screens/Invitados/PronosticoAgrometeorologico.dart';
 import 'package:helvetasfront/services/FenologiaService.dart';
 import 'package:helvetasfront/services/MunicipioService.dart';
 import 'package:provider/provider.dart';
