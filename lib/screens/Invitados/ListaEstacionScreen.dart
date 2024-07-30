@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:helvetasfront/model/Estacion.dart';
 import 'package:helvetasfront/screens/Invitados/ListaInvitadoHidrologicaScreen.dart';
 import 'package:helvetasfront/screens/Invitados/ListaInvitadoMeteorologicaScreen.dart';
@@ -104,17 +105,22 @@ class _EstacionScreenState extends State<EstacionScreen> {
                 SizedBox(height: 5),
                 Text(
                   "Bienvenido Invitado ",
-                  style: TextStyle(
+                  style: GoogleFonts.lexend(
+                      textStyle: TextStyle(
                     color: Colors.white60,
-                    fontWeight: FontWeight.bold,
-                  ),
+                    //fontWeight: FontWeight.bold,
+                  )),
                 ),
                 SizedBox(height: 15),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      style: TextStyle(color: Colors.white),
+                      style: GoogleFonts.lexend(
+                          textStyle: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      )),
                       'Lista de Estaciones - Municipio de ' +
                           widget.nombreMunicipio,
                     )
@@ -152,25 +158,45 @@ class _EstacionScreenState extends State<EstacionScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'ID: ${widget.idMunicipio}',
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                        'ID Municipio: ${widget.idMunicipio}',
+                        style: GoogleFonts.lexend(
+                            textStyle: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                        )),
                       ),
                       SizedBox(height: 5),
                       Text(
                         'Estacion: ${dato.nombreEstacion}',
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                        style: GoogleFonts.numans(
+                            textStyle: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                        )),
                       ),
                       Text(
                         'Tipo de Estacion: ${dato.tipoEstacion}',
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                        style: GoogleFonts.numans(
+                            textStyle: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                        )),
                       ),
                       Text(
                         'COD Tipo de Estacion: ${dato.codTipoEstacion}',
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                        style: GoogleFonts.numans(
+                            textStyle: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                        )),
                       ),
                       Text(
-                        'COD Tipo de Estacion: ${dato.id}',
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                        'ID Estacion: ${dato.id}',
+                        style: GoogleFonts.numans(
+                            textStyle: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                        )),
                       ),
                       SizedBox(height: 10),
                       Row(
@@ -180,7 +206,12 @@ class _EstacionScreenState extends State<EstacionScreen> {
                             icon: Icon(Icons.visibility_rounded,
                                 color: Colors.white),
                             label: Text('Ver Datos',
-                                style: TextStyle(color: Colors.white)),
+                                style: GoogleFonts.lexend(
+                                textStyle: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),),
                             style: TextButton.styleFrom(
                               backgroundColor: Colors.grey, // Color plomo
                               shape: RoundedRectangleBorder(
@@ -211,7 +242,8 @@ class _EstacionScreenState extends State<EstacionScreen> {
                                   context,
                                   MaterialPageRoute(builder: (context) {
                                     return ChangeNotifierProvider(
-                                      create: (context) => EstacionHidrologicaService(),
+                                      create: (context) =>
+                                          EstacionHidrologicaService(),
                                       child: ListaInvitadoHidrologicaScreen(
                                         idEstacion: dato.id,
                                         nombreEstacion: dato.nombreEstacion,

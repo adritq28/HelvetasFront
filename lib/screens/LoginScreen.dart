@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:helvetasfront/model/UsuarioEstacion.dart';
 import 'package:helvetasfront/screens/Invitados/MunicipiosScreen.dart';
 import 'package:helvetasfront/screens/Meteorologia/ListaUsuarioEstacionScreen.dart';
@@ -18,7 +19,6 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-
   final UsuarioService _datosService2 = UsuarioService();
   late Future<List<UsuarioEstacion>> _futureUsuarioEstacion;
   final EstacionService _datosService3 = EstacionService();
@@ -28,59 +28,55 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
-
   }
 
+  void _showPasswordDialog(BuildContext context) {
+    TextEditingController usernameController = TextEditingController();
+    TextEditingController passwordController = TextEditingController();
 
-void _showPasswordDialog(BuildContext context) {
-  TextEditingController usernameController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
-
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: Text('Admin Login'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: usernameController,
-              decoration: InputDecoration(labelText: 'Nombre de usuario'),
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Admin Login'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: usernameController,
+                decoration: InputDecoration(labelText: 'Nombre de usuario'),
+              ),
+              SizedBox(height: 10),
+              TextField(
+                controller: passwordController,
+                obscureText: true,
+                decoration: InputDecoration(labelText: 'Contraseña'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              child: Text('Cancelar'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
             ),
-            SizedBox(height: 10),
-            TextField(
-              controller: passwordController,
-              obscureText: true,
-              decoration: InputDecoration(labelText: 'Contraseña'),
+            TextButton(
+              child: Text('OK'),
+              onPressed: () async {
+                String nombreUsuario = usernameController.text;
+                String password = passwordController.text;
+
+                // Llama a la función login del servicio
+                await Provider.of<UsuarioService>(context, listen: false)
+                    .login(nombreUsuario, password, context);
+              },
             ),
           ],
-        ),
-        actions: [
-          TextButton(
-            child: Text('Cancelar'),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-          TextButton(
-            child: Text('OK'),
-            onPressed: () async {
-              String nombreUsuario = usernameController.text;
-              String password = passwordController.text;
-
-              // Llama a la función login del servicio
-              await Provider.of<UsuarioService>(context, listen: false)
-                  .login(nombreUsuario, password, context);
-            },
-          ),
-        ],
-      );
-    },
-  );
-}
-
-
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -93,8 +89,10 @@ void _showPasswordDialog(BuildContext context) {
             Container(
               decoration: BoxDecoration(
                 image: DecorationImage(
-                  image: AssetImage('images/fondo.jpg'), // Ruta de la imagen de fondo
-                  fit: BoxFit.cover, // Ajustar la imagen para cubrir todo el contenedor
+                  image: AssetImage(
+                      'images/fondo.jpg'), // Ruta de la imagen de fondo
+                  fit: BoxFit
+                      .cover, // Ajustar la imagen para cubrir todo el contenedor
                 ),
               ),
             ),
@@ -116,7 +114,12 @@ void _showPasswordDialog(BuildContext context) {
                         SizedBox(width: 5), // Espacio entre el icono y el texto
                         Text(
                           'Admin',
-                          style: TextStyle(color: Colors.white),
+                          style: GoogleFonts.gantari(
+                            textStyle: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                          ),
                         ),
                       ],
                     ),
@@ -143,7 +146,10 @@ class LoginForm extends StatelessWidget {
       children: [
         Text(
           'Iniciar Sesión',
-          style: TextStyle(color: Colors.white, fontSize: 30),
+          style: GoogleFonts.prozaLibre(
+            textStyle: TextStyle(
+                fontWeight: FontWeight.bold, color: Colors.white, fontSize: 30),
+          ),
         ),
         Container(
           margin: EdgeInsets.only(bottom: 20),
@@ -176,10 +182,12 @@ class LoginForm extends StatelessWidget {
             ),
             label: Text(
               "Soy Observador",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF164092),
+              style: GoogleFonts.murecho(
+                textStyle: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF164092),
+                ),
               ),
             ),
           ),
@@ -194,7 +202,8 @@ class LoginForm extends StatelessWidget {
                 MaterialPageRoute(builder: (context) {
                   return ChangeNotifierProvider(
                     create: (context) => PromotorService(),
-                    child: PromotorScreen(), // Aquí envuelve la pantalla en el Provider
+                    child:
+                        PromotorScreen(), // Aquí envuelve la pantalla en el Provider
                   );
                 }),
               );
@@ -212,10 +221,12 @@ class LoginForm extends StatelessWidget {
             ),
             label: Text(
               "Soy Promotor",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF164092),
+              style: GoogleFonts.murecho(
+                textStyle: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF164092),
+                ),
               ),
             ),
           ),
@@ -230,7 +241,8 @@ class LoginForm extends StatelessWidget {
                 MaterialPageRoute(builder: (context) {
                   return ChangeNotifierProvider(
                     create: (context) => EstacionService(),
-                    child: MunicipiosScreen(), // Aquí envuelve la pantalla en el Provider
+                    child:
+                        MunicipiosScreen(), // Aquí envuelve la pantalla en el Provider
                   );
                 }),
               );
@@ -248,10 +260,12 @@ class LoginForm extends StatelessWidget {
             ),
             label: Text(
               "Entrar como invitado",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF164092),
+              style: GoogleFonts.murecho(
+                textStyle: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF164092),
+                ),
               ),
             ),
           ),

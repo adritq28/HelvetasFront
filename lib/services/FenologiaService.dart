@@ -13,6 +13,7 @@ class FenologiaService extends ChangeNotifier {
   List<Fenologia> _lista5 = [];
   List<Fenologia> get lista115 => _lista5;
 
+
   Future<List<DatosPronostico>> pronosticoCultivo(int idCultivo) async {
     final response =
         await http.get(Uri.parse('http://localhost:8080/datos_pronostico/registro/$idCultivo'));
@@ -28,10 +29,10 @@ class FenologiaService extends ChangeNotifier {
   }
 
 
-  Future<void> obtenerFenologia(int id) async {
+  Future<void> obtenerFenologia(int idCultivo) async {
     try {
       final response =
-          await http.get(Uri.parse('http://localhost:8080/fenologia/verFenologia/$id'));
+          await http.get(Uri.parse('http://localhost:8080/fenologia/verFenologia/$idCultivo'));
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
         _lista = data.map((e) => Fenologia.fromJson(e)).toList();
@@ -44,6 +45,17 @@ class FenologiaService extends ChangeNotifier {
       throw Exception('Error: $e');
     }
   }
+
+  Future<List<Map<String, dynamic>>> fetchPcpnFase(int cultivoId) async {
+  final response = await http.get(Uri.parse('http://localhost:8080/alertas/pcpnFase/$cultivoId'));
+
+  if (response.statusCode == 200) {
+    List<dynamic> data = jsonDecode(response.body);
+    return List<Map<String, dynamic>>.from(data);
+  } else {
+    throw Exception('Failed to load data');
+  }
+}
 
   Future<List<Fenologia>> alertas(int idFenologia, int idZona) async {
     final response = await http.get(Uri.parse(

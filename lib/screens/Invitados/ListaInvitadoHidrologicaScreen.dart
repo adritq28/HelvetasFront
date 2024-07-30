@@ -3,6 +3,7 @@ import 'dart:html' as html;
 
 import 'package:excel/excel.dart' as excel_pkg;
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:helvetasfront/model/DatosEstacionHidrologica.dart';
 import 'package:helvetasfront/services/EstacionHidrologicaService.dart';
 import 'package:http/http.dart' as http;
@@ -173,7 +174,8 @@ class _ListaInvitadoHidrologicaScreenState
               image: DecorationImage(
                 image: AssetImage(
                     'images/fondo.jpg'), // Ruta de la imagen de fondo
-                fit: BoxFit.cover, // Ajustar la imagen para cubrir todo el contenedor
+                fit: BoxFit
+                    .cover, // Ajustar la imagen para cubrir todo el contenedor
               ),
             ),
           ),
@@ -204,29 +206,56 @@ class _ListaInvitadoHidrologicaScreenState
                     ],
                   ),
                   const SizedBox(height: 10),
-                  const CircleAvatar(
-                    radius: 35,
-                    backgroundImage: AssetImage("images/47.jpg"),
-                  ),
-                  const SizedBox(height: 5),
-                  Text(
-                    'Municipio de: ${widget.nombreMunicipio}',
-                    style: const TextStyle(
-                      fontSize: 15,
-                      color: Color.fromARGB(208, 255, 255, 255),
-                      fontWeight: FontWeight.bold,
+                  SizedBox(height: 10),
+                  Container(
+                    height: 90,
+                    color: Color.fromARGB(
+                        51, 25, 25, 26), // Fondo negro con 20% de opacidad
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const SizedBox(height: 10),
+                        CircleAvatar(
+                          radius: 35,
+                          backgroundImage: AssetImage("images/47.jpg"),
+                        ),
+                        SizedBox(width: 15),
+                        Flexible(
+                          child: Wrap(
+                            alignment: WrapAlignment.center,
+                            spacing: 10.0,
+                            runSpacing: 5.0,
+                            children: [
+                              Text(
+                                "Bienvenido Invitado",
+                                style: TextStyle(
+                                  color: Colors.white60,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                '| Municipio de: ${widget.nombreMunicipio}',
+                                style: const TextStyle(
+                                  fontSize: 15,
+                                  color: Color.fromARGB(208, 255, 255, 255),
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                '| Estación Hidrológica: ${widget.nombreEstacion}',
+                                style: const TextStyle(
+                                  fontSize: 15,
+                                  color: Color.fromARGB(208, 255, 255, 255),
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  Text(
-                    'Estación Hidrologica: ${widget.nombreEstacion}',
-                    style: const TextStyle(
-                      fontSize: 15,
-                      color: Color.fromARGB(208, 255, 255, 255),
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 10),
                   Container(
                     width: MediaQuery.of(context).size.width *
                         0.5, // Ajusta el ancho según tus necesidades
@@ -287,7 +316,6 @@ class _ListaInvitadoHidrologicaScreenState
                       ),
                     ],
                   ),
-                  
                   const SizedBox(height: 10),
                   isLoading
                       ? const CircularProgressIndicator()
@@ -339,11 +367,36 @@ class _ListaInvitadoHidrologicaScreenState
                             ),
                           ),
                         ),
+                  const SizedBox(height: 20),
+                  Footer(), // Añadido Footer aquí
                 ],
               ),
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class Footer extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(16.0),
+      //color: Color.fromARGB(35, 20, 19, 19), // Color de fondo del footer
+      child: Center(
+        child: Text(
+          '@Pachatatiña 2024 | HELVETAS | EUROCLIMA',
+          style: GoogleFonts.convergence(
+            textStyle: TextStyle(
+              color: Color.fromARGB(255, 237, 237, 239), // Color del texto
+              fontSize: 16.0, // Tamaño de la fuente
+              //fontWeight: FontWeight.bold,
+            ),
+          ),
+          textAlign: TextAlign.center, // Centra el texto
+        ),
       ),
     );
   }

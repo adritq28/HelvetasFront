@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:helvetasfront/model/Municipio.dart';
-import 'package:helvetasfront/screens/Invitados/EstacionScreen.dart';
+import 'package:helvetasfront/screens/Invitados/ListaEstacionScreen.dart';
 import 'package:helvetasfront/screens/Invitados/ZonasScreen.dart';
 import 'package:helvetasfront/services/EstacionService.dart';
 import 'package:helvetasfront/services/MunicipioService.dart';
@@ -39,58 +40,149 @@ class _MunicipiosScreenState extends State<MunicipiosScreen> {
   }
 
   void _mostrarModal(int idMunicipio, String nombreMunicipio) {
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return Container(
-          padding: EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context); // Cerrar el modal
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) {
-                      return ChangeNotifierProvider(
-                      create: (context) => EstacionService(),
-                      child: EstacionScreen(
-                        idMunicipio: idMunicipio,
-                        nombreMunicipio: nombreMunicipio,
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (BuildContext context) {
+      return GestureDetector(
+        onTap: () => Navigator.of(context).pop(), // Cierra el modal al hacer clic fuera de él
+        child: Center(
+          child: GestureDetector(
+            onTap: () {}, // Para evitar que los clics en el contenido cierren el modal
+            child: SingleChildScrollView(
+              child: Container(
+                padding: EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Color.fromARGB(226, 255, 255, 255),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                width: MediaQuery.of(context).size.width * 0.8, // Ajuste de ancho
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Opciones',
+                          style: GoogleFonts.lexend(
+                            textStyle: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Color.fromARGB(255, 9, 64, 142),
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.close),
+                          onPressed: () => Navigator.of(context).pop(),
+                          color: Colors.black,
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context); // Cerrar el modal
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) {
+                            return ChangeNotifierProvider(
+                              create: (context) => EstacionService(),
+                              child: EstacionScreen(
+                                idMunicipio: idMunicipio,
+                                nombreMunicipio: nombreMunicipio,
+                              ),
+                            );
+                          }),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.grey, // Color de fondo plomo
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10), // Bordes redondeados
+                        ),
+                        padding: EdgeInsets.symmetric(
+                            vertical: 20, horizontal: 20), // Ajuste de tamaño
                       ),
-                    );
-                    }),
-                  );
-                },
-                child: Text('Estaciones Hidrometeorologicas'),
-              ),
-              SizedBox(height: 10),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context); // Cerrar el modal
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) {
-                      return ChangeNotifierProvider(
-                      create: (context) => MunicipioService(),
-                      child: ZonasScreen(
-                        idMunicipio: idMunicipio,
-                        nombreMunicipio: nombreMunicipio,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.location_on, color: Colors.white), // Icono
+                          SizedBox(width: 10), // Espacio entre icono y texto
+                          Flexible(
+                            child: Text(
+                              'Estaciones Hidrometeorologicas',
+                              style: GoogleFonts.lexend(
+                                textStyle: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
                       ),
-                    );
-                    }),
-                  );
-                },
-                child: Text('Pronostico Agrometeorologico'),
+                    ),
+                    SizedBox(height: 10),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context); // Cerrar el modal
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) {
+                            return ChangeNotifierProvider(
+                              create: (context) => MunicipioService(),
+                              child: ZonasScreen(
+                                idMunicipio: idMunicipio,
+                                nombreMunicipio: nombreMunicipio,
+                              ),
+                            );
+                          }),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green, // Color de fondo verde
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10), // Bordes redondeados
+                        ),
+                        padding: EdgeInsets.symmetric(
+                            vertical: 20, horizontal: 20), // Ajuste de tamaño
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.wb_sunny, color: Colors.white), // Icono
+                          SizedBox(width: 10), // Espacio entre icono y texto
+                          Flexible(
+                            child: Text(
+                              'Pronostico Agrometeorologico',
+                              style: GoogleFonts.lexend(
+                                textStyle: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ],
+            ),
           ),
-        );
-      },
-    );
+        ),
+      );
+    },
+  );
 }
 
+  
 
   @override
   Widget build(BuildContext context) {
@@ -140,19 +232,23 @@ class _MunicipiosScreenState extends State<MunicipiosScreen> {
                 ),
                 SizedBox(height: 15),
                 SizedBox(height: 5),
-                Text(
-                  "Bienvenido Invitado ",
-                  style: TextStyle(
-                    color: Colors.white60,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(height: 15),
+                Text("Bienvenido Invitado ",
+                    style: GoogleFonts.lexend(
+                        textStyle: TextStyle(
+                      color: Colors.white60,
+                      //fontWeight: FontWeight.bold,
+                    ))),
+                SizedBox(height: 5),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      style: TextStyle(color: Colors.white),
+                      //style: TextStyle(color: Colors.white),
+                      style: GoogleFonts.lexend(
+                          textStyle: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      )),
                       'Lista de Municipios',
                     )
                   ],
@@ -188,12 +284,22 @@ class _MunicipiosScreenState extends State<MunicipiosScreen> {
                     children: [
                       Text(
                         'ID: ${dato.idMunicipio}',
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                        style: GoogleFonts.lexend(
+                          textStyle: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                       SizedBox(height: 5),
                       Text(
                         'Municipio: ${dato.nombreMunicipio}',
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                        style: GoogleFonts.numans(
+                          textStyle: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                       SizedBox(height: 10),
                       Row(
@@ -202,8 +308,15 @@ class _MunicipiosScreenState extends State<MunicipiosScreen> {
                           TextButton.icon(
                             icon: Icon(Icons.visibility_rounded,
                                 color: Colors.white),
-                            label: Text('Ver Datos',
-                                style: TextStyle(color: Colors.white)),
+                            label: Text(
+                              'Ver Datos',
+                              style: GoogleFonts.lexend(
+                                textStyle: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
                             style: TextButton.styleFrom(
                               backgroundColor: Colors.grey,
                               shape: RoundedRectangleBorder(
@@ -213,7 +326,8 @@ class _MunicipiosScreenState extends State<MunicipiosScreen> {
                                   horizontal: 16.0, vertical: 8.0),
                             ),
                             onPressed: () async {
-                              _mostrarModal(dato.idMunicipio, dato.nombreMunicipio);
+                              _mostrarModal(
+                                  dato.idMunicipio, dato.nombreMunicipio);
                             },
                           ),
                         ],

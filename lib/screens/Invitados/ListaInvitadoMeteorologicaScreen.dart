@@ -4,6 +4,7 @@ import 'dart:html' as html;
 import 'package:excel/excel.dart' as excel_pkg;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:helvetasfront/screens/Administrador/Meteorologia/GraficaScreen.dart';
 import 'package:helvetasfront/services/EstacionService.dart';
 import 'package:http/http.dart' as http;
@@ -210,30 +211,54 @@ class _ListaInvitadoMeteorologicaScreenState
                       ),
                     ],
                   ),
+
+                  SizedBox(height: 10),
+                  Container(
+                    height: 90,
+                    color: Color.fromARGB(
+                        91, 4, 18, 43), // Fondo negro con 20% de opacidad
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const SizedBox(height: 10),
+                        CircleAvatar(
+                          radius: 30,
+                          backgroundImage: AssetImage("images/47.jpg"),
+                        ),
+                        SizedBox(width: 15),
+                        Flexible(
+                          child: Wrap(
+                            alignment: WrapAlignment.center,
+                            spacing: 10.0,
+                            runSpacing: 5.0,
+                            children: [
+                              Text("Bienvenido Invitado",
+                                  style: GoogleFonts.lexend(
+                                      textStyle: TextStyle(
+                                    color: Colors.white60,
+                                    //fontWeight: FontWeight.bold,
+                                  ))),
+                              Text('| Municipio de: ${widget.nombreMunicipio}',
+                                  style: GoogleFonts.lexend(
+                                      textStyle: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ))),
+                              Text(
+                                  '| Estación Meteorológica: ${widget.nombreEstacion}',
+                                  style: GoogleFonts.lexend(
+                                      textStyle: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ))),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
                   const SizedBox(height: 10),
-                  const CircleAvatar(
-                    radius: 35,
-                    backgroundImage: AssetImage("images/47.jpg"),
-                  ),
-                  const SizedBox(height: 5),
-                  Text(
-                    'Municipio de: ${widget.nombreMunicipio}',
-                    style: const TextStyle(
-                      fontSize: 15,
-                      color: Color.fromARGB(208, 255, 255, 255),
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Text(
-                    'Estación Meteorológica: ${widget.nombreEstacion}',
-                    style: const TextStyle(
-                      fontSize: 15,
-                      color: Color.fromARGB(208, 255, 255, 255),
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
                   Container(
                     width: MediaQuery.of(context).size.width *
                         0.5, // Ajusta el ancho según tus necesidades
@@ -290,8 +315,14 @@ class _ListaInvitadoMeteorologicaScreenState
                           ),
                         ),
                         style: TextButton.styleFrom(
-                          backgroundColor: Color.fromARGB(255, 142, 146, 143),
-                        ),
+                              backgroundColor: Color(0xFF58D68D ), // Color plomo
+                              shape: RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.circular(8.0), // Border radius
+                              ),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 16.0, vertical: 8.0),
+                            ),
                       ),
                       const SizedBox(width: 5),
                       TextButton.icon(
@@ -313,7 +344,13 @@ class _ListaInvitadoMeteorologicaScreenState
                           ),
                         ),
                         style: TextButton.styleFrom(
-                          backgroundColor: Color.fromARGB(255, 142, 146, 143),
+                          backgroundColor: Color(0xFFF0B27A), // Color plomo
+                          shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.circular(8.0), // Border radius
+                          ),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 16.0, vertical: 8.0),
                         ),
                       ),
                     ],

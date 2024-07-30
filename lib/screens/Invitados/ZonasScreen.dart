@@ -154,6 +154,14 @@ class _ZonasScreenState extends State<ZonasScreen> {
                           'ID Zona: ${dato.idZona}',
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
+                        Text(
+                          'Nombre Cultivo: ${dato.nombreCultivo}',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          'ID Cultivo: ${dato.idCultivo}',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
                         SizedBox(height: 10),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
@@ -185,6 +193,7 @@ class _ZonasScreenState extends State<ZonasScreen> {
                                       child: PronosticoAgrometeorologico(
                                         idZona: dato.idZona,
                                         nombreMunicipio: dato.nombreMunicipio,
+                                        idCultivo: dato.idCultivo,
                                       ),
                                     );
                                   }),

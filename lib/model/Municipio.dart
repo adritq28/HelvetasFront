@@ -3,12 +3,16 @@ class Municipio {
   final String nombreMunicipio;
   final int idZona;
   final String nombreZona;
+  final String nombreCultivo;
+   final int idCultivo;
 
   Municipio(
       {required this.idMunicipio,
       required this.nombreMunicipio,
       required this.idZona,
-      required this.nombreZona});
+      required this.nombreZona,
+      required this.nombreCultivo,
+      required this.idCultivo});
 
   factory Municipio.fromJson(Map<String, dynamic> json) {
     return Municipio(
@@ -16,6 +20,8 @@ class Municipio {
       nombreMunicipio: (json['nombreMunicipio'] ?? ''),
       idZona: json['idZona'] ?? 0,
       nombreZona: (json['nombreZona'] ?? ''),
+      nombreCultivo: (json['nombreCultivo'] ?? ''),
+      idCultivo: json['idCultivo'] ?? 0,
     );
   }
 
@@ -23,7 +29,9 @@ class Municipio {
         'idMunicipio': idMunicipio,
         'nombreMunicipio': nombreMunicipio,
         'idZona': idZona,
-        'nombreZona': nombreZona
+        'nombreZona': nombreZona,
+        'nombreCultivo': nombreCultivo,
+        'idCultivo': idCultivo,
       };
 
   String toStringMunicipio() {
@@ -35,6 +43,10 @@ class Municipio {
         idZona.toString() +
         ", nombreZona=" +
         nombreZona.toString() +
+        ", nombreCultivo=" +
+        nombreCultivo.toString() +
+        ", idCultivo=" +
+        idCultivo.toString() +
         "]";
   }
 }
