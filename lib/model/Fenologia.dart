@@ -15,6 +15,7 @@ class Fenologia {
   final double tempOpt;
   final double umbInf;
   final double umbSup;
+  final String imagen;
 
   Fenologia({
     //required this.id,
@@ -33,6 +34,7 @@ class Fenologia {
     required this.tempOpt,
     required this.umbInf,
     required this.umbSup,
+    required this.imagen
   });
 
   factory Fenologia.fromJson(Map<String, dynamic> json) {
@@ -55,6 +57,7 @@ class Fenologia {
       tempOpt: (json['tempOpt'] ?? 0.0).toDouble(),
       umbSup: (json['umbSup'] ?? 0.0).toDouble(),
       umbInf: (json['umbInf'] ?? 0.0).toDouble(),
+      imagen: (json['imagen'] ?? ''),
     );
   }
 
@@ -76,6 +79,7 @@ class Fenologia {
         'tempOpt': tempOpt,
         'umbSup': umbSup,
         'umbInf': umbInf,
+        'imagen': imagen,
       };
 
   String toStringFenologia() {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:helvetasfront/model/DatosPronostico.dart';
 import 'package:helvetasfront/model/Fenologia.dart';
-import 'package:helvetasfront/screens/HorizontalTimeLine.dart';
 import 'package:helvetasfront/screens/TimeLineEvent.dart';
 import 'package:helvetasfront/services/FenologiaService.dart';
 import 'package:intl/intl.dart';
@@ -109,50 +109,46 @@ class _PronosticoAgrometeorologicoState
                         SizedBox(height: 10),
                         Container(
                           height: 90,
-                          color: Color.fromARGB(91, 43, 26, 4), 
+                          color: Color.fromARGB(
+                              91, 4, 18, 43), // Fondo negro con 20% de opacidad
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               const SizedBox(height: 10),
                               CircleAvatar(
-                                radius: 35,
+                                radius: 30,
                                 backgroundImage: AssetImage("images/47.jpg"),
                               ),
                               SizedBox(width: 15),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    "Bienvenido Invitado ",
-                                    style: TextStyle(
-                                      color: Colors.white60,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  SizedBox(height: 10),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        ' | Municipio de ' + widget.nombreMunicipio,
-                                        style: TextStyle(color: Colors.white),
-                                      ),
-                                    ],
-                                  ),
-                                  //SizedBox(width: 10),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      SizedBox(height: 10),
-                                      Text(
+                              Flexible(
+                                child: Wrap(
+                                  alignment: WrapAlignment.center,
+                                  spacing: 10.0,
+                                  runSpacing: 5.0,
+                                  children: [
+                                    Text("Bienvenido Invitado",
+                                        style: GoogleFonts.lexend(
+                                            textStyle: TextStyle(
+                                          color: Colors.white60,
+                                          //fontWeight: FontWeight.bold,
+                                        ))),
+                                    Text(
+                                        '| Municipio de: ${widget.nombreMunicipio}',
+                                        style: GoogleFonts.lexend(
+                                            textStyle: TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 12))),
+                                    Text(
                                         ' | Cultivo de ' +
                                             miModelo5.lista11[0].nombreCultivo,
-                                        style: TextStyle(color: Colors.white),
-                                      )
-                                    ],
-                                  ),
-                                  SizedBox(height: 20),
-                                ],
+                                        style: GoogleFonts.lexend(
+                                            textStyle: TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 12))),
+                                  ],
+                                ),
                               ),
                             ],
                           ),
@@ -164,9 +160,9 @@ class _PronosticoAgrometeorologicoState
                   Container(
                     width: double
                         .infinity, // Asegura que el contenedor ocupe todo el ancho disponible
-                    padding: EdgeInsets.all(
-                        16.0), // Espaciado alrededor del texto // Fondo azul para contrastar el texto blanco
-                    child: const Column(
+                    padding:
+                        EdgeInsets.all(16.0), // Espaciado alrededor del texto
+                    child: Column(
                       mainAxisAlignment: MainAxisAlignment
                           .center, // Centra el contenido verticalmente
                       crossAxisAlignment: CrossAxisAlignment
@@ -174,9 +170,12 @@ class _PronosticoAgrometeorologicoState
                       children: [
                         Text(
                           'PRONOSTICO AGROMETEOROLOGICO',
-                          style: TextStyle(
-                            fontSize: 24.0, // Tamaño de la letra
-                            color: Colors.white, // Color de la letra
+                          style: GoogleFonts.reemKufiFun(
+                            textStyle: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                            ),
                           ),
                           textAlign: TextAlign.center, // Centrar el texto
                         ),
@@ -292,58 +291,22 @@ class _PronosticoAgrometeorologicoState
                   Container(
                     width: double
                         .infinity, // Asegura que el contenedor ocupe todo el ancho disponible
-                    padding: EdgeInsets.all(
-                        16.0), // Espaciado alrededor del texto // Fondo azul para contrastar el texto blanco
-                    child: const Column(
+                    padding:
+                        EdgeInsets.all(16.0), // Espaciado alrededor del texto
+                    child: Column(
                       mainAxisAlignment: MainAxisAlignment
                           .center, // Centra el contenido verticalmente
                       crossAxisAlignment: CrossAxisAlignment
                           .center, // Centra el contenido horizontalmente
                       children: [
                         Text(
-                          'FENOLOGIA',
-                          style: TextStyle(
-                            fontSize: 24.0, // Tamaño de la letra
-                            color: Colors.white, // Color de la letra
-                          ),
-                          textAlign: TextAlign.center, // Centrar el texto
-                        ),
-                      ],
-                    ),
-                  ),
-                  //SizedBox(height: 10),
-                  Center(
-                    child: Padding(
-                      padding:
-                          const EdgeInsets.all(16.0), // Margen en los bordes
-                      child: Container(
-                        decoration: BoxDecoration(
-                          border:
-                              Border.all(color: Colors.grey), // Borde opcional
-                          borderRadius: BorderRadius.circular(
-                              10), // Borde redondeado opcional
-                        ),
-                        child: HorizontalTimeline(events: timelineEvents),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Container(
-                    width: double
-                        .infinity, // Asegura que el contenedor ocupe todo el ancho disponible
-                    padding: EdgeInsets.all(
-                        16.0), // Espaciado alrededor del texto // Fondo azul para contrastar el texto blanco
-                    child: const Column(
-                      mainAxisAlignment: MainAxisAlignment
-                          .center, // Centra el contenido verticalmente
-                      crossAxisAlignment: CrossAxisAlignment
-                          .center, // Centra el contenido horizontalmente
-                      children: [
-                        Text(
-                          'DATOS PRONOSTICO',
-                          style: TextStyle(
-                            fontSize: 24.0, // Tamaño de la letra
-                            color: Colors.white, // Color de la letra
+                          'DATOS PRONOSTICO DECENAL',
+                          style: GoogleFonts.reemKufiFun(
+                            textStyle: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                            ),
                           ),
                           textAlign: TextAlign.center, // Centrar el texto
                         ),
@@ -367,28 +330,238 @@ class _PronosticoAgrometeorologicoState
                         final datosList = snapshot.data!;
                         return Column(
                           children: [
-                            tablaDatos(datosList),
+                            //tablaDatos(datosList),
+                            listaTarjetasPronostico(datosList),
                             //tablaDatosInvertida2(datosList),
                           ],
                         );
                       }
                     },
                   ),
+                  // SingleChildScrollView(
+                  //   scrollDirection: Axis.horizontal,
+                  //   child: tablaDatosInvertida2(miModelo5.lista112),
+                  // ),
                   const SizedBox(height: 10),
                   Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.all(16.0),
-                    child: const Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
+                    width: double
+                        .infinity, // Asegura que el contenedor ocupe todo el ancho disponible
+                    padding:
+                        EdgeInsets.all(16.0), // Espaciado alrededor del texto
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment
+                          .center, // Centra el contenido verticalmente
+                      crossAxisAlignment: CrossAxisAlignment
+                          .center, // Centra el contenido horizontalmente
+                      children: [
+                        Text(
+                          'FENOLOGIA DE ' +
+                              miModelo5.lista11[0].nombreCultivo.toUpperCase(),
+                          style: GoogleFonts.reemKufiFun(
+                            textStyle: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                            ),
+                          ),
+                          textAlign: TextAlign.center, // Centrar el texto
+                        ),
+                      ],
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment.center,
+                    child: Builder(
+                      builder: (context) {
+                        final ScrollController scrollController =
+                            ScrollController();
+                        return Scrollbar(
+                          controller: scrollController,
+                          thumbVisibility:
+                              true, // Muestra la barra de desplazamiento siempre
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            controller: scrollController,
+                            child: Row(
+                              children: [
+                                ...miModelo5.lista11
+                                    .asMap()
+                                    .entries
+                                    .map((entry) {
+                                  int index = entry.key;
+                                  var dato = entry.value;
+
+                                  // La primera fase muestra la fecha de siembra sin sumar días
+                                  DateTime fechaAcumulado;
+                                  if (index == 0) {
+                                    fechaAcumulado = dato.fechaSiembra;
+                                  } else {
+                                    // Fases posteriores muestran las fechas acumuladas
+                                    fechaAcumulado =
+                                        miModelo5.lista11[0].fechaSiembra;
+                                    for (int i = 0; i < index; i++) {
+                                      fechaAcumulado = fechaAcumulado.add(
+                                        Duration(
+                                            days: miModelo5.lista11[i].nroDias),
+                                      );
+                                    }
+                                  }
+
+                                  return Container(
+                                    margin: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 10),
+                                    padding: const EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                      color: Color.fromARGB(255, 255, 255, 255),
+                                      borderRadius: BorderRadius.circular(10),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black26,
+                                          blurRadius: 5,
+                                          offset: Offset(0, 5),
+                                        ),
+                                      ],
+                                    ),
+                                    width:
+                                        200, // Ajustar el ancho para hacer las tarjetas más angostas
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        SizedBox(height: 10),
+                                        Center(
+                                          child: Image.asset(
+                                            'images/${dato.imagen}', // Construir la ruta completa usando el nombre de la imagen de la base de datos
+                                            width: 90,
+                                            height: 120,
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                        SizedBox(height: 10),
+                                        Center(
+                                          child: Text(
+                                            '${dato.descripcion}',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold, fontSize: 18),
+                                          ),
+                                        ),
+                                        SizedBox(height: 5),
+                                        Text(
+                                          'Nro Dias: ${dato.nroDias}',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                        Text(
+                                          'Fase: ${dato.fase}',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        Text(
+                                          '${formatearFecha(fechaAcumulado)}',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        SizedBox(height: 10),
+                                      ],
+                                    ),
+                                  );
+                                }).toList(),
+                                // Agrega una tarjeta adicional para la última fecha acumulada
+                                Container(
+                                  margin: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 10),
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(10),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black26,
+                                        blurRadius: 5,
+                                        offset: Offset(0, 5),
+                                      ),
+                                    ],
+                                  ),
+                                  width:
+                                      200, // Ajustar el ancho para hacer las tarjetas más angostas
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Center(
+                                        child: Image.asset(
+                                          "images/6.jpg",
+                                          width: 90,
+                                          height: 120,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                      SizedBox(height: 5),
+                                      Center(
+                                        child: Text(
+                                          'Fase Final',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                      Text(
+                                        '${formatearFecha(miModelo5.lista11.last.fechaSiembra.add(Duration(days: miModelo5.lista11.map((dato) => dato.nroDias).reduce((a, b) => a + b))))}',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      SizedBox(height: 10),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+
+                  //SizedBox(height: 10),
+                  // Center(
+                  //   child: Padding(
+                  //     padding:
+                  //         const EdgeInsets.all(16.0), // Margen en los bordes
+                  //     child: Container(
+                  //       decoration: BoxDecoration(
+                  //         border:
+                  //             Border.all(color: Colors.grey), // Borde opcional
+                  //         borderRadius: BorderRadius.circular(
+                  //             10), // Borde redondeado opcional
+                  //       ),
+                  //       child: HorizontalTimeline(events: timelineEvents),
+                  //     ),
+                  //   ),
+                  // ),
+
+                  const SizedBox(height: 10),
+                  Container(
+                    width: double
+                        .infinity, // Asegura que el contenedor ocupe todo el ancho disponible
+                    padding:
+                        EdgeInsets.all(16.0), // Espaciado alrededor del texto
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment
+                          .center, // Centra el contenido verticalmente
+                      crossAxisAlignment: CrossAxisAlignment
+                          .center, // Centra el contenido horizontalmente
                       children: [
                         Text(
                           'DATOS PCPN FASE',
-                          style: TextStyle(
-                            fontSize: 24.0,
-                            color: Colors.white,
+                          style: GoogleFonts.reemKufiFun(
+                            textStyle: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                            ),
                           ),
-                          textAlign: TextAlign.center,
+                          textAlign: TextAlign.center, // Centrar el texto
                         ),
                       ],
                     ),
@@ -469,19 +642,26 @@ class _PronosticoAgrometeorologicoState
                   //const SizedBox(height: 25),
                   const SizedBox(height: 10),
                   Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.all(16.0),
-                    child: const Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
+                    width: double
+                        .infinity, // Asegura que el contenedor ocupe todo el ancho disponible
+                    padding:
+                        EdgeInsets.all(16.0), // Espaciado alrededor del texto
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment
+                          .center, // Centra el contenido verticalmente
+                      crossAxisAlignment: CrossAxisAlignment
+                          .center, // Centra el contenido horizontalmente
                       children: [
                         Text(
                           'UMBRALES',
-                          style: TextStyle(
-                            fontSize: 24.0,
-                            color: Colors.white,
+                          style: GoogleFonts.reemKufiFun(
+                            textStyle: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                            ),
                           ),
-                          textAlign: TextAlign.center,
+                          textAlign: TextAlign.center, // Centrar el texto
                         ),
                       ],
                     ),
@@ -490,6 +670,9 @@ class _PronosticoAgrometeorologicoState
                     scrollDirection: Axis.horizontal,
                     child: tablaDatosInvertida(miModelo5.lista11),
                   ),
+
+                  const SizedBox(height: 20),
+                  Footer(),
                 ],
               ),
             );
@@ -590,9 +773,7 @@ class _PronosticoAgrometeorologicoState
               );
             }).toList(),
           ),
-          
         ),
- 
       ),
     );
   }
@@ -786,4 +967,112 @@ class _PronosticoAgrometeorologicoState
     }
     return timelineEvents;
   }
+}
+
+class Footer extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(16.0),
+      //color: Color.fromARGB(35, 20, 19, 19), // Color de fondo del footer
+      child: Center(
+        child: Text(
+          '@Pachatatiña 2024 | HELVETAS | EUROCLIMA',
+          style: GoogleFonts.convergence(
+            textStyle: TextStyle(
+              color: Color.fromARGB(255, 237, 237, 239), // Color del texto
+              fontSize: 11.0, // Tamaño de la fuente
+              //fontWeight: FontWeight.bold,
+            ),
+          ),
+          textAlign: TextAlign.center, // Centra el texto
+        ),
+      ),
+    );
+  }
+}
+
+DateTime parseFecha(String fecha) {
+  return DateTime.parse(fecha);
+}
+
+String formatearFecha(DateTime fecha) {
+  final DateFormat formatter = DateFormat('MMM d, y', 'en_US');
+  return formatter.format(fecha).toUpperCase();
+}
+
+Widget tarjetaPronostico(DatosPronostico datos) {
+  // Puedes usar lógica aquí para seleccionar la imagen correcta
+  DateTime fechaInicio = datos.fecha;
+  DateTime fechaFinal = fechaInicio.add(Duration(days: 10));
+
+  String fechaInicioFormateada = formatearFecha(fechaInicio);
+  String fechaFinalFormateada = formatearFecha(fechaFinal);
+
+  String imagen = datos.pcpn > 0 ? 'images/25.png' : 'images/26.png';
+
+  return Card(
+    margin: const EdgeInsets.all(8.0),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(10),
+      side: BorderSide(color: Color.fromARGB(255, 156, 245, 219)),
+    ),
+    color: datos.pcpn > 0
+        ? Color.fromARGB(97, 160, 208, 247)
+        : Color.fromARGB(119, 255, 204, 128),
+    child: Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Image.asset(
+            imagen,
+            height: 170,
+            width: 170,
+          ),
+          SizedBox(height: 10),
+          Text(
+            'Fecha: $fechaInicioFormateada - $fechaFinalFormateada',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+              fontSize: 20,
+            ),
+          ),
+          Text(
+            'Temp. Max: ${datos.tempMax}°C',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+            ),
+          ),
+          Text(
+            'Temp. Min: ${datos.tempMin}°C',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+            ),
+          ),
+          Text(
+            'Precipitación: ${datos.pcpn} mm',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+Widget listaTarjetasPronostico(List<DatosPronostico> datosList) {
+  return SingleChildScrollView(
+    scrollDirection: Axis.vertical,
+    child: Column(
+      children: datosList.map((datos) {
+        return tarjetaPronostico(datos);
+      }).toList(),
+    ),
+  );
 }

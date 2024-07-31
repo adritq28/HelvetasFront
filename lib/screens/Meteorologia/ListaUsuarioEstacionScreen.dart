@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:helvetasfront/model/UsuarioEstacion.dart';
 import 'package:helvetasfront/screens/Hidrologia/ListaEstacionHidrologicaScreen.dart';
 import 'package:helvetasfront/screens/Meteorologia/ListaEstacionScreen.dart';
@@ -20,6 +21,8 @@ class _ListaUsuarioEstacionScreenState
   final EstacionService _datosService3 = EstacionService();
   late UsuarioService miModelo4;
   late List<UsuarioEstacion> _usuarioEstacion = [];
+  late List<String> _municipios = []; // Lista de municipios
+  String? _selectedMunicipio; // Municipio seleccionado
 
   @override
   void initState() {
@@ -34,6 +37,7 @@ class _ListaUsuarioEstacionScreenState
       List<UsuarioEstacion> a = miModelo4.lista11;
       setState(() {
         _usuarioEstacion = a;
+        _municipios = a.map((e) => e.nombreMunicipio).toSet().toList();
       });
     } catch (e) {
       print('Error al cargar los datos: $e');
@@ -43,22 +47,131 @@ class _ListaUsuarioEstacionScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Color(0xFF164092),
-        title: Text(
-          'ObservadoreEs Meteorologicos e Hidrologicos',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-          ),
-        ),
-      ),
-      body: Column(
+      body: Stack(
         children: [
-          Expanded(
-            child: Container(
-              margin: const EdgeInsets.all(10.0),
-              child: op2(context),
+          // Imagen de fondo
+          Positioned.fill(
+            child: Image.asset(
+              'images/fondo.jpg', // Cambia esto por la ruta de tu imagen
+              fit: BoxFit.cover,
+            ),
+          ),
+          // Contenido de la pantalla
+          Padding(
+            padding: const EdgeInsets.all(0.0),
+            child: Column(
+              children: [
+                SizedBox(height: 15),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    InkWell(
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Icon(
+                        Icons.arrow_back_ios_new,
+                        color: Color.fromARGB(255, 255, 255, 255),
+                        size: 25,
+                      ),
+                    ),
+                    const Icon(
+                      Icons.more_vert,
+                      color: Color.fromARGB(255, 255, 255, 255),
+                      size: 28,
+                    ),
+                  ],
+                ),
+                SizedBox(height: 10),
+                Container(
+                  height: 70,
+                  color: Color.fromARGB(
+                      91, 4, 18, 43), // Fondo negro con 20% de opacidad
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(width: 15),
+                      Flexible(
+                        child: Wrap(
+                          alignment: WrapAlignment.start,
+                          spacing: 10.0,
+                          runSpacing: 5.0,
+                          children: [
+                            Text(
+                              'OBSERVADORES METEOROLOGICOS E HIDROLOGICOS',
+                              style: GoogleFonts.kulimPark(
+                                textStyle: TextStyle(
+                                  color: Color.fromARGB(
+                                      255, 243, 243, 243), // Color del texto
+                                  fontSize:
+                                      13.0, // Tamaño de la fuente mayor para el título
+                                  fontWeight:
+                                      FontWeight.bold, // Negrita para el título
+                                ),
+                              ),
+                              textAlign: TextAlign
+                                  .left, // Alineación del texto a la izquierda
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 15),
+                Text(
+                  'MUNICIPIOS: ',
+                  style: GoogleFonts.kulimPark(
+                    textStyle: TextStyle(
+                      color:
+                          Color.fromARGB(255, 239, 239, 240), // Color del texto
+                      fontSize: 15.0,
+                      fontWeight: FontWeight.bold, // Tamaño de la fuente
+                      //fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                DropdownButton<String>(
+                  hint: Text(
+                    "Seleccione un Municipio",
+                    style: GoogleFonts.convergence(
+                      textStyle: TextStyle(
+                        color: Color.fromARGB(
+                            255, 255, 255, 255), // Color del texto
+                        fontSize: 15.0, // Tamaño de la fuente
+                        //fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  value: _selectedMunicipio,
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      _selectedMunicipio = newValue;
+                    });
+                  },
+                  items:
+                      _municipios.map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value,
+                          style: GoogleFonts.convergence(
+                            textStyle: TextStyle(
+                              color: Color.fromARGB(
+                                  255, 8, 8, 114), // Color del texto
+                              fontSize: 15.0, // Tamaño de la fuente
+                              //fontWeight: FontWeight.bold,
+                            ),
+                          )),
+                    );
+                  }).toList(),
+                ),
+                Expanded(
+                  child: Container(
+                    margin: const EdgeInsets.all(10.0),
+                    child: op2(context),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -67,15 +180,21 @@ class _ListaUsuarioEstacionScreenState
   }
 
   Widget op2(BuildContext context) {
+    List<UsuarioEstacion> usuariosFiltrados = _selectedMunicipio == null
+        ? _usuarioEstacion
+        : _usuarioEstacion
+            .where((u) => u.nombreMunicipio == _selectedMunicipio)
+            .toList();
+
     return ListView.builder(
-      itemCount: (miModelo4.lista11.length / 2).ceil(),
+      itemCount: (usuariosFiltrados.length / 2).ceil(),
       itemBuilder: (context, index) {
         int firstIndex = index * 2;
         int secondIndex = firstIndex + 1;
 
-        var firstDato = miModelo4.lista11[firstIndex];
-        var secondDato = secondIndex < miModelo4.lista11.length
-            ? miModelo4.lista11[secondIndex]
+        var firstDato = usuariosFiltrados[firstIndex];
+        var secondDato = secondIndex < usuariosFiltrados.length
+            ? usuariosFiltrados[secondIndex]
             : null;
 
         return Row(
@@ -106,14 +225,31 @@ class _ListaUsuarioEstacionScreenState
                     ),
                     Text(
                       "${firstDato.nombreCompleto}",
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style: GoogleFonts.krub(
+                          textStyle: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16)),
                     ),
                     SizedBox(height: 5),
-                    Text("Municipio: ${firstDato.nombreMunicipio}"),
-                    Text("Estación: ${firstDato.nombreEstacion}"),
-                    Text("Tipo de Estación: ${firstDato.tipoEstacion}"),
-                    Text("COD tipo estacion: ${firstDato.codTipoEstacion}"),
+                    Text("Municipio: ${firstDato.nombreMunicipio}",
+                        style: GoogleFonts.fredoka(
+                            textStyle: TextStyle(
+                          color: Color.fromARGB(255, 0, 7, 40),
+                          fontSize: 15,
+                        ))),
+                    Text("Estación: ${firstDato.nombreEstacion}",
+                        style: GoogleFonts.fredoka(
+                            textStyle: TextStyle(
+                          color: Color.fromARGB(255, 0, 7, 40),
+                          fontSize: 15,
+                        ))),
+                    Text("Tipo de Estación: ${firstDato.tipoEstacion}",
+                        style: GoogleFonts.fredoka(
+                            textStyle: TextStyle(
+                          color: Color.fromARGB(255, 0, 7, 40),
+                          fontSize: 15,
+                        ))),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
@@ -157,16 +293,31 @@ class _ListaUsuarioEstacionScreenState
                           backgroundImage: AssetImage("images/46.jpg"),
                         ),
                       ),
-                      Text(
-                        "${secondDato.nombreCompleto}",
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
+                      Text("${secondDato.nombreCompleto}",
+                          style: GoogleFonts.krub(
+                              textStyle: TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16))),
                       SizedBox(height: 5),
-                      Text("Municipio: ${secondDato.nombreMunicipio}"),
-                      Text("Estación: ${secondDato.nombreEstacion}"),
-                      Text("Tipo de Estación: ${secondDato.tipoEstacion}"),
-                      Text("COD Estación: ${secondDato.codTipoEstacion}"),
+                      Text("Municipio: ${secondDato.nombreMunicipio}",
+                          style: GoogleFonts.fredoka(
+                              textStyle: TextStyle(
+                            color: Color.fromARGB(255, 0, 7, 40),
+                            fontSize: 15,
+                          ))),
+                      Text("Estación: ${secondDato.nombreEstacion}",
+                          style: GoogleFonts.fredoka(
+                              textStyle: TextStyle(
+                            color: Color.fromARGB(255, 0, 7, 40),
+                            fontSize: 15,
+                          ))),
+                      Text("Tipo de Estación: ${secondDato.tipoEstacion}",
+                          style: GoogleFonts.fredoka(
+                              textStyle: TextStyle(
+                            color: Color.fromARGB(255, 0, 7, 40),
+                            fontSize: 15,
+                          ))),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
@@ -272,14 +423,14 @@ class _ListaUsuarioEstacionScreenState
                               );
                             }),
                           );
-                        }
-                        else{
+                        } else {
                           Navigator.of(context).pop(); // Cierra el diálogo
                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) {
                               return ChangeNotifierProvider(
-                                create: (context) => EstacionHidrologicaService(),
+                                create: (context) =>
+                                    EstacionHidrologicaService(),
                                 child: ListaEstacionHidrologicaScreen(
                                   idUsuario: dato.idUsuario,
                                   nombreMunicipio: dato.nombreMunicipio,
@@ -289,7 +440,6 @@ class _ListaUsuarioEstacionScreenState
                                   telefono: dato.telefono,
                                   idEstacion: dato.idEstacion,
                                   codTipoEstacion: dato.codTipoEstacion,
-        
                                 ),
                               );
                             }),
@@ -323,203 +473,6 @@ class _ListaUsuarioEstacionScreenState
           ),
         );
       },
-    );
-  }
-
-  Future<Widget> crear(UsuarioEstacion elem) async {
-    String h = await _datosService2.saveUsuario(elem);
-    print("a");
-    return AlertDialog(
-      title: const Text('Título del Alerta'),
-      actions: <Widget>[
-        TextButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-            setState(() {
-              _cargarUsuarioEstacion();
-            });
-          },
-          child: const Text('Aceptar'),
-        ),
-      ],
-    );
-  }
-
-  final _formKey = GlobalKey<FormState>();
-  late int _idUsuario;
-  late String _nombreMunicipio;
-  late String _nombreEstacion;
-  late String _tipoEstacion;
-  late String _nombreCompleto;
-  late String _telefono;
-  late int _idEstacion;
-  late bool _codTipoEstacion;
-
-  Widget formUsuarioEstacion() {
-    return Form(
-      key: _formKey,
-      child: Column(
-        children: <Widget>[
-          Row(
-            children: [
-              Expanded(
-                child: MyTextField(
-                  labelText: 'Municipio',
-                  hintText: 'Municipio',
-                  prefixIcon: Icons.person,
-                  onSaved: (value) {
-                    _nombreMunicipio = value!;
-                  },
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: MyTextField(
-                  labelText: 'Estacion',
-                  hintText: 'Estacion',
-                  prefixIcon: Icons.person,
-                  onSaved: (value) {
-                    _nombreEstacion = value!;
-                  },
-                ),
-              ),
-            ],
-          ),
-          Row(
-            children: [
-              const SizedBox(width: 10),
-              Expanded(
-                child: MyTextField(
-                  labelText: 'Tipo estacion',
-                  hintText: 'Tipo estacion',
-                  prefixIcon: Icons.person,
-                  onSaved: (value) {
-                    _tipoEstacion = value!;
-                  },
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: MyTextField(
-                  labelText: 'Nombre',
-                  hintText: 'Nombre',
-                  prefixIcon: Icons.person,
-                  onSaved: (value) {
-                    _nombreCompleto = value!;
-                  },
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: () {
-              if (_formKey.currentState!.validate()) {
-                _formKey.currentState!.save();
-                UsuarioEstacion nuevoDato = UsuarioEstacion(
-                    idUsuario: _idUsuario,
-                    nombreMunicipio: _nombreMunicipio,
-                    nombreEstacion: _nombreEstacion,
-                    tipoEstacion: _tipoEstacion,
-                    nombreCompleto: _nombreCompleto,
-                    telefono: _telefono,
-                    idEstacion: _idEstacion,
-                    codTipoEstacion: _codTipoEstacion);
-                print(nuevoDato.toStringUsuarioEstacion());
-
-                crear(nuevoDato).then((alertDialog) {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return alertDialog;
-                    },
-                  );
-                });
-              }
-            },
-            child: const Text('Guardar datos'),
-            style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.all<Color>(Colors.green),
-              foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
-              shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
-              ),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) {
-                  return ChangeNotifierProvider(
-                    create: (context) => EstacionService(),
-                  );
-                }),
-              );
-            },
-            child: const Text('Datos estacion'),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class MyTextField extends StatelessWidget {
-  final String? labelText;
-  final String? hintText;
-  final IconData? prefixIcon;
-  final void Function(String?)? onSaved;
-
-  const MyTextField({
-    Key? key,
-    this.labelText,
-    this.hintText,
-    this.prefixIcon,
-    this.onSaved,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return TextFormField(
-      decoration: InputDecoration(
-        filled: true,
-        fillColor: Color.fromARGB(255, 225, 255, 246), // Color de fondo
-        hintText: hintText, // Texto de sugerencia
-        hintStyle: const TextStyle(
-            color: Color.fromARGB(
-                255, 180, 255, 231)), // Estilo del texto de sugerencia
-        labelText: labelText, // Etiqueta del campo
-        labelStyle:
-            const TextStyle(color: Colors.blue), // Estilo de la etiqueta
-        prefixIcon: Icon(
-          prefixIcon,
-          color: Color.fromARGB(255, 97, 173, 255),
-        ), // Icono al inicio del campo
-        border: OutlineInputBorder(
-          // Borde del campo
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide.none, // Sin bordes visibles
-        ),
-        enabledBorder: OutlineInputBorder(
-          // Borde cuando el campo está habilitado pero no seleccionado
-          borderRadius: BorderRadius.circular(10),
-          borderSide:
-              const BorderSide(color: Colors.blue, width: 2), // Bordes azules
-        ),
-        focusedBorder: OutlineInputBorder(
-          // Borde cuando el campo está seleccionado
-          borderRadius: BorderRadius.circular(10),
-          borderSide:
-              const BorderSide(color: Colors.blue, width: 2), // Bordes azules
-        ),
-      ),
-      // onSaved: (value) {
-      //   _labelText = value!;
-      // },
-      onSaved: onSaved,
     );
   }
 }

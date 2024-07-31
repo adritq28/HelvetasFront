@@ -236,15 +236,14 @@ class _ListaInvitadoHidrologicaScreenState
                               Text(
                                 '| Municipio de: ${widget.nombreMunicipio}',
                                 style: const TextStyle(
-                                  fontSize: 15,
+                                  fontSize: 12,
                                   color: Color.fromARGB(208, 255, 255, 255),
-                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
                               Text(
                                 '| Estación Hidrológica: ${widget.nombreEstacion}',
                                 style: const TextStyle(
-                                  fontSize: 15,
+                                  fontSize: 12,
                                   color: Color.fromARGB(208, 255, 255, 255),
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -311,7 +310,13 @@ class _ListaInvitadoHidrologicaScreenState
                           ),
                         ),
                         style: TextButton.styleFrom(
-                          backgroundColor: Color.fromARGB(255, 142, 146, 143),
+                          backgroundColor: Color(0xFF58D68D), // Color plomo
+                          shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.circular(8.0), // Border radius
+                          ),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 16.0, vertical: 8.0),
                         ),
                       ),
                     ],
@@ -367,8 +372,9 @@ class _ListaInvitadoHidrologicaScreenState
                             ),
                           ),
                         ),
+                  // Añadido Footer aquí
                   const SizedBox(height: 20),
-                  Footer(), // Añadido Footer aquí
+                  Footer(),
                 ],
               ),
             ),
@@ -391,7 +397,7 @@ class Footer extends StatelessWidget {
           style: GoogleFonts.convergence(
             textStyle: TextStyle(
               color: Color.fromARGB(255, 237, 237, 239), // Color del texto
-              fontSize: 16.0, // Tamaño de la fuente
+              fontSize: 11.0, // Tamaño de la fuente
               //fontWeight: FontWeight.bold,
             ),
           ),

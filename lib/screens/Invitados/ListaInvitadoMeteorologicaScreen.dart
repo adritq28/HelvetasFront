@@ -241,16 +241,16 @@ class _ListaInvitadoMeteorologicaScreenState
                               Text('| Municipio de: ${widget.nombreMunicipio}',
                                   style: GoogleFonts.lexend(
                                       textStyle: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                  ))),
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 12))),
                               Text(
                                   '| Estación Meteorológica: ${widget.nombreEstacion}',
                                   style: GoogleFonts.lexend(
                                       textStyle: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                  ))),
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 12))),
                             ],
                           ),
                         ),
@@ -315,14 +315,14 @@ class _ListaInvitadoMeteorologicaScreenState
                           ),
                         ),
                         style: TextButton.styleFrom(
-                              backgroundColor: Color(0xFF58D68D ), // Color plomo
-                              shape: RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.circular(8.0), // Border radius
-                              ),
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 16.0, vertical: 8.0),
-                            ),
+                          backgroundColor: Color(0xFF58D68D), // Color plomo
+                          shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.circular(8.0), // Border radius
+                          ),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 16.0, vertical: 8.0),
+                        ),
                       ),
                       const SizedBox(width: 5),
                       TextButton.icon(
@@ -681,11 +681,36 @@ class _ListaInvitadoMeteorologicaScreenState
                                   ),
                                 ),
                         ),
+                  const SizedBox(height: 20),
+                  Footer(),
                 ],
               ),
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class Footer extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(16.0),
+      //color: Color.fromARGB(35, 20, 19, 19), // Color de fondo del footer
+      child: Center(
+        child: Text(
+          '@Pachatatiña 2024 | HELVETAS | EUROCLIMA',
+          style: GoogleFonts.convergence(
+            textStyle: TextStyle(
+              color: Color.fromARGB(255, 237, 237, 239), // Color del texto
+              fontSize: 11.0, // Tamaño de la fuente
+              //fontWeight: FontWeight.bold,
+            ),
+          ),
+          textAlign: TextAlign.center, // Centra el texto
+        ),
       ),
     );
   }
