@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:helvetasfront/model/Promotor.dart';
 import 'package:helvetasfront/screens/OpcionZonaScreen.dart';
 import 'package:helvetasfront/services/EstacionService.dart';
@@ -16,6 +17,8 @@ class _PromotorScreenState extends State<PromotorScreen> {
   final EstacionService _datosService3 = EstacionService();
   late PromotorService miModelo4;
   late List<Promotor> _Promotor = [];
+  late List<String> _municipios = []; // Lista de municipios
+  String? _selectedMunicipio;
 
   @override
   void initState() {
@@ -30,31 +33,142 @@ class _PromotorScreenState extends State<PromotorScreen> {
       List<Promotor> a = miModelo4.lista11;
       setState(() {
         _Promotor = a;
+        _municipios = a.map((e) => e.nombreMunicipio).toSet().toList();
+      
       });
     } catch (e) {
       print('Error al cargar los datossss: $e');
     }
   }
   
-  @override
+   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Color(0xFF164092),
-        title: Text(
-          'Observadores Meteorologicos e Hidrologicos',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-          ),
-        ),
-      ),
-      body: Column(
+      body: Stack(
         children: [
-          Expanded(
-            child: Container(
-              margin: const EdgeInsets.all(10.0),
-              child: op2(context),
+          // Imagen de fondo
+          Positioned.fill(
+            child: Image.asset(
+              'images/fondo.jpg', // Cambia esto por la ruta de tu imagen
+              fit: BoxFit.cover,
+            ),
+          ),
+          // Contenido de la pantalla
+          Padding(
+            padding: const EdgeInsets.all(0.0),
+            child: Column(
+              children: [
+                SizedBox(height: 15),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    InkWell(
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Icon(
+                        Icons.arrow_back_ios_new,
+                        color: Color.fromARGB(255, 255, 255, 255),
+                        size: 25,
+                      ),
+                    ),
+                    const Icon(
+                      Icons.more_vert,
+                      color: Color.fromARGB(255, 255, 255, 255),
+                      size: 28,
+                    ),
+                  ],
+                ),
+                SizedBox(height: 10),
+                Container(
+                  height: 70,
+                  color: Color.fromARGB(
+                      91, 4, 18, 43), // Fondo negro con 20% de opacidad
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(width: 15),
+                      Flexible(
+                        child: Wrap(
+                          alignment: WrapAlignment.start,
+                          spacing: 10.0,
+                          runSpacing: 5.0,
+                          children: [
+                            Text(
+                              'OBSERVADORES METEOROLOGICOS E HIDROLOGICOS',
+                              style: GoogleFonts.kulimPark(
+                                textStyle: TextStyle(
+                                  color: Color.fromARGB(
+                                      255, 243, 243, 243), // Color del texto
+                                  fontSize:
+                                      13.0, // Tamaño de la fuente mayor para el título
+                                  fontWeight:
+                                      FontWeight.bold, // Negrita para el título
+                                ),
+                              ),
+                              textAlign: TextAlign
+                                  .left, // Alineación del texto a la izquierda
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 15),
+                Text(
+                  'MUNICIPIOS: ',
+                  style: GoogleFonts.kulimPark(
+                    textStyle: TextStyle(
+                      color:
+                          Color.fromARGB(255, 239, 239, 240), // Color del texto
+                      fontSize: 15.0,
+                      fontWeight: FontWeight.bold, // Tamaño de la fuente
+                      //fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                DropdownButton<String>(
+                  hint: Text(
+                    "Seleccione un Municipio",
+                    style: GoogleFonts.convergence(
+                      textStyle: TextStyle(
+                        color: Color.fromARGB(
+                            255, 255, 255, 255), // Color del texto
+                        fontSize: 15.0, // Tamaño de la fuente
+                        //fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  value: _selectedMunicipio,
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      _selectedMunicipio = newValue;
+                    });
+                  },
+                  items:
+                      _municipios.map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value,
+                          style: GoogleFonts.convergence(
+                            textStyle: TextStyle(
+                              color: Color.fromARGB(
+                                  255, 8, 8, 114), // Color del texto
+                              fontSize: 15.0, // Tamaño de la fuente
+                              //fontWeight: FontWeight.bold,
+                            ),
+                          )),
+                    );
+                  }).toList(),
+                ),
+                Expanded(
+                  child: Container(
+                    margin: const EdgeInsets.all(10.0),
+                    child: op2(context),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -63,15 +177,20 @@ class _PromotorScreenState extends State<PromotorScreen> {
   }
 
   Widget op2(BuildContext context) {
+    List<Promotor> usuariosFiltrados = _selectedMunicipio == null
+        ? _Promotor
+        : _Promotor
+            .where((u) => u.nombreMunicipio == _selectedMunicipio)
+            .toList();
     return ListView.builder(
-      itemCount: (miModelo4.lista11.length / 2).ceil(),
+      itemCount: (usuariosFiltrados.length / 2).ceil(),
       itemBuilder: (context, index) {
         int firstIndex = index * 2;
         int secondIndex = firstIndex + 1;
 
-        var firstDato = miModelo4.lista11[firstIndex];
-        var secondDato = secondIndex < miModelo4.lista11.length
-            ? miModelo4.lista11[secondIndex]
+        var firstDato = usuariosFiltrados[firstIndex];
+        var secondDato = secondIndex < usuariosFiltrados.length
+            ? usuariosFiltrados[secondIndex]
             : null;
 
         return Row(
@@ -107,8 +226,7 @@ class _PromotorScreenState extends State<PromotorScreen> {
                     ),
                     SizedBox(height: 5),
                     Text("Municipio: ${firstDato.nombreMunicipio}"),
-                    Text("Zona: ${firstDato.nombreZona}"),
-                    Text("ID: ${firstDato.idZona}"),
+                    Text("ID Municipio: ${firstDato.idMunicipio}"),
                     //Text("ID: ${firstDato.idCultivo}"),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
@@ -160,8 +278,7 @@ class _PromotorScreenState extends State<PromotorScreen> {
                       ),
                       SizedBox(height: 5),
                       Text("Municipio: ${secondDato.nombreMunicipio}"),
-                      Text("Zona: ${secondDato.nombreZona}"),
-                      Text("ID: ${secondDato.idZona}"),
+                    Text("ID Municipio: ${secondDato.idMunicipio}"),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [

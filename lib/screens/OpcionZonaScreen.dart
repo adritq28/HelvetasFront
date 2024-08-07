@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:helvetasfront/model/Promotor.dart';
 import 'package:helvetasfront/screens/Promotor/FormFechaSiembra.dart';
 import 'package:helvetasfront/screens/Promotor/FormPronostico.dart';
@@ -64,17 +65,117 @@ class _OpcionZonaScreenState extends State<OpcionZonaScreen> {
     }
   }
 
+  // void _mostrarModal(Promotor promotor) {
+  //   showModalBottomSheet(
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       return Container(
+  //         padding: EdgeInsets.all(20),
+  //         child: Column(
+  //           mainAxisSize: MainAxisSize.min,
+  //           children: [
+  //             ElevatedButton(
+  //               onPressed: () {
+  //                 Navigator.pop(context); // Cerrar el modal
+  //                 Navigator.push(
+  //                   context,
+  //                   MaterialPageRoute(builder: (context) {
+  //                     return ChangeNotifierProvider(
+  //                       create: (context) => PromotorService(),
+  //                       child: FormFechaSiembra(
+  //                         idUsuario: promotor.idUsuario,
+  //                         idZona: promotor.idZona,
+  //                         nombreZona: promotor.nombreZona ?? '',
+  //                         nombreMunicipio: promotor.nombreMunicipio ?? '',
+  //                         nombreCompleto: promotor.nombreCompleto ?? '',
+  //                         telefono: promotor.telefono ?? '',
+  //                         idCultivo: promotor.idCultivo ?? 0,
+  //                         nombreCultivo: promotor.nombreCultivo ?? '',
+  //                         tipo: promotor.tipo ?? '',
+  //                       ),
+  //                     );
+  //                   }),
+  //                 );
+  //               },
+  //               child: Text('Registro de Fecha Siembra'),
+  //             ),
+  //             SizedBox(height: 10),
+  //             ElevatedButton(
+  //               onPressed: () {
+  //                 Navigator.pop(context); // Cerrar el modal
+  //                 Navigator.push(
+  //                   context,
+  //                   MaterialPageRoute(builder: (context) {
+  //                     return ChangeNotifierProvider(
+  //                       create: (context) => PronosticoService(),
+  //                       child: FormPronostico(
+  //                         idUsuario: promotor.idUsuario,
+  //                         idZona: promotor.idZona,
+  //                         nombreZona: promotor.nombreZona ?? '',
+  //                         nombreMunicipio: promotor.nombreMunicipio ?? '',
+  //                         nombreCompleto: promotor.nombreCompleto ?? '',
+  //                         telefono: promotor.telefono ?? '',
+  //                       ),
+  //                     );
+  //                   }),
+  //                 );
+  //               },
+  //               child: Text('Registro de Pronóstico Decenal'),
+  //             ),
+  //           ],
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
   void _mostrarModal(Promotor promotor) {
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
       builder: (BuildContext context) {
-        return Container(
-          padding: EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ElevatedButton(
-                onPressed: () {
+        return GestureDetector(
+          onTap: () => Navigator.of(context)
+              .pop(), // Cierra el modal al hacer clic fuera de él
+          child: Center(
+            child: GestureDetector(
+              onTap:
+                  () {}, // Para evitar que los clics en el contenido cierren el modal
+              child: SingleChildScrollView(
+                child: Container(
+                  padding: EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Color.fromARGB(226, 255, 255, 255),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  width: MediaQuery.of(context).size.width *
+                      0.8, // Ajuste de ancho
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Opciones',
+                            style: GoogleFonts.lexend(
+                              textStyle: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Color.fromARGB(255, 9, 64, 142),
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.close),
+                            onPressed: () => Navigator.of(context).pop(),
+                            color: Colors.black,
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: () {
                   Navigator.pop(context); // Cerrar el modal
                   Navigator.push(
                     context,
@@ -96,11 +197,39 @@ class _OpcionZonaScreenState extends State<OpcionZonaScreen> {
                     }),
                   );
                 },
-                child: Text('Registro de Fecha Siembra'),
-              ),
-              SizedBox(height: 10),
-              ElevatedButton(
-                onPressed: () {
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.grey, // Color de fondo plomo
+                          shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.circular(10), // Bordes redondeados
+                          ),
+                          padding: EdgeInsets.symmetric(
+                              vertical: 20, horizontal: 20), // Ajuste de tamaño
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.location_on,
+                                color: Colors.white), // Icono
+                            SizedBox(width: 10), // Espacio entre icono y texto
+                            Flexible(
+                              child: Text(
+                                'Registro Fecha Siembra',
+                                style: GoogleFonts.lexend(
+                                  textStyle: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      ElevatedButton(
+                        onPressed: () {
                   Navigator.pop(context); // Cerrar el modal
                   Navigator.push(
                     context,
@@ -119,9 +248,40 @@ class _OpcionZonaScreenState extends State<OpcionZonaScreen> {
                     }),
                   );
                 },
-                child: Text('Registro de Pronóstico Decenal'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green, // Color de fondo verde
+                          shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.circular(10), // Bordes redondeados
+                          ),
+                          padding: EdgeInsets.symmetric(
+                              vertical: 20, horizontal: 20), // Ajuste de tamaño
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.wb_sunny, color: Colors.white), // Icono
+                            SizedBox(width: 10), // Espacio entre icono y texto
+                            Flexible(
+                              child: Text(
+                                'Registro Pronostico Decenal',
+                                style: GoogleFonts.lexend(
+                                  textStyle: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-            ],
+            ),
           ),
         );
       },

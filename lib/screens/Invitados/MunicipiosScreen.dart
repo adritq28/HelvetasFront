@@ -38,151 +38,156 @@ class _MunicipiosScreenState extends State<MunicipiosScreen> {
       print('Error al cargar los datos: $e');
     }
   }
+  
 
   void _mostrarModal(int idMunicipio, String nombreMunicipio) {
-  showModalBottomSheet(
-    context: context,
-    isScrollControlled: true,
-    backgroundColor: Colors.transparent,
-    builder: (BuildContext context) {
-      return GestureDetector(
-        onTap: () => Navigator.of(context).pop(), // Cierra el modal al hacer clic fuera de él
-        child: Center(
-          child: GestureDetector(
-            onTap: () {}, // Para evitar que los clics en el contenido cierren el modal
-            child: SingleChildScrollView(
-              child: Container(
-                padding: EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Color.fromARGB(226, 255, 255, 255),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                width: MediaQuery.of(context).size.width * 0.8, // Ajuste de ancho
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Opciones',
-                          style: GoogleFonts.lexend(
-                            textStyle: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Color.fromARGB(255, 9, 64, 142),
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return GestureDetector(
+          onTap: () => Navigator.of(context)
+              .pop(), // Cierra el modal al hacer clic fuera de él
+          child: Center(
+            child: GestureDetector(
+              onTap:
+                  () {}, // Para evitar que los clics en el contenido cierren el modal
+              child: SingleChildScrollView(
+                child: Container(
+                  padding: EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Color.fromARGB(226, 255, 255, 255),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  width: MediaQuery.of(context).size.width *
+                      0.8, // Ajuste de ancho
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Opciones',
+                            style: GoogleFonts.lexend(
+                              textStyle: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Color.fromARGB(255, 9, 64, 142),
+                              ),
                             ),
                           ),
-                        ),
-                        IconButton(
-                          icon: Icon(Icons.close),
-                          onPressed: () => Navigator.of(context).pop(),
-                          color: Colors.black,
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context); // Cerrar el modal
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) {
-                            return ChangeNotifierProvider(
-                              create: (context) => EstacionService(),
-                              child: EstacionScreen(
-                                idMunicipio: idMunicipio,
-                                nombreMunicipio: nombreMunicipio,
-                              ),
-                            );
-                          }),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.grey, // Color de fondo plomo
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10), // Bordes redondeados
-                        ),
-                        padding: EdgeInsets.symmetric(
-                            vertical: 20, horizontal: 20), // Ajuste de tamaño
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.location_on, color: Colors.white), // Icono
-                          SizedBox(width: 10), // Espacio entre icono y texto
-                          Flexible(
-                            child: Text(
-                              'Estaciones Hidrometeorologicas',
-                              style: GoogleFonts.lexend(
-                                textStyle: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
+                          IconButton(
+                            icon: Icon(Icons.close),
+                            onPressed: () => Navigator.of(context).pop(),
+                            color: Colors.black,
                           ),
                         ],
                       ),
-                    ),
-                    SizedBox(height: 10),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context); // Cerrar el modal
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) {
-                            return ChangeNotifierProvider(
-                              create: (context) => MunicipioService(),
-                              child: ZonasScreen(
-                                idMunicipio: idMunicipio,
-                                nombreMunicipio: nombreMunicipio,
-                              ),
-                            );
-                          }),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green, // Color de fondo verde
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10), // Bordes redondeados
-                        ),
-                        padding: EdgeInsets.symmetric(
-                            vertical: 20, horizontal: 20), // Ajuste de tamaño
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.wb_sunny, color: Colors.white), // Icono
-                          SizedBox(width: 10), // Espacio entre icono y texto
-                          Flexible(
-                            child: Text(
-                              'Pronostico Agrometeorologico',
-                              style: GoogleFonts.lexend(
-                                textStyle: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
+                      SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context); // Cerrar el modal
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) {
+                              return ChangeNotifierProvider(
+                                create: (context) => EstacionService(),
+                                child: EstacionScreen(
+                                  idMunicipio: idMunicipio,
+                                  nombreMunicipio: nombreMunicipio,
                                 ),
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
+                              );
+                            }),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.grey, // Color de fondo plomo
+                          shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.circular(10), // Bordes redondeados
                           ),
-                        ],
+                          padding: EdgeInsets.symmetric(
+                              vertical: 20, horizontal: 20), // Ajuste de tamaño
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.location_on,
+                                color: Colors.white), // Icono
+                            SizedBox(width: 10), // Espacio entre icono y texto
+                            Flexible(
+                              child: Text(
+                                'Estaciones Hidrometeorologicas',
+                                style: GoogleFonts.lexend(
+                                  textStyle: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                      SizedBox(height: 10),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context); // Cerrar el modal
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) {
+                              return ChangeNotifierProvider(
+                                create: (context) => MunicipioService(),
+                                child: ZonasScreen(
+                                  idMunicipio: idMunicipio,
+                                  nombreMunicipio: nombreMunicipio,
+                                ),
+                              );
+                            }),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green, // Color de fondo verde
+                          shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.circular(10), // Bordes redondeados
+                          ),
+                          padding: EdgeInsets.symmetric(
+                              vertical: 20, horizontal: 20), // Ajuste de tamaño
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.wb_sunny, color: Colors.white), // Icono
+                            SizedBox(width: 10), // Espacio entre icono y texto
+                            Flexible(
+                              child: Text(
+                                'Pronostico Agrometeorologico',
+                                style: GoogleFonts.lexend(
+                                  textStyle: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-      );
-    },
-  );
-}
-
-  
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -368,4 +373,3 @@ class Footer extends StatelessWidget {
     );
   }
 }
-

@@ -1,9 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:helvetasfront/model/DatosPronostico.dart';
 import 'package:helvetasfront/model/Fenologia.dart';
-import 'package:helvetasfront/screens/TimeLineEvent.dart';
+import 'package:helvetasfront/model/HistFechaSiembra.dart';
 import 'package:helvetasfront/services/FenologiaService.dart';
+import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -32,13 +35,30 @@ class _PronosticoAgrometeorologicoState
   late Future<List> _futurePronosticoCultivo;
   late Future<List<Map<String, dynamic>>> _futurePcpnFase;
 
+  List<HistFechaSiembra> _fechasSiembra = [];
+  HistFechaSiembra? _selectedFechaSiembra;
+
   @override
   void initState() {
     super.initState();
     miModelo5 = Provider.of<FenologiaService>(context, listen: false);
     _cargarFenologia();
-    //fetchAlertas();
-    //_alertas();
+    _fetchFechasSiembra();
+  }
+
+  Future<void> _fetchFechasSiembra() async {
+    final response = await http.get(
+        Uri.parse('http://localhost:8080/cultivos/fechas/${widget.idCultivo}'));
+
+    if (response.statusCode == 200) {
+      List<dynamic> data = json.decode(response.body);
+      setState(() {
+        _fechasSiembra =
+            data.map((json) => HistFechaSiembra.fromJson(json)).toList();
+      });
+    } else {
+      // Manejar error
+    }
   }
 
   Future<void> _cargarFenologia() async {
@@ -76,8 +96,7 @@ class _PronosticoAgrometeorologicoState
                 ),
               );
             }
-
-            final timelineEvents = generateTimeline(miModelo5.lista11);
+            //final timelineEvents = generateTimeline(miModelo5.lista11);
             return SingleChildScrollView(
               child: Column(
                 children: [
@@ -157,6 +176,35 @@ class _PronosticoAgrometeorologicoState
                     ),
                   ),
                   const SizedBox(height: 10),
+                  Text(
+                    'SELECCIONE FECHAS: ',
+                    style: GoogleFonts.kulimPark(
+                      textStyle: TextStyle(
+                        color: Color.fromARGB(
+                            255, 239, 239, 240), // Color del texto
+                        fontSize: 15.0,
+                        fontWeight: FontWeight.bold, // Tamaño de la fuente
+                        //fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  DropdownButton<HistFechaSiembra>(
+                    hint: Text('Seleccionar Fecha de Siembra'),
+                    value: _selectedFechaSiembra,
+                    onChanged: (HistFechaSiembra? nuevaFecha) {
+                      setState(() {
+                        _selectedFechaSiembra = nuevaFecha;
+                        // Aquí puedes actualizar la fecha de siembra en tu UI
+                        // y recalcular la fecha acumulada si es necesario
+                      });
+                    },
+                    items: _fechasSiembra.map((HistFechaSiembra fecha) {
+                      return DropdownMenuItem<HistFechaSiembra>(
+                        value: fecha,
+                        child: Text('${fecha.fechaSiembra.toLocal()}'),
+                      );
+                    }).toList(),
+                  ),
                   Container(
                     width: double
                         .infinity, // Asegura que el contenedor ocupe todo el ancho disponible
@@ -338,10 +386,6 @@ class _PronosticoAgrometeorologicoState
                       }
                     },
                   ),
-                  // SingleChildScrollView(
-                  //   scrollDirection: Axis.horizontal,
-                  //   child: tablaDatosInvertida2(miModelo5.lista112),
-                  // ),
                   const SizedBox(height: 10),
                   Container(
                     width: double
@@ -370,176 +414,135 @@ class _PronosticoAgrometeorologicoState
                     ),
                   ),
                   Align(
-                    alignment: Alignment.center,
-                    child: Builder(
-                      builder: (context) {
-                        final ScrollController scrollController =
-                            ScrollController();
-                        return Scrollbar(
-                          controller: scrollController,
-                          thumbVisibility:
-                              true, // Muestra la barra de desplazamiento siempre
-                          child: SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            controller: scrollController,
-                            child: Row(
-                              children: [
-                                ...miModelo5.lista11
-                                    .asMap()
-                                    .entries
-                                    .map((entry) {
-                                  int index = entry.key;
-                                  var dato = entry.value;
-
-                                  // La primera fase muestra la fecha de siembra sin sumar días
-                                  DateTime fechaAcumulado;
-                                  if (index == 0) {
-                                    fechaAcumulado = dato.fechaSiembra;
-                                  } else {
-                                    // Fases posteriores muestran las fechas acumuladas
-                                    fechaAcumulado =
-                                        miModelo5.lista11[0].fechaSiembra;
-                                    for (int i = 0; i < index; i++) {
-                                      fechaAcumulado = fechaAcumulado.add(
-                                        Duration(
-                                            days: miModelo5.lista11[i].nroDias),
-                                      );
-                                    }
-                                  }
-
-                                  return Container(
-                                    margin: const EdgeInsets.symmetric(
-                                        vertical: 10, horizontal: 10),
-                                    padding: const EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                      color: Color.fromARGB(255, 255, 255, 255),
-                                      borderRadius: BorderRadius.circular(10),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black26,
-                                          blurRadius: 5,
-                                          offset: Offset(0, 5),
-                                        ),
-                                      ],
-                                    ),
-                                    width:
-                                        200, // Ajustar el ancho para hacer las tarjetas más angostas
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        SizedBox(height: 10),
-                                        Center(
-                                          child: Image.asset(
-                                            'images/${dato.imagen}', // Construir la ruta completa usando el nombre de la imagen de la base de datos
-                                            width: 90,
-                                            height: 120,
-                                            fit: BoxFit.cover,
-                                          ),
-                                        ),
-                                        SizedBox(height: 10),
-                                        Center(
-                                          child: Text(
-                                            '${dato.descripcion}',
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold, fontSize: 18),
-                                          ),
-                                        ),
-                                        SizedBox(height: 5),
-                                        Text(
-                                          'Nro Dias: ${dato.nroDias}',
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                          textAlign: TextAlign.center,
-                                        ),
-                                        Text(
-                                          'Fase: ${dato.fase}',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                        Text(
-                                          '${formatearFecha(fechaAcumulado)}',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                        SizedBox(height: 10),
-                                      ],
-                                    ),
-                                  );
-                                }).toList(),
-                                // Agrega una tarjeta adicional para la última fecha acumulada
-                                Container(
-                                  margin: const EdgeInsets.symmetric(
-                                      vertical: 10, horizontal: 10),
-                                  padding: const EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(10),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black26,
-                                        blurRadius: 5,
-                                        offset: Offset(0, 5),
-                                      ),
-                                    ],
-                                  ),
-                                  width:
-                                      200, // Ajustar el ancho para hacer las tarjetas más angostas
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Center(
-                                        child: Image.asset(
-                                          "images/6.jpg",
-                                          width: 90,
-                                          height: 120,
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                      SizedBox(height: 5),
-                                      Center(
-                                        child: Text(
-                                          'Fase Final',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                      ),
-                                      Text(
-                                        '${formatearFecha(miModelo5.lista11.last.fechaSiembra.add(Duration(days: miModelo5.lista11.map((dato) => dato.nroDias).reduce((a, b) => a + b))))}',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                      SizedBox(height: 10),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    ),
+  alignment: Alignment.center,
+  child: Builder(
+    builder: (context) {
+      final ScrollController scrollController = ScrollController();
+      return Scrollbar(
+        controller: scrollController,
+        thumbVisibility: true, // Muestra la barra de desplazamiento siempre
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          controller: scrollController,
+          child: Row(
+            children: [
+              ...miModelo5.lista11.asMap().entries.map((entry) {
+                int index = entry.key;
+                var dato = entry.value;
+                // La primera fase muestra la fecha de siembra sin sumar días
+                DateTime fechaAcumulado;
+                if (index == 0) {
+                  fechaAcumulado = _selectedFechaSiembra?.fechaSiembra ?? dato.fechaSiembra;
+                } else {
+                  fechaAcumulado = (_selectedFechaSiembra?.fechaSiembra ?? miModelo5.lista11[0].fechaSiembra).add(
+                    Duration(days: miModelo5.lista11.sublist(0, index).map((dato) => dato.nroDias).reduce((a, b) => a + b)),
+                  );
+                }
+                return Container(
+                  margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: Color.fromARGB(255, 255, 255, 255),
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 5,
+                        offset: Offset(0, 5),
+                      ),
+                    ],
                   ),
-
-                  //SizedBox(height: 10),
-                  // Center(
-                  //   child: Padding(
-                  //     padding:
-                  //         const EdgeInsets.all(16.0), // Margen en los bordes
-                  //     child: Container(
-                  //       decoration: BoxDecoration(
-                  //         border:
-                  //             Border.all(color: Colors.grey), // Borde opcional
-                  //         borderRadius: BorderRadius.circular(
-                  //             10), // Borde redondeado opcional
-                  //       ),
-                  //       child: HorizontalTimeline(events: timelineEvents),
-                  //     ),
-                  //   ),
-                  // ),
-
+                  width: 200, // Ajustar el ancho para hacer las tarjetas más angostas
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: 10),
+                      Center(
+                        child: Image.asset(
+                          'images/${dato.imagen}', // Construir la ruta completa usando el nombre de la imagen de la base de datos
+                          width: 90,
+                          height: 120,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      Center(
+                        child: Text(
+                          '${dato.descripcion}',
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                        ),
+                      ),
+                      SizedBox(height: 5),
+                      Text(
+                        'Nro Dias: ${dato.nroDias}',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.center,
+                      ),
+                      Text(
+                        'Fase: ${dato.fase}',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        '${formatearFecha(fechaAcumulado)}',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(height: 10),
+                    ],
+                  ),
+                );
+              }).toList(),
+              // Agrega una tarjeta adicional para la última fecha acumulada
+              Container(
+                margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black26,
+                      blurRadius: 5,
+                      offset: Offset(0, 5),
+                    ),
+                  ],
+                ),
+                width: 200, // Ajustar el ancho para hacer las tarjetas más angostas
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Image.asset( 
+                        "images/6.jpg",
+                        width: 90,
+                        height: 120,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    SizedBox(height: 5),
+                    Center(
+                      child: Text(
+                        'Fase Final',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    Text(
+                      '${formatearFecha((_selectedFechaSiembra?.fechaSiembra ?? miModelo5.lista11[0].fechaSiembra).add(
+                        Duration(days: miModelo5.lista11.map((dato) => dato.nroDias).reduce((a, b) => a + b))
+                      ))}',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 10),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  ),
+)
+,
                   const SizedBox(height: 10),
                   Container(
                     width: double
@@ -577,7 +580,6 @@ class _PronosticoAgrometeorologicoState
                         return Center(child: Text('No hay datos disponibles'));
                       } else {
                         final pcpnFaseList = snapshot.data!;
-
                         // Extraer datos
                         List<String> fases = pcpnFaseList
                             .map((e) => e['fase']?.toString() ?? '')
@@ -585,7 +587,6 @@ class _PronosticoAgrometeorologicoState
                         List<String> pcpnAcumuladas = pcpnFaseList
                             .map((e) => e['pcpnAcumulada']?.toString() ?? '')
                             .toList();
-
                         // Crear filas para el DataTable invertido
                         List<DataRow> rows = [];
                         for (int i = 0; i < fases.length; i++) {
@@ -606,7 +607,6 @@ class _PronosticoAgrometeorologicoState
                             ),
                           );
                         }
-
                         return SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           child: DataTable(
@@ -639,7 +639,6 @@ class _PronosticoAgrometeorologicoState
                       }
                     },
                   ),
-                  //const SizedBox(height: 25),
                   const SizedBox(height: 10),
                   Container(
                     width: double
@@ -670,7 +669,6 @@ class _PronosticoAgrometeorologicoState
                     scrollDirection: Axis.horizontal,
                     child: tablaDatosInvertida(miModelo5.lista11),
                   ),
-
                   const SizedBox(height: 20),
                   Footer(),
                 ],
@@ -928,45 +926,6 @@ class _PronosticoAgrometeorologicoState
       ),
     );
   }
-
-  List<TimelineEvent> generateTimeline(List<Fenologia> fenologiaList) {
-    List<TimelineEvent> timelineEvents = [];
-    if (fenologiaList.isEmpty) return timelineEvents;
-
-    DateTime fechaAcumulada = fenologiaList[0].fechaSiembra;
-    //String dias;
-    var aux = 1;
-    for (int i = 0; i < fenologiaList.length; i++) {
-      var dato = fenologiaList[i];
-
-      //dias = dato.nroDias.toString();
-      // Aquí decides qué imagen mostrar basada en tus datos
-      String imagenPath = 'images/$aux.jpg'; // Ejemplo de ruta de imagen
-
-      timelineEvents.add(TimelineEvent(
-          imagen: imagenPath,
-          fecha: fechaAcumulada,
-          title: 'FASE: ${dato.fase}',
-          description: dato.descripcion,
-          dias: 'Dias: ${dato.nroDias}'));
-
-      // Solo suma los días después de añadir el evento
-      if (i < fenologiaList.length - 1) {
-        fechaAcumulada = fechaAcumulada.add(Duration(days: dato.nroDias));
-      } else {
-        // Para el último elemento, asegurarse de que la fecha acumulada final incluya todos los días
-        fechaAcumulada = fechaAcumulada.add(Duration(days: dato.nroDias));
-        timelineEvents.add(TimelineEvent(
-            imagen: imagenPath,
-            fecha: fechaAcumulada,
-            title: 'FASE Final',
-            description: 'Fecha final',
-            dias: ' '));
-      }
-      aux++;
-    }
-    return timelineEvents;
-  }
 }
 
 class Footer extends StatelessWidget {
@@ -1018,8 +977,8 @@ Widget tarjetaPronostico(DatosPronostico datos) {
       side: BorderSide(color: Color.fromARGB(255, 156, 245, 219)),
     ),
     color: datos.pcpn > 0
-        ? Color.fromARGB(97, 160, 208, 247)
-        : Color.fromARGB(119, 255, 204, 128),
+        ? Color.fromARGB(119, 128, 253, 255)
+        : Color.fromARGB(119, 255, 251, 128),
     child: Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(

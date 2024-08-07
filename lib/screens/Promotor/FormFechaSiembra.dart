@@ -15,6 +15,7 @@ class FormFechaSiembra extends StatefulWidget {
   final int idCultivo;
   final String nombreCultivo;
   final String tipo;
+  
 
   FormFechaSiembra({
     required this.idUsuario,
@@ -37,6 +38,8 @@ class _FormFechaSiembraState extends State<FormFechaSiembra> {
   late DateTime _focusedDay;
   late DateTime _selectedDay;
   DateTime? _fechaSeleccionada;
+  
+  
 
   @override
   void initState() {
@@ -44,46 +47,50 @@ class _FormFechaSiembraState extends State<FormFechaSiembra> {
     _calendarFormat = CalendarFormat.month;
     _focusedDay = DateTime.now();
     _selectedDay = DateTime.now();
+   
   }
 
-  Future<void> guardarFechaSiembra() async {
-  if (_fechaSeleccionada != null) {
-    final formattedDate = DateFormat('yyyy-MM-dd').format(_fechaSeleccionada!);
-    final url = Uri.parse('http://localhost:8080/cultivos/${widget.idCultivo}/fecha-siembra?fechaSiembra=$formattedDate');
-    
-    final response = await http.put(
-      url,
-      headers: {  
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode({
-        'fechaSiembra': formattedDate,
-      }),
-    );
+  
 
-    if (response.statusCode == 200) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Fecha $formattedDate guardada correctamente'),
-        ),
+  Future<void> guardarFechaSiembra() async {
+    if (_fechaSeleccionada != null) {
+      final formattedDate =
+          DateFormat('yyyy-MM-dd').format(_fechaSeleccionada!);
+      final url = Uri.parse(
+          'http://localhost:8080/cultivos/${widget.idCultivo}/fecha-siembra?fechaSiembra=$formattedDate');
+
+      final response = await http.put(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'fechaSiembra': formattedDate,
+        }),
       );
+
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Fecha $formattedDate guardada correctamente'),
+          ),
+        );
+      } else {
+        print('Error ${response.statusCode}: ${response.body}');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error al guardar la fecha'),
+          ),
+        );
+      }
     } else {
-      print('Error ${response.statusCode}: ${response.body}');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Error al guardar la fecha'),
+          content: Text('Por favor selecciona una fecha primero'),
         ),
       );
     }
-  } else {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Por favor selecciona una fecha primero'),
-      ),
-    );
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -189,7 +196,11 @@ class _FormFechaSiembraState extends State<FormFechaSiembra> {
                   setState(() {
                     _selectedDay = selectedDay;
                     _focusedDay = focusedDay;
-                    _fechaSeleccionada = DateTime(selectedDay.year, selectedDay.month, selectedDay.day); // Asegurarse de que la fecha no tenga horas ni minutos
+                    _fechaSeleccionada = DateTime(
+                        selectedDay.year,
+                        selectedDay.month,
+                        selectedDay
+                            .day); // Asegurarse de que la fecha no tenga horas ni minutos
                   });
                 },
               ),
@@ -202,7 +213,10 @@ class _FormFechaSiembraState extends State<FormFechaSiembra> {
               ),
             SizedBox(height: 20),
             ElevatedButton(
-              onPressed: guardarFechaSiembra,
+              onPressed: () async {
+                await guardarFechaSiembra();
+                Navigator.pop(context, true);
+              },
               child: Text('Guardar Fecha'),
             ),
           ],

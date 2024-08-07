@@ -8,6 +8,7 @@ class Promotor {
   final int idCultivo;
   final String nombreCultivo;
   final String tipo;
+  final int idMunicipio;
 
   Promotor({
     required this.idUsuario,
@@ -19,6 +20,7 @@ class Promotor {
     required this.idCultivo,
     required this.nombreCultivo,
     required this.tipo,
+    required this.idMunicipio,
   });
 
   factory Promotor.fromJson(Map<String, dynamic> json) {
@@ -32,6 +34,7 @@ class Promotor {
       idCultivo: json['idCultivo']?? 0,
       nombreCultivo: json['nombreCultivo'] ?? 'N/A',
       tipo: json['tipo'] ?? 'N/A',
+      idMunicipio: json['idMunicipio']?? 0,
     );
   }
 
@@ -45,6 +48,7 @@ class Promotor {
         'idCultivo': idCultivo,
         'nombreCultivo': nombreCultivo,
         'tipo': tipo,
+        'idMunicipio': idMunicipio,
       };
 
   String toStringPromotor() {
@@ -66,6 +70,8 @@ class Promotor {
         nombreCultivo.toString() +
         ", tipo=" +
         tipo.toString() +
+        ", idMunicipio=" +
+        idMunicipio.toString() +
         "]";
   }
 }
